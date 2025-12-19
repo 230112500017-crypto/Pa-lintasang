@@ -83,9 +83,9 @@
 
                 <!-- Desktop Login & Mobile Toggle -->
                 <div class="flex items-center space-x-3">
-                    <button class="hidden sm:block bg-blue-900 text-white px-4 sm:px-5 py-2 rounded-full text-xs sm:text-sm font-semibold hover:bg-blue-800 transition">
-                        Login Portal
-                    </button>
+                    <a id="authLink" href="login.html" class="hidden sm:block bg-blue-900 text-white px-4 sm:px-5 py-2 rounded-full text-xs sm:text-sm font-semibold hover:bg-blue-800 transition">
+                        Login
+                    </a>
                     <!-- Mobile Menu Toggle -->
                     <button id="menuToggle" class="lg:hidden text-blue-900 text-xl p-2">
                         <i class="fas fa-bars"></i>
@@ -96,7 +96,7 @@
             <!-- Mobile Navigation Menu -->
             <div id="mobileMenu" class="mobile-menu lg:hidden bg-white border-t border-slate-200 mt-3 rounded-lg overflow-hidden">
                 <div class="flex flex-col space-y-1 p-4">
-                    <a href="index.html" class="text-blue-600 hover:bg-blue-50 px-3 py-2 rounded-lg transition">Beranda</a>
+                    <a href="#" class="text-blue-600 hover:bg-blue-50 px-3 py-2 rounded-lg transition">Beranda</a>
                     <a href="katalog.html" class="text-slate-700 hover:bg-blue-50 px-3 py-2 rounded-lg transition">Katalog</a>
                     
                     <!-- Mobile Kategori Dropdown -->
@@ -115,9 +115,9 @@
                         </div>
                     </div>
                     
-                    <button class="sm:hidden w-full bg-blue-900 text-white px-4 py-2 rounded-lg text-xs font-semibold hover:bg-blue-800 transition mt-3">
-                        Login Portal
-                    </button>
+                    <a id="authMobileLink" href="login.html" class="sm:hidden block w-full bg-blue-900 text-white px-4 py-2 rounded-lg text-xs font-semibold hover:bg-blue-800 transition mt-3 text-center">
+                        Login
+                    </a>
                 </div>
             </div>
         </div>
@@ -412,6 +412,58 @@
             mobileKategoriMenu.classList.toggle('hidden');
             icon.style.transform = mobileKategoriMenu.classList.contains('hidden') ? 'rotate(0deg)' : 'rotate(180deg)';
         });
+
+        // --- Auth display: show username when logged in ---
+        function signOut() {
+            localStorage.removeItem('pd_username');
+            localStorage.removeItem('pd_display');
+            location.reload();
+        }
+
+        function renderAuth() {
+            const display = localStorage.getItem('pd_display');
+            const authLink = document.getElementById('authLink');
+            const authMobile = document.getElementById('authMobileLink');
+
+            if (display && authLink) {
+                // Desktop user menu
+                const userHtml = `
+                    <div class="relative" id="userMenuWrap">
+                        <button id="userBtn" class="hidden sm:inline-flex items-center bg-white/5 text-white px-4 py-2 rounded-full text-xs sm:text-sm font-semibold">
+                            <span class="mr-2">${display}</span>
+                            <i class="fas fa-chevron-down text-xs"></i>
+                        </button>
+                        <div id="userDropdown" class="absolute right-0 mt-2 w-40 bg-white text-slate-800 rounded-lg shadow-lg p-1 hidden">
+                            <a href="upload.html" class="block px-3 py-2 text-sm hover:bg-slate-50">Dashboard</a>
+                            <button id="signOutBtn" class="w-full text-left px-3 py-2 text-sm hover:bg-slate-50">Keluar</button>
+                        </div>
+                    </div>
+                `;
+                authLink.outerHTML = userHtml;
+
+                // Mobile: replace login link with username + sign out
+                if (authMobile) {
+                    authMobile.outerHTML = `<div class=\"text-center\"><div class=\"text-sm font-medium\">${display}</div><a id=\"mobileSignOut\" href=\"#\" class=\"text-rose-500 block mt-1 text-xs\">Keluar</a></div>`;
+                }
+
+                // Attach listeners after DOM change
+                setTimeout(() => {
+                    const btn = document.getElementById('userBtn');
+                    const dd = document.getElementById('userDropdown');
+                    const so = document.getElementById('signOutBtn');
+                    const ms = document.getElementById('mobileSignOut');
+                    if (btn && dd) btn.addEventListener('click', () => dd.classList.toggle('hidden'));
+                    if (so) so.addEventListener('click', signOut);
+                    if (ms) ms.addEventListener('click', function(e){ e.preventDefault(); signOut(); });
+                }, 50);
+            } else {
+                // ensure default login links
+                if (authLink) { authLink.href = 'login.html'; authLink.textContent = 'Login'; }
+                if (authMobile) { authMobile.href = 'login.html'; authMobile.textContent = 'Login'; }
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', renderAuth);
 
         // Chart.js
         const ctx = document.getElementById('miniTestChart').getContext('2d');
