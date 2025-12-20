@@ -4,209 +4,1618 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Katalog Dataset - Pa'lintasang Data</title>
+    
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap');
-        body { font-family: 'Plus Jakarta Sans', sans-serif; }
-        .hero-gradient { background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%); }
-        .accent-makassar { color: #facc15; }
-        .modal-active { display: flex !important; animation: fadeIn 0.2s ease-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700;800&display=swap');
+        
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+        }
+        
+        .hero-gradient { 
+            background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%); 
+        }
+        
+        .accent-makassar { 
+            color: #facc15; 
+        }
+        
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        .mobile-menu {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+        
+        .mobile-menu.active {
+            max-height: 500px;
+        }
+        
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            background: white;
+            border-radius: 0.75rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            z-index: 100;
+            min-width: 200px;
+        }
+        
+        .dropdown:hover .dropdown-menu {
+            display: block;
+        }
+        
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .animate-fade-in {
+            animation: fadeIn 0.5s ease-out;
+        }
+        
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 640px) {
+            .stat-number {
+                font-size: 1.75rem;
+            }
+            .stat-label {
+                font-size: 0.75rem;
+            }
+            .dataset-title {
+                font-size: 0.875rem;
+            }
+            .dataset-desc {
+                font-size: 0.75rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .stat-number {
+                font-size: 1.5rem;
+            }
+            .stat-label {
+                font-size: 0.7rem;
+            }
+        }
+        
+        .line-clamp-2 {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        
+        .line-clamp-3 {
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        
+        /* Loading skeleton */
+        .skeleton {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+        }
+        
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+        
+        /* Active filter indicator */
+        .active-filter {
+            background-color: #1e3a8a;
+            color: white;
+            border-color: #1e3a8a;
+        }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-900">
-
-    <div id="detailModal" class="fixed inset-0 z-[100] hidden items-center justify-center bg-blue-900/60 backdrop-blur-sm p-4">
-        <div class="bg-white w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden relative">
-            <button onclick="closeModal()" class="absolute top-4 right-4 text-slate-400 hover:text-rose-500 transition">
-                <i class="fas fa-times-circle text-2xl"></i>
-            </button>
-            <div class="p-8">
-                <div id="modalCategory" class="inline-block text-[10px] font-extrabold uppercase px-3 py-1 rounded-full bg-blue-50 text-blue-600 mb-4 tracking-widest">KATEGORI</div>
-                <h3 id="modalTitle" class="text-xl font-bold text-blue-900 mb-2 leading-tight">Judul Dataset</h3>
-                <div class="flex flex-wrap gap-3 mb-6">
-                    <span class="text-[10px] font-bold text-slate-500 bg-slate-100 px-2 py-1 rounded-lg" id="modalYear">2024</span>
-                    <span class="text-[10px] font-bold text-amber-600 bg-amber-50 px-2 py-1 rounded-lg" id="modalFormat">CSV</span>
-                </div>
-                <p id="modalDesc" class="text-sm text-slate-600 leading-relaxed italic mb-6">Deskripsi lengkap akan muncul di sini.</p>
-                <button class="w-full bg-blue-900 text-white py-3 rounded-2xl text-xs font-bold hover:bg-blue-800 transition">
-                    <i class="fas fa-download mr-2"></i> UNDUH SEKARANG
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <nav class="bg-white/80 backdrop-blur-md sticky top-0 z-50 border-b border-slate-200">
-        <div class="container mx-auto px-6 py-3 flex justify-between items-center">
-            <div class="flex items-center space-x-3">
-                <div class="bg-blue-900 p-1.5 rounded-lg">
-                    <i class="fas fa-route text-white text-lg"></i>
-                </div>
-                <h1 class="font-bold text-lg tracking-tight text-blue-900 uppercase">PA'LINTASANG <span class="text-amber-500">DATA</span></h1>
-            </div>
-            <button class="bg-blue-900 text-white px-4 py-1.5 rounded-full text-xs font-semibold hover:bg-amber-500 transition">Login</button>
-        </div>
-    </nav>
-
-    <header class="hero-gradient text-white pt-12 pb-8 relative">
-        <div class="container mx-auto px-6">
-            <div class="flex flex-col md:flex-row md:items-end justify-between gap-6">
-                <div>
-                    <h2 class="text-3xl font-extrabold italic uppercase leading-none mb-2">Katalog <span class="accent-makassar">Dataset</span></h2>
-                    <p class="text-blue-100 text-[11px] uppercase tracking-widest opacity-70">Manajemen Data Terpadu Dinas Perhubungan Makassar</p>
+    
+    <!-- Navigation -->
+    <nav class="bg-white/90 backdrop-blur-md sticky top-0 z-50 border-b border-slate-200 shadow-sm">
+        <div class="container mx-auto px-4 sm:px-6 py-3">
+            <div class="flex justify-between items-center">
+                <!-- Logo -->
+                <div class="flex items-center space-x-3">
+                    <div class="bg-blue-900 p-2 rounded-xl shadow-lg">
+                        <i class="fas fa-route text-white text-xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="font-bold text-lg sm:text-xl tracking-tight text-blue-900">
+                            PA'LINTASANG <span class="text-amber-500">DATA</span>
+                        </h1>
+                        <p class="text-[9px] text-slate-500 hidden sm:block">Portal Data Transportasi Makassar</p>
+                    </div>
                 </div>
                 
-                <div class="flex flex-wrap gap-2">
-                    <a href="#" class="bg-white/10 hover:bg-white/20 backdrop-blur-sm border border-white/20 px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-wider transition flex items-center">
-                        <i class="fas fa-home mr-2 text-amber-400"></i> Beranda
+                <!-- Desktop Navigation -->
+                <div class="hidden md:flex items-center space-x-6">
+                    <a href="index.html" class="text-slate-700 hover:text-blue-600 text-sm">
+                        <i class="fas fa-home mr-1"></i> Beranda
                     </a>
-                    <a href="#" class="bg-amber-500 text-blue-900 px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-wider transition flex items-center shadow-lg shadow-amber-500/20">
-                        <i class="fas fa-database mr-2"></i> Katalog Data
+                    
+                    <div class="dropdown relative">
+                        <button class="text-slate-700 hover:text-blue-600 text-sm flex items-center space-x-1">
+                            <i class="fas fa-folder"></i>
+                            <span>Kategori</span>
+                            <i class="fas fa-chevron-down text-xs"></i>
+                        </button>
+                        <div class="dropdown-menu mt-2 p-2">
+                            <a href="katalog.html?category=Lalu%20Lintas" class="block px-4 py-2 text-sm hover:bg-blue-50 rounded">
+                                <i class="fas fa-traffic-light text-rose-500 mr-2"></i> Lalu Lintas
+                            </a>
+                            <a href="katalog.html?category=Transportasi" class="block px-4 py-2 text-sm hover:bg-blue-50 rounded">
+                                <i class="fas fa-bus text-purple-500 mr-2"></i> Transportasi
+                            </a>
+                            <a href="katalog.html?category=Parkir" class="block px-4 py-2 text-sm hover:bg-blue-50 rounded">
+                                <i class="fas fa-parking text-blue-500 mr-2"></i> Parkir
+                            </a>
+                            <a href="katalog.html?category=Terminal" class="block px-4 py-2 text-sm hover:bg-blue-50 rounded">
+                                <i class="fas fa-terminal text-emerald-500 mr-2"></i> Terminal
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <a href="katalog.html" class="text-blue-600 font-semibold text-sm hover:text-blue-800 transition border-b-2 border-blue-600 pb-1">
+                        <i class="fas fa-database mr-1"></i> Katalog
                     </a>
+                    
+                    <a href="upload.html" class="text-slate-700 hover:text-blue-600 text-sm">
+                        <i class="fas fa-upload mr-1"></i> Upload
+                    </a>
+                    
+                    <!-- Auth Buttons -->
+                    <div id="authArea" class="flex items-center space-x-3">
+                        <!-- Will be populated by JavaScript -->
+                    </div>
+                </div>
+                
+                <!-- Mobile Menu Button -->
+                <button id="mobileMenuBtn" class="md:hidden text-blue-900 text-xl p-2">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+            
+            <!-- Mobile Menu -->
+            <div id="mobileMenu" class="mobile-menu md:hidden mt-4 bg-white rounded-lg shadow-lg p-4">
+                <div class="space-y-3">
+                    <a href="index.html" class="block text-slate-700">
+                        <i class="fas fa-home mr-2"></i> Beranda
+                    </a>
+                    
+                    <div class="border-l-2 border-blue-100 pl-3">
+                        <p class="text-xs text-slate-500 font-bold mb-2">KATEGORI</p>
+                        <div class="space-y-2">
+                            <a href="katalog.html?category=Lalu%20Lintas" class="block text-sm text-slate-700">
+                                <i class="fas fa-traffic-light text-rose-500 mr-2 text-xs"></i> Lalu Lintas
+                            </a>
+                            <a href="katalog.html?category=Transportasi" class="block text-sm text-slate-700">
+                                <i class="fas fa-bus text-purple-500 mr-2 text-xs"></i> Transportasi
+                            </a>
+                            <a href="katalog.html?category=Parkir" class="block text-sm text-slate-700">
+                                <i class="fas fa-parking text-blue-500 mr-2 text-xs"></i> Parkir
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <a href="katalog.html" class="block text-blue-600 font-semibold border-l-4 border-blue-600 pl-3">
+                        <i class="fas fa-database mr-2"></i> Katalog Dataset
+                    </a>
+                    
+                    <a href="upload.html" class="block text-slate-700">
+                        <i class="fas fa-upload mr-2"></i> Upload Data
+                    </a>
+                    
+                    <div class="pt-3 border-t">
+                        <div id="mobileAuthArea"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Hero Section -->
+    <header class="hero-gradient text-white relative overflow-hidden">
+        <div class="absolute inset-0 opacity-10">
+            <div class="absolute -top-20 -right-20 w-64 h-64 bg-white rounded-full"></div>
+            <div class="absolute -bottom-20 -left-20 w-64 h-64 bg-amber-400 rounded-full"></div>
+        </div>
+        
+        <div class="container mx-auto px-4 sm:px-6 py-12 sm:py-16 relative">
+            <div class="max-w-4xl mx-auto">
+                <div class="mb-6">
+                    <a href="index.html" class="text-blue-100 hover:text-amber-400 transition inline-flex items-center text-sm mb-4">
+                        <i class="fas fa-arrow-left mr-2"></i> Kembali ke Beranda
+                    </a>
+                    <h1 class="text-3xl sm:text-4xl md:text-5xl font-extrabold mb-4">
+                        Katalog <span class="accent-makassar">Dataset</span>
+                    </h1>
+                    <p class="text-lg text-blue-100">
+                        Jelajahi koleksi dataset transportasi terbaru dari Dinas Perhubungan Kota Makassar
+                    </p>
+                </div>
+                
+                <!-- Search Box -->
+                <div class="max-w-2xl bg-white p-2 rounded-2xl shadow-2xl flex flex-col sm:flex-row items-center search-glow">
+                    <div class="flex items-center w-full sm:w-auto sm:flex-1 mb-2 sm:mb-0">
+                        <i class="fas fa-search text-slate-400 ml-4"></i>
+                        <input 
+                            type="text" 
+                            id="searchInput"
+                            placeholder="Cari dataset (contoh: volume kendaraan, trayek angkot)..." 
+                            class="w-full p-4 text-slate-800 outline-none rounded-xl"
+                        >
+                    </div>
+                    <button 
+                        onclick="searchDataset()"
+                        class="bg-blue-600 hover:bg-blue-700 text-white px-6 sm:px-8 py-4 rounded-xl font-bold transition-all duration-300 transform hover:scale-105 w-full sm:w-auto"
+                    >
+                        <i class="fas fa-search mr-2"></i> Cari
+                    </button>
+                </div>
+                
+                <!-- Quick Stats -->
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-8">
+                    <div class="text-center">
+                        <p class="text-2xl sm:text-3xl font-bold">152</p>
+                        <p class="text-blue-100 text-sm">Total Dataset</p>
+                    </div>
+                    <div class="text-center">
+                        <p class="text-2xl sm:text-3xl font-bold">6</p>
+                        <p class="text-blue-100 text-sm">Kategori</p>
+                    </div>
+                    <div class="text-center">
+                        <p class="text-2xl sm:text-3xl font-bold">1.2K</p>
+                        <p class="text-blue-100 text-sm">Download</p>
+                    </div>
+                    <div class="text-center">
+                        <p class="text-2xl sm:text-3xl font-bold">4 jam</p>
+                        <p class="text-blue-100 text-sm">Update Terakhir</p>
+                    </div>
                 </div>
             </div>
         </div>
     </header>
-
-    <div class="container mx-auto px-6 py-8">
+    
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 sm:px-6 py-8 sm:py-12">
         <div class="flex flex-col lg:flex-row gap-6">
             
-            <aside class="w-full lg:w-1/4">
-                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 sticky top-24">
-                    <div class="mb-5">
-                        <label class="block text-[10px] font-bold uppercase text-slate-400 mb-2 tracking-widest">Cari Data</label>
+            <!-- Sidebar Filters -->
+            <aside class="lg:w-1/4">
+                <div class="bg-white rounded-2xl shadow-lg border border-slate-100 p-5 sticky top-24">
+                    <h2 class="font-bold text-slate-900 mb-5 flex items-center">
+                        <i class="fas fa-filter text-amber-500 mr-2"></i> Filter Dataset
+                    </h2>
+                    
+                    <!-- Search Filter -->
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium text-slate-700 mb-2">Cari Dataset</label>
                         <div class="relative">
-                            <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
-                            <input type="text" id="searchInput" placeholder="Judul dataset..." class="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:border-blue-500">
+                            <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400"></i>
+                            <input 
+                                type="text" 
+                                id="filterSearch"
+                                placeholder="Kata kunci..."
+                                class="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition"
+                            >
                         </div>
                     </div>
-
-                    <div class="mb-5">
-                        <label class="block text-[10px] font-bold uppercase text-slate-400 mb-2 tracking-widest">Tahun</label>
-                        <select id="yearFilter" onchange="applyFilters()" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:border-blue-500 font-bold text-blue-900">
-                            <option value="all">Semua Tahun</option>
-                            <option value="2024">2024</option>
-                            <option value="2023">2023</option>
-                            <option value="2022">2022</option>
+                    
+                    <!-- Category Filter -->
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium text-slate-700 mb-2">Kategori</label>
+                        <div class="space-y-2" id="categoryFilters">
+                            <button onclick="filterByCategory('all')" class="filter-category w-full text-left px-4 py-2 rounded-lg text-sm bg-blue-600 text-white font-medium active-filter">
+                                <i class="fas fa-layer-group mr-2"></i> Semua Kategori
+                            </button>
+                            <button onclick="filterByCategory('Lalu Lintas')" class="filter-category w-full text-left px-4 py-2 rounded-lg text-sm text-slate-700 hover:bg-slate-50 transition">
+                                <i class="fas fa-traffic-light text-rose-500 mr-2"></i> Lalu Lintas
+                                <span class="float-right text-slate-500">24</span>
+                            </button>
+                            <button onclick="filterByCategory('Transportasi')" class="filter-category w-full text-left px-4 py-2 rounded-lg text-sm text-slate-700 hover:bg-slate-50 transition">
+                                <i class="fas fa-bus text-purple-500 mr-2"></i> Transportasi
+                                <span class="float-right text-slate-500">18</span>
+                            </button>
+                            <button onclick="filterByCategory('Parkir')" class="filter-category w-full text-left px-4 py-2 rounded-lg text-sm text-slate-700 hover:bg-slate-50 transition">
+                                <i class="fas fa-parking text-blue-500 mr-2"></i> Parkir & Terminal
+                                <span class="float-right text-slate-500">15</span>
+                            </button>
+                            <button onclick="filterByCategory('Infrastruktur')" class="filter-category w-full text-left px-4 py-2 rounded-lg text-sm text-slate-700 hover:bg-slate-50 transition">
+                                <i class="fas fa-lightbulb text-amber-500 mr-2"></i> Infrastruktur
+                                <span class="float-right text-slate-500">12</span>
+                            </button>
+                            <button onclick="filterByCategory('Personel')" class="filter-category w-full text-left px-4 py-2 rounded-lg text-sm text-slate-700 hover:bg-slate-50 transition">
+                                <i class="fas fa-users text-cyan-500 mr-2"></i> Personel
+                                <span class="float-right text-slate-500">8</span>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Year Filter -->
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium text-slate-700 mb-2">Tahun Data</label>
+                        <div class="space-y-2" id="yearFilters">
+                            <button onclick="filterByYear('all')" class="filter-year w-full text-left px-4 py-2 rounded-lg text-sm bg-blue-600 text-white font-medium active-filter">
+                                Semua Tahun
+                            </button>
+                            <button onclick="filterByYear('2024')" class="filter-year w-full text-left px-4 py-2 rounded-lg text-sm text-slate-700 hover:bg-slate-50 transition">
+                                2024 <span class="float-right text-slate-500">42</span>
+                            </button>
+                            <button onclick="filterByYear('2023')" class="filter-year w-full text-left px-4 py-2 rounded-lg text-sm text-slate-700 hover:bg-slate-50 transition">
+                                2023 <span class="float-right text-slate-500">38</span>
+                            </button>
+                            <button onclick="filterByYear('2022')" class="filter-year w-full text-left px-4 py-2 rounded-lg text-sm text-slate-700 hover:bg-slate-50 transition">
+                                2022 <span class="float-right text-slate-500">35</span>
+                            </button>
+                            <button onclick="filterByYear('2021')" class="filter-year w-full text-left px-4 py-2 rounded-lg text-sm text-slate-700 hover:bg-slate-50 transition">
+                                2021 <span class="float-right text-slate-500">27</span>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Format Filter -->
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium text-slate-700 mb-2">Format Data</label>
+                        <div class="flex flex-wrap gap-2">
+                            <button onclick="filterByFormat('all')" class="filter-format px-3 py-1 rounded-lg text-sm bg-blue-600 text-white active-filter">
+                                Semua
+                            </button>
+                            <button onclick="filterByFormat('CSV')" class="filter-format px-3 py-1 rounded-lg text-sm bg-slate-100 text-slate-700 hover:bg-slate-200 transition">
+                                CSV
+                            </button>
+                            <button onclick="filterByFormat('Excel')" class="filter-format px-3 py-1 rounded-lg text-sm bg-slate-100 text-slate-700 hover:bg-slate-200 transition">
+                                Excel
+                            </button>
+                            <button onclick="filterByFormat('JSON')" class="filter-format px-3 py-1 rounded-lg text-sm bg-slate-100 text-slate-700 hover:bg-slate-200 transition">
+                                JSON
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Sort Options -->
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium text-slate-700 mb-2">Urutkan</label>
+                        <select id="sortOptions" class="w-full px-4 py-2 border border-slate-200 rounded-xl focus:border-blue-500 outline-none transition">
+                            <option value="newest">Terbaru</option>
+                            <option value="oldest">Terlama</option>
+                            <option value="popular">Paling Populer</option>
+                            <option value="az">A-Z</option>
+                            <option value="za">Z-A</option>
                         </select>
                     </div>
-
-                    <div class="mb-2">
-                        <label class="block text-[10px] font-bold uppercase text-slate-400 mb-2 tracking-widest">Kategori</label>
-                        <div class="space-y-1" id="categoryFilters">
-                            <button onclick="setCategory('all')" class="w-full text-left px-3 py-2 rounded-lg text-xs bg-blue-50 text-blue-700 font-bold cat-btn" data-cat="all">Semua Kategori</button>
-                            <button onclick="setCategory('Lalu Lintas')" class="w-full text-left px-3 py-2 rounded-lg text-xs text-slate-600 cat-btn" data-cat="Lalu Lintas">Lalu Lintas</button>
-                            <button onclick="setCategory('Transportasi')" class="w-full text-left px-3 py-2 rounded-lg text-xs text-slate-600 cat-btn" data-cat="Transportasi">Transportasi Umum</button>
-                            <button onclick="setCategory('Parkir')" class="w-full text-left px-3 py-2 rounded-lg text-xs text-slate-600 cat-btn" data-cat="Parkir">Parkir & Terminal</button>
+                    
+                    <!-- Clear Filters -->
+                    <button onclick="clearAllFilters()" class="w-full py-2 border-2 border-red-200 text-red-600 rounded-xl font-medium hover:bg-red-50 transition">
+                        <i class="fas fa-times mr-2"></i> Hapus Semua Filter
+                    </button>
+                </div>
+                
+                <!-- Quick Stats Sidebar -->
+                <div class="bg-gradient-to-br from-blue-900 to-blue-800 rounded-2xl p-5 text-white mt-6">
+                    <h3 class="font-bold mb-4">Statistik Katalog</h3>
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-center">
+                            <span class="text-blue-100">Total Dataset</span>
+                            <span class="font-bold">152</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-blue-100">Diupdate Bulan Ini</span>
+                            <span class="font-bold">12</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-blue-100">Rata-rata Download</span>
+                            <span class="font-bold">48/hari</span>
+                        </div>
+                        <div class="pt-3 border-t border-blue-800">
+                            <p class="text-sm text-blue-200">Data diperbarui setiap hari kerja</p>
                         </div>
                     </div>
                 </div>
             </aside>
-
-            <main class="w-full lg:w-3/4">
-                <div id="datasetGrid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-                    </div>
-
-                <div class="mt-10 flex items-center justify-between border-t border-slate-200 pt-6">
-                    <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest" id="pageInfo">Halaman 1</p>
-                    <div class="flex space-x-2">
-                        <button onclick="prevPage()" class="w-10 h-10 bg-white border border-slate-200 rounded-xl flex items-center justify-center hover:bg-slate-50 transition"><i class="fas fa-chevron-left text-xs"></i></button>
-                        <button onclick="nextPage()" class="w-10 h-10 bg-blue-900 text-white rounded-xl flex items-center justify-center shadow-lg shadow-blue-900/20 hover:bg-blue-800 transition"><i class="fas fa-chevron-right text-xs"></i></button>
-                    </div>
-                </div>
-            </main>
-        </div>
-    </div>
-
-    <script>
-        // Mock data generator (60 items)
-        const allDatasets = Array.from({ length: 60 }, (_, i) => ({
-            id: i,
-            title: i % 2 === 0 ? `Analisis Volume Kendaraan Titik ${i + 1}` : `Trayek Angkutan Kota Jalur ${i + 1}`,
-            category: i % 3 === 0 ? 'Lalu Lintas' : (i % 3 === 1 ? 'Transportasi' : 'Parkir'),
-            format: i % 2 === 0 ? 'CSV' : 'JSON',
-            year: (2024 - (i % 3)).toString(),
-            date: `10 Des ${2024 - (i % 3)}`,
-            desc: 'Dataset operasional harian Dinas Perhubungan Kota Makassar untuk analisis kebijakan transportasi.'
-        }));
-
-        let filteredData = [...allDatasets];
-        let currentPage = 1;
-        const itemsPerPage = 20;
-        let currentCategory = 'all';
-
-        function renderDatasets() {
-            const grid = document.getElementById('datasetGrid');
-            const start = (currentPage - 1) * itemsPerPage;
-            const pageItems = filteredData.slice(start, start + itemsPerPage);
-
-            grid.innerHTML = pageItems.map(item => `
-                <div class="bg-white p-4 rounded-xl border border-slate-200 hover:border-blue-400 transition-all shadow-sm flex flex-col justify-between group">
+            
+            <!-- Main Content Area -->
+            <div class="lg:w-3/4">
+                <!-- Header with Results Count -->
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 p-4 bg-white rounded-2xl shadow-sm border border-slate-100">
                     <div>
-                        <div class="flex justify-between items-center mb-2">
-                            <span class="text-[8px] font-black uppercase px-2 py-0.5 rounded-md ${
-                                item.category === 'Lalu Lintas' ? 'bg-blue-50 text-blue-600' : 'bg-purple-50 text-purple-600'
-                            }">${item.category}</span>
-                            <span class="text-[9px] font-bold text-slate-300">${item.year}</span>
-                        </div>
-                        <h4 class="font-bold text-xs text-blue-900 mb-1 line-clamp-2 leading-tight">${item.title}</h4>
-                        <p class="text-slate-400 text-[10px] line-clamp-2 mb-4 italic">"${item.desc}"</p>
+                        <h2 class="text-xl font-bold text-slate-900">Hasil Pencarian</h2>
+                        <p id="resultsCount" class="text-slate-600 text-sm">Menampilkan 152 dataset</p>
                     </div>
-                    <div class="flex gap-2 pt-3 border-t border-slate-50">
-                        <button onclick="openModal(${item.id})" class="flex-1 bg-slate-100 text-slate-600 py-2 rounded-lg text-[10px] font-bold hover:bg-blue-900 hover:text-white transition uppercase tracking-tighter">
-                            <i class="fas fa-info-circle mr-1 text-[8px]"></i> Detail
-                        </button>
-                        <button class="px-3 bg-amber-50 text-amber-600 py-2 rounded-lg text-[10px] hover:bg-amber-500 hover:text-white transition">
-                            <i class="fas fa-download"></i>
-                        </button>
+                    
+                    <div class="flex items-center space-x-4 mt-3 sm:mt-0">
+                        <!-- View Toggle -->
+                        <div class="flex border border-slate-200 rounded-xl overflow-hidden">
+                            <button id="gridViewBtn" class="p-2 bg-blue-600 text-white">
+                                <i class="fas fa-th-large"></i>
+                            </button>
+                            <button id="listViewBtn" class="p-2 bg-white text-slate-600 hover:bg-slate-50">
+                                <i class="fas fa-list"></i>
+                            </button>
+                        </div>
+                        
+                        <!-- Items per page -->
+                        <select id="itemsPerPage" class="px-3 py-2 border border-slate-200 rounded-xl text-sm outline-none">
+                            <option value="12">12 per halaman</option>
+                            <option value="24">24 per halaman</option>
+                            <option value="48">48 per halaman</option>
+                        </select>
                     </div>
                 </div>
-            `).join('');
-
-            document.getElementById('pageInfo').innerText = `DATA ${start + 1}-${Math.min(start + itemsPerPage, filteredData.length)} DARI ${filteredData.length}`;
+                
+                <!-- Active Filters Display -->
+                <div id="activeFilters" class="mb-6 flex flex-wrap gap-2">
+                    <!-- Active filters will be displayed here -->
+                </div>
+                
+                <!-- Loading State -->
+                <div id="loadingState" class="hidden">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <!-- Skeleton Loaders -->
+                        <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-5">
+                            <div class="skeleton h-4 w-24 mb-4 rounded"></div>
+                            <div class="skeleton h-6 w-full mb-3 rounded"></div>
+                            <div class="skeleton h-16 w-full mb-4 rounded"></div>
+                            <div class="skeleton h-8 w-full rounded"></div>
+                        </div>
+                        <!-- Repeat 5 more times -->
+                    </div>
+                </div>
+                
+                <!-- Datasets Grid/List View -->
+                <div id="datasetsContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+                    <!-- Datasets will be loaded here -->
+                </div>
+                
+                <!-- No Results Message -->
+                <div id="noResults" class="hidden text-center py-12">
+                    <div class="w-24 h-24 mx-auto mb-6 text-slate-300">
+                        <i class="fas fa-database text-6xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-700 mb-2">Dataset Tidak Ditemukan</h3>
+                    <p class="text-slate-600 mb-6">Coba gunakan kata kunci lain atau hapus beberapa filter</p>
+                    <button onclick="clearAllFilters()" class="bg-blue-600 text-white px-6 py-3 rounded-xl font-medium hover:bg-blue-700 transition">
+                        <i class="fas fa-filter mr-2"></i> Hapus Semua Filter
+                    </button>
+                </div>
+                
+                <!-- Pagination -->
+                <div class="flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0 pt-6 border-t border-slate-200">
+                    <div class="text-sm text-slate-600" id="paginationInfo">
+                        Halaman 1 dari 8
+                    </div>
+                    
+                    <div class="flex items-center space-x-2">
+                        <button onclick="prevPage()" class="w-10 h-10 flex items-center justify-center border border-slate-200 rounded-xl hover:bg-slate-50 transition disabled:opacity-50 disabled:cursor-not-allowed" id="prevPageBtn">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        
+                        <div class="flex items-center space-x-1" id="pageNumbers">
+                            <!-- Page numbers will be generated here -->
+                        </div>
+                        
+                        <button onclick="nextPage()" class="w-10 h-10 flex items-center justify-center border border-slate-200 rounded-xl hover:bg-slate-50 transition" id="nextPageBtn">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="text-sm text-slate-600">
+                        Total <span id="totalItems">152</span> dataset
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Popular Categories Section -->
+        <section class="mt-16">
+            <h2 class="text-2xl font-bold text-slate-900 mb-8 text-center">Kategori <span class="text-amber-500">Populer</span></h2>
+            
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+                <!-- Category 1 -->
+                <a href="katalog.html?category=Lalu%20Lintas" class="bg-white p-4 rounded-2xl shadow-lg border border-slate-100 text-center card-hover group">
+                    <div class="w-12 h-12 mx-auto mb-3 bg-red-100 rounded-xl flex items-center justify-center group-hover:bg-red-200 transition">
+                        <i class="fas fa-traffic-light text-red-600 text-xl"></i>
+                    </div>
+                    <h4 class="font-bold text-slate-900 text-sm mb-1">Lalu Lintas</h4>
+                    <p class="text-xs text-slate-600">24 dataset</p>
+                </a>
+                
+                <!-- Category 2 -->
+                <a href="katalog.html?category=Transportasi" class="bg-white p-4 rounded-2xl shadow-lg border border-slate-100 text-center card-hover group">
+                    <div class="w-12 h-12 mx-auto mb-3 bg-purple-100 rounded-xl flex items-center justify-center group-hover:bg-purple-200 transition">
+                        <i class="fas fa-bus text-purple-600 text-xl"></i>
+                    </div>
+                    <h4 class="font-bold text-slate-900 text-sm mb-1">Transportasi</h4>
+                    <p class="text-xs text-slate-600">18 dataset</p>
+                </a>
+                
+                <!-- Category 3 -->
+                <a href="katalog.html?category=Parkir" class="bg-white p-4 rounded-2xl shadow-lg border border-slate-100 text-center card-hover group">
+                    <div class="w-12 h-12 mx-auto mb-3 bg-blue-100 rounded-xl flex items-center justify-center group-hover:bg-blue-200 transition">
+                        <i class="fas fa-parking text-blue-600 text-xl"></i>
+                    </div>
+                    <h4 class="font-bold text-slate-900 text-sm mb-1">Parkir</h4>
+                    <p class="text-xs text-slate-600">15 dataset</p>
+                </a>
+                
+                <!-- Category 4 -->
+                <a href="katalog.html?category=Terminal" class="bg-white p-4 rounded-2xl shadow-lg border border-slate-100 text-center card-hover group">
+                    <div class="w-12 h-12 mx-auto mb-3 bg-green-100 rounded-xl flex items-center justify-center group-hover:bg-green-200 transition">
+                        <i class="fas fa-terminal text-green-600 text-xl"></i>
+                    </div>
+                    <h4 class="font-bold text-slate-900 text-sm mb-1">Terminal</h4>
+                    <p class="text-xs text-slate-600">12 dataset</p>
+                </a>
+                
+                <!-- Category 5 -->
+                <a href="katalog.html?category=Infrastruktur" class="bg-white p-4 rounded-2xl shadow-lg border border-slate-100 text-center card-hover group">
+                    <div class="w-12 h-12 mx-auto mb-3 bg-amber-100 rounded-xl flex items-center justify-center group-hover:bg-amber-200 transition">
+                        <i class="fas fa-lightbulb text-amber-600 text-xl"></i>
+                    </div>
+                    <h4 class="font-bold text-slate-900 text-sm mb-1">Infrastruktur</h4>
+                    <p class="text-xs text-slate-600">10 dataset</p>
+                </a>
+                
+                <!-- Category 6 -->
+                <a href="katalog.html?category=Personel" class="bg-white p-4 rounded-2xl shadow-lg border border-slate-100 text-center card-hover group">
+                    <div class="w-12 h-12 mx-auto mb-3 bg-cyan-100 rounded-xl flex items-center justify-center group-hover:bg-cyan-200 transition">
+                        <i class="fas fa-users text-cyan-600 text-xl"></i>
+                    </div>
+                    <h4 class="font-bold text-slate-900 text-sm mb-1">Personel</h4>
+                    <p class="text-xs text-slate-600">8 dataset</p>
+                </a>
+            </div>
+        </section>
+        
+        <!-- Featured Datasets -->
+        <section class="mt-16">
+            <div class="flex justify-between items-center mb-8">
+                <h2 class="text-2xl font-bold text-slate-900">Dataset <span class="text-amber-500">Unggulan</span></h2>
+                <a href="#" class="text-blue-600 hover:text-blue-800 font-medium text-sm">
+                    Lihat Semua <i class="fas fa-arrow-right ml-1"></i>
+                </a>
+            </div>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Featured Dataset 1 -->
+                <div class="bg-gradient-to-br from-blue-900 to-blue-800 rounded-2xl p-6 text-white card-hover overflow-hidden relative group">
+                    <div class="absolute -top-10 -right-10 w-40 h-40 bg-white/10 rounded-full group-hover:scale-125 transition"></div>
+                    <div class="relative z-10">
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-xs font-bold">TRENDING</span>
+                            <span class="text-amber-400"><i class="fas fa-star"></i> <i class="fas fa-star"></i> <i class="fas fa-star"></i> <i class="fas fa-star"></i> <i class="fas fa-star-half-alt"></i></span>
+                        </div>
+                        <h3 class="text-xl font-bold mb-3">Data Volume Lalu Lintas 2024</h3>
+                        <p class="text-blue-100 text-sm mb-6 line-clamp-3">Dataset komprehensif volume kendaraan di 25 titik strategis Kota Makassar dengan update real-time setiap jam.</p>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-4">
+                                <div class="text-center">
+                                    <p class="font-bold">1.2K</p>
+                                    <p class="text-xs text-blue-200">Download</p>
+                                </div>
+                                <div class="text-center">
+                                    <p class="font-bold">24/7</p>
+                                    <p class="text-xs text-blue-200">Update</p>
+                                </div>
+                            </div>
+                            <a href="detail.html?id=featured1" class="bg-amber-400 text-blue-900 px-4 py-2 rounded-xl font-bold hover:bg-amber-300 transition text-sm">
+                                <i class="fas fa-download mr-1"></i> Unduh
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Featured Dataset 2 -->
+                <div class="bg-gradient-to-br from-emerald-700 to-emerald-600 rounded-2xl p-6 text-white card-hover overflow-hidden relative group">
+                    <div class="absolute -top-10 -right-10 w-40 h-40 bg-white/10 rounded-full group-hover:scale-125 transition"></div>
+                    <div class="relative z-10">
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-xs font-bold">BARU</span>
+                            <span class="text-xs text-emerald-200">Updated: 2 jam lalu</span>
+                        </div>
+                        <h3 class="text-xl font-bold mb-3">Data Parkir Sisi Jalan</h3>
+                        <p class="text-emerald-100 text-sm mb-6 line-clamp-3">Monitoring okupansi parkir di 50 titik parkir sisi jalan dengan data waktu nyata.</p>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-4">
+                                <div class="text-center">
+                                    <p class="font-bold">856</p>
+                                    <p class="text-xs text-emerald-200">Download</p>
+                                </div>
+                                <div class="text-center">
+                                    <p class="font-bold">50</p>
+                                    <p class="text-xs text-emerald-200">Lokasi</p>
+                                </div>
+                            </div>
+                            <a href="detail.html?id=featured2" class="bg-white text-emerald-700 px-4 py-2 rounded-xl font-bold hover:bg-emerald-50 transition text-sm">
+                                <i class="fas fa-eye mr-1"></i> Detail
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Featured Dataset 3 -->
+                <div class="bg-gradient-to-br from-purple-700 to-purple-600 rounded-2xl p-6 text-white card-hover overflow-hidden relative group">
+                    <div class="absolute -top-10 -right-10 w-40 h-40 bg-white/10 rounded-full group-hover:scale-125 transition"></div>
+                    <div class="relative z-10">
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-xs font-bold">POPULER</span>
+                            <span class="text-xs text-purple-200"><i class="fas fa-fire"></i> Hot</span>
+                        </div>
+                        <h3 class="text-xl font-bold mb-3">Trayek Angkutan Kota 2024</h3>
+                        <p class="text-purple-100 text-sm mb-6 line-clamp-3">Database lengkap trayek angkot, bus kota, dan BRT dengan informasi rute dan jadwal operasional.</p>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-4">
+                                <div class="text-center">
+                                    <p class="font-bold">2.4K</p>
+                                    <p class="text-xs text-purple-200">Download</p>
+                                </div>
+                                <div class="text-center">
+                                    <p class="font-bold">842</p>
+                                    <p class="text-xs text-purple-200">Unit</p>
+                                </div>
+                            </div>
+                            <a href="detail.html?id=featured3" class="bg-amber-400 text-purple-900 px-4 py-2 rounded-xl font-bold hover:bg-amber-300 transition text-sm">
+                                <i class="fas fa-download mr-1"></i> Unduh
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- CTA Section -->
+        <section class="mt-16 bg-gradient-to-r from-blue-900 to-blue-800 rounded-2xl p-8 md:p-12 text-center text-white relative overflow-hidden">
+            <div class="absolute -top-20 -right-20 w-64 h-64 bg-white/10 rounded-full hidden sm:block"></div>
+            <div class="absolute -bottom-20 -left-20 w-64 h-64 bg-amber-400/10 rounded-full hidden sm:block"></div>
+            
+            <div class="relative z-10 max-w-3xl mx-auto">
+                <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold mb-4">Punya Dataset untuk Dibagikan?</h2>
+                <p class="text-blue-100 text-base sm:text-lg mb-8">
+                    Bergabunglah dengan kontributor dan bagikan dataset transportasi Anda untuk memperkaya koleksi data kami.
+                </p>
+                
+                <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                    <a href="upload.html" class="bg-amber-400 text-blue-900 px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-bold text-base sm:text-lg hover:bg-amber-300 transition transform hover:scale-105">
+                        <i class="fas fa-upload mr-2"></i> Upload Dataset
+                    </a>
+                    <a href="login.html" class="bg-white/20 backdrop-blur-sm border border-white/30 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-bold text-base sm:text-lg hover:bg-white/30 transition">
+                        <i class="fas fa-sign-in-alt mr-2"></i> Login untuk Upload
+                    </a>
+                </div>
+            </div>
+        </section>
+        
+    </main>
+    
+    <!-- Footer -->
+    <footer class="bg-blue-950 text-white pt-12 pb-10 mt-16">
+        <div class="container mx-auto px-4 sm:px-6">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-10">
+                <!-- Column 1 -->
+                <div>
+                    <div class="flex items-center space-x-3 mb-6">
+                        <div class="bg-amber-500 p-2 rounded-lg">
+                            <i class="fas fa-route text-white"></i>
+                        </div>
+                        <h3 class="font-bold text-lg">PA'LINTASANG <span class="text-amber-500">DATA</span></h3>
+                    </div>
+                    <p class="text-blue-200 text-sm mb-6">
+                        Portal Katalog Dataset Transportasi Dinas Perhubungan Kota Makassar.
+                    </p>
+                </div>
+                
+                <!-- Column 2 -->
+                <div>
+                    <h4 class="font-bold text-lg mb-6">Navigasi</h4>
+                    <ul class="space-y-3 text-sm">
+                        <li><a href="index.html" class="text-blue-200 hover:text-amber-400 transition">Beranda</a></li>
+                        <li><a href="katalog.html" class="text-blue-200 hover:text-amber-400 transition">Katalog Dataset</a></li>
+                        <li><a href="upload.html" class="text-blue-200 hover:text-amber-400 transition">Upload Data</a></li>
+                        <li><a href="dashboard.html" class="text-blue-200 hover:text-amber-400 transition">Dashboard</a></li>
+                    </ul>
+                </div>
+                
+                <!-- Column 3 -->
+                <div>
+                    <h4 class="font-bold text-lg mb-6">Kontak</h4>
+                    <div class="space-y-4 text-sm">
+                        <div class="flex items-start">
+                            <i class="fas fa-map-marker-alt text-amber-400 mt-1 mr-3"></i>
+                            <p class="text-blue-200">
+                                Jl. Mallengkeri Raya No.18, Mangasa, Tamalate, Kota Makassar
+                            </p>
+                        </div>
+                        <div class="flex items-center">
+                            <i class="fas fa-phone text-amber-400 mr-3"></i>
+                            <p class="text-blue-200">(0411) 884816</p>
+                        </div>
+                        <div class="flex items-center">
+                            <i class="fas fa-envelope text-amber-400 mr-3"></i>
+                            <p class="text-blue-200">dishub@makassar.go.id</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Column 4 -->
+                <div>
+                    <h4 class="font-bold text-lg mb-6">Statistik</h4>
+                    <div class="space-y-2 text-sm">
+                        <div class="flex justify-between">
+                            <span class="text-blue-200">Total Dataset</span>
+                            <span class="text-amber-400 font-bold">152</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-blue-200">Download Hari Ini</span>
+                            <span class="text-amber-400 font-bold">248</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-blue-200">Kontributor</span>
+                            <span class="text-amber-400 font-bold">45</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="pt-6 border-t border-blue-800 text-center">
+                <p class="text-blue-300 text-sm">
+                    © 2025 Pa'lintasang Data - Dinas Perhubungan Kota Makassar. 
+                    <span class="text-amber-400 font-bold">DATA-DRIVEN POLICY!</span>
+                </p>
+                <p class="text-blue-400 text-xs mt-2">
+                    PKL Statistika UNM | Sistem Katalog Dataset Transportasi
+                </p>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- JavaScript -->
+    <script>
+        // Mobile Menu Toggle
+        document.getElementById('mobileMenuBtn').addEventListener('click', function() {
+            const mobileMenu = document.getElementById('mobileMenu');
+            mobileMenu.classList.toggle('active');
+            const icon = this.querySelector('i');
+            if (mobileMenu.classList.contains('active')) {
+                icon.classList.remove('fa-bars');
+                icon.classList.add('fa-times');
+            } else {
+                icon.classList.remove('fa-times');
+                icon.classList.add('fa-bars');
+            }
+        });
+        
+        // Authentication Display
+        function updateAuthDisplay() {
+            const authArea = document.getElementById('authArea');
+            const mobileAuthArea = document.getElementById('mobileAuthArea');
+            const display = localStorage.getItem('pd_display');
+            const username = localStorage.getItem('pd_username');
+            
+            if (display && username) {
+                // User is logged in
+                const desktopHTML = `
+                    <div class="flex items-center space-x-4">
+                        <div class="text-right hidden sm:block">
+                            <p class="text-sm font-semibold">${display}</p>
+                            <p class="text-xs text-slate-500">${username}</p>
+                        </div>
+                        <div class="relative">
+                            <img src="https://ui-avatars.com/api/?name=${encodeURIComponent(display)}&background=1e3a8a&color=fff" 
+                                 class="w-10 h-10 rounded-full border-2 border-blue-600 cursor-pointer"
+                                 id="userAvatarBtn">
+                            <div class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg hidden" id="userDropdown">
+                                <a href="dashboard.html" class="block px-4 py-3 text-sm hover:bg-slate-100">
+                                    <i class="fas fa-tachometer-alt mr-2"></i> Dashboard
+                                </a>
+                                <a href="upload.html" class="block px-4 py-3 text-sm hover:bg-slate-100">
+                                    <i class="fas fa-upload mr-2"></i> Upload Data
+                                </a>
+                                <hr class="my-1">
+                                <button onclick="logout()" class="w-full text-left px-4 py-3 text-sm text-red-600 hover:bg-red-50">
+                                    <i class="fas fa-sign-out-alt mr-2"></i> Keluar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                const mobileHTML = `
+                    <div class="space-y-3">
+                        <div class="flex items-center space-x-3">
+                            <img src="https://ui-avatars.com/api/?name=${encodeURIComponent(display)}&background=1e3a8a&color=fff" 
+                                 class="w-10 h-10 rounded-full border-2 border-blue-600">
+                            <div>
+                                <p class="font-semibold text-sm">${display}</p>
+                                <p class="text-xs text-slate-500">${username}</p>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <a href="dashboard.html" class="px-3 py-2 bg-blue-600 text-white rounded-lg text-center text-xs sm:text-sm">
+                                <i class="fas fa-tachometer-alt mr-1"></i> Dashboard
+                            </a>
+                            <button onclick="logout()" class="px-3 py-2 bg-red-600 text-white rounded-lg text-center text-xs sm:text-sm">
+                                <i class="fas fa-sign-out-alt mr-1"></i> Keluar
+                            </button>
+                        </div>
+                    </div>
+                `;
+                
+                if (authArea) authArea.innerHTML = desktopHTML;
+                if (mobileAuthArea) mobileAuthArea.innerHTML = mobileHTML;
+                
+                // Add event listener for user dropdown
+                setTimeout(() => {
+                    const avatarBtn = document.getElementById('userAvatarBtn');
+                    const dropdown = document.getElementById('userDropdown');
+                    
+                    if (avatarBtn && dropdown) {
+                        avatarBtn.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            dropdown.classList.toggle('hidden');
+                        });
+                        
+                        // Close dropdown when clicking outside
+                        document.addEventListener('click', () => {
+                            dropdown.classList.add('hidden');
+                        });
+                        
+                        // Prevent dropdown from closing when clicking inside
+                        dropdown.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                        });
+                    }
+                }, 100);
+                
+            } else {
+                // User is not logged in
+                if (authArea) {
+                    authArea.innerHTML = `
+                        <a href="login.html" class="bg-blue-600 text-white px-4 sm:px-6 py-2 rounded-lg font-semibold hover:bg-blue-700 transition text-sm">
+                            <i class="fas fa-sign-in-alt mr-2"></i> Login
+                        </a>
+                    `;
+                }
+                
+                if (mobileAuthArea) {
+                    mobileAuthArea.innerHTML = `
+                        <a href="login.html" class="block w-full bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold text-center hover:bg-blue-700 transition text-sm">
+                            <i class="fas fa-sign-in-alt mr-2"></i> Login ke Akun
+                        </a>
+                    `;
+                }
+            }
         }
-
-        function openModal(id) {
-            const item = allDatasets.find(d => d.id === id);
-            document.getElementById('modalTitle').innerText = item.title;
-            document.getElementById('modalCategory').innerText = item.category;
-            document.getElementById('modalDesc').innerText = item.desc;
-            document.getElementById('modalYear').innerText = item.year;
-            document.getElementById('modalFormat').innerText = item.format;
-            document.getElementById('detailModal').classList.add('modal-active');
+        
+        // Logout function
+        function logout() {
+            if (confirm('Apakah Anda yakin ingin keluar?')) {
+                localStorage.removeItem('pd_username');
+                localStorage.removeItem('pd_display');
+                localStorage.removeItem('pd_role');
+                window.location.href = 'index.html';
+            }
         }
-
-        function closeModal() { document.getElementById('detailModal').classList.remove('modal-active'); }
-
-        function applyFilters() {
-            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-            const selectedYear = document.getElementById('yearFilter').value;
-            filteredData = allDatasets.filter(item => {
-                const matchSearch = item.title.toLowerCase().includes(searchTerm);
-                const matchCat = currentCategory === 'all' || item.category === currentCategory;
-                const matchYear = selectedYear === 'all' || item.year === selectedYear;
-                return matchSearch && matchCat && matchYear;
+        
+        // Search function
+        function searchDataset() {
+            const searchTerm = document.getElementById('searchInput').value.trim();
+            if (searchTerm) {
+                // Simulate search
+                console.log('Searching for:', searchTerm);
+                // In real implementation, this would filter the datasets
+            }
+        }
+        
+        // Dataset data
+        const datasets = [
+            {
+                id: 1,
+                title: "Volume Kendaraan Simpang Lima Bandara",
+                category: "Lalu Lintas",
+                description: "Data real-time volume kendaraan per jam di Simpang Lima Bandara",
+                year: "2024",
+                format: "CSV",
+                downloads: 1240,
+                lastUpdate: "2 jam lalu",
+                featured: true
+            },
+            {
+                id: 2,
+                title: "Data Okupansi Terminal Daya & Malengkeri",
+                category: "Terminal",
+                description: "Data penumpang dan kendaraan di terminal utama Kota Makassar",
+                year: "2024",
+                format: "Excel",
+                downloads: 856,
+                lastUpdate: "Hari ini, 08:00",
+                featured: false
+            },
+            {
+                id: 3,
+                title: "Data Parkir Sisi Jalan 2024",
+                category: "Parkir",
+                description: "Data parkir di 50 titik parkir sisi jalan dengan update real-time",
+                year: "2024",
+                format: "JSON",
+                downloads: 642,
+                lastUpdate: "Kemarin, 14:30",
+                featured: true
+            },
+            {
+                id: 4,
+                title: "Trayek Angkutan Kota Makassar",
+                category: "Transportasi",
+                description: "Database lengkap trayek angkot, bus kota, dan BRT",
+                year: "2024",
+                format: "CSV",
+                downloads: 2450,
+                lastUpdate: "1 minggu lalu",
+                featured: false
+            },
+            {
+                id: 5,
+                title: "Data Lampu Lalu Lintas Aktif",
+                category: "Infrastruktur",
+                description: "Status dan kondisi traffic light di 52 titik persimpangan",
+                year: "2024",
+                format: "Excel",
+                downloads: 428,
+                lastUpdate: "3 hari lalu",
+                featured: false
+            },
+            {
+                id: 6,
+                title: "Personel Dishub Kota Makassar",
+                category: "Personel",
+                description: "Data pegawai dan distribusi tugas Dinas Perhubungan",
+                year: "2024",
+                format: "CSV",
+                downloads: 312,
+                lastUpdate: "Bulan lalu",
+                featured: false
+            },
+            {
+                id: 7,
+                title: "Data Kecelakaan Lalu Lintas 2023",
+                category: "Lalu Lintas",
+                description: "Statistik kecelakaan berdasarkan lokasi dan waktu",
+                year: "2023",
+                format: "Excel",
+                downloads: 892,
+                lastUpdate: "6 bulan lalu",
+                featured: false
+            },
+            {
+                id: 8,
+                title: "Penggembokan Kendaraan 2024",
+                category: "Parkir",
+                description: "Data penggembokan kendaraan per bulan dan lokasi",
+                year: "2024",
+                format: "CSV",
+                downloads: 567,
+                lastUpdate: "2 minggu lalu",
+                featured: false
+            },
+            {
+                id: 9,
+                title: "Data Rambu Terpasang 2024",
+                category: "Infrastruktur",
+                description: "Inventaris rambu lalu lintas yang terpasang",
+                year: "2024",
+                format: "JSON",
+                downloads: 234,
+                lastUpdate: "1 bulan lalu",
+                featured: false
+            },
+            {
+                id: 10,
+                title: "Sosialisasi Keselamatan Sekolah",
+                category: "Lalu Lintas",
+                description: "Jadwal dan lokasi sosialisasi di sekolah-sekolah",
+                year: "2024",
+                format: "Excel",
+                downloads: 189,
+                lastUpdate: "2 minggu lalu",
+                featured: false
+            },
+            {
+                id: 11,
+                title: "Data Pengujian Kendaraan 2024",
+                category: "Transportasi",
+                description: "Hasil pengujian kendaraan bermotor per bulan",
+                year: "2024",
+                format: "CSV",
+                downloads: 456,
+                lastUpdate: "1 minggu lalu",
+                featured: false
+            },
+            {
+                id: 12,
+                title: "Lampu Jalan UPTD 2024",
+                category: "Infrastruktur",
+                description: "Data titik lampu jalan yang berfungsi",
+                year: "2024",
+                format: "Excel",
+                downloads: 321,
+                lastUpdate: "3 hari lalu",
+                featured: false
+            }
+        ];
+        
+        // Filter state
+        let currentFilters = {
+            category: 'all',
+            year: 'all',
+            format: 'all',
+            search: '',
+            sort: 'newest'
+        };
+        
+        let currentPage = 1;
+        let itemsPerPage = 12;
+        let currentView = 'grid'; // 'grid' or 'list'
+        
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', function() {
+            updateAuthDisplay();
+            renderDatasets();
+            setupEventListeners();
+            
+            // Check URL parameters for category
+            const urlParams = new URLSearchParams(window.location.search);
+            const categoryFromUrl = urlParams.get('category');
+            if (categoryFromUrl) {
+                filterByCategory(categoryFromUrl);
+            }
+        });
+        
+        function setupEventListeners() {
+            // Search input
+            document.getElementById('filterSearch').addEventListener('input', function(e) {
+                currentFilters.search = e.target.value.toLowerCase();
+                currentPage = 1;
+                renderDatasets();
             });
+            
+            // Sort options
+            document.getElementById('sortOptions').addEventListener('change', function(e) {
+                currentFilters.sort = e.target.value;
+                renderDatasets();
+            });
+            
+            // Items per page
+            document.getElementById('itemsPerPage').addEventListener('change', function(e) {
+                itemsPerPage = parseInt(e.target.value);
+                currentPage = 1;
+                renderDatasets();
+            });
+            
+            // View toggle
+            document.getElementById('gridViewBtn').addEventListener('click', function() {
+                currentView = 'grid';
+                updateViewToggle();
+                renderDatasets();
+            });
+            
+            document.getElementById('listViewBtn').addEventListener('click', function() {
+                currentView = 'list';
+                updateViewToggle();
+                renderDatasets();
+            });
+            
+            // Add search on Enter key
+            document.getElementById('searchInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    searchDataset();
+                }
+            });
+        }
+        
+        function updateViewToggle() {
+            const gridBtn = document.getElementById('gridViewBtn');
+            const listBtn = document.getElementById('listViewBtn');
+            
+            if (currentView === 'grid') {
+                gridBtn.classList.add('bg-blue-600', 'text-white');
+                gridBtn.classList.remove('bg-white', 'text-slate-600');
+                listBtn.classList.add('bg-white', 'text-slate-600');
+                listBtn.classList.remove('bg-blue-600', 'text-white');
+            } else {
+                listBtn.classList.add('bg-blue-600', 'text-white');
+                listBtn.classList.remove('bg-white', 'text-slate-600');
+                gridBtn.classList.add('bg-white', 'text-slate-600');
+                gridBtn.classList.remove('bg-blue-600', 'text-white');
+            }
+        }
+        
+        function filterByCategory(category) {
+            currentFilters.category = category;
             currentPage = 1;
+            updateActiveFilters();
+            renderDatasets();
+            
+            // Update active state
+            document.querySelectorAll('.filter-category').forEach(btn => {
+                btn.classList.remove('active-filter');
+                btn.classList.remove('bg-blue-600', 'text-white');
+                btn.classList.add('text-slate-700', 'hover:bg-slate-50');
+            });
+            
+            const activeBtn = document.querySelector(`.filter-category[onclick*="${category}"]`);
+            if (activeBtn) {
+                activeBtn.classList.add('active-filter');
+                activeBtn.classList.add('bg-blue-600', 'text-white');
+                activeBtn.classList.remove('text-slate-700', 'hover:bg-slate-50');
+            }
+        }
+        
+        function filterByYear(year) {
+            currentFilters.year = year;
+            currentPage = 1;
+            updateActiveFilters();
+            renderDatasets();
+            
+            // Update active state
+            document.querySelectorAll('.filter-year').forEach(btn => {
+                btn.classList.remove('active-filter');
+                btn.classList.remove('bg-blue-600', 'text-white');
+                btn.classList.add('text-slate-700', 'hover:bg-slate-50');
+            });
+            
+            const activeBtn = document.querySelector(`.filter-year[onclick*="${year}"]`);
+            if (activeBtn) {
+                activeBtn.classList.add('active-filter');
+                activeBtn.classList.add('bg-blue-600', 'text-white');
+                activeBtn.classList.remove('text-slate-700', 'hover:bg-slate-50');
+            }
+        }
+        
+        function filterByFormat(format) {
+            currentFilters.format = format;
+            currentPage = 1;
+            updateActiveFilters();
+            renderDatasets();
+            
+            // Update active state
+            document.querySelectorAll('.filter-format').forEach(btn => {
+                btn.classList.remove('active-filter');
+                btn.classList.remove('bg-blue-600', 'text-white');
+                btn.classList.add('bg-slate-100', 'text-slate-700');
+            });
+            
+            const activeBtn = document.querySelector(`.filter-format[onclick*="${format}"]`);
+            if (activeBtn) {
+                activeBtn.classList.add('active-filter');
+                activeBtn.classList.add('bg-blue-600', 'text-white');
+                activeBtn.classList.remove('bg-slate-100', 'text-slate-700');
+            }
+        }
+        
+        function updateActiveFilters() {
+            const activeFiltersContainer = document.getElementById('activeFilters');
+            let activeFiltersHTML = '';
+            
+            if (currentFilters.category !== 'all') {
+                activeFiltersHTML += `
+                    <div class="flex items-center bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">
+                        <span>Kategori: ${currentFilters.category}</span>
+                        <button onclick="filterByCategory('all')" class="ml-2 text-blue-600 hover:text-blue-800">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                `;
+            }
+            
+            if (currentFilters.year !== 'all') {
+                activeFiltersHTML += `
+                    <div class="flex items-center bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">
+                        <span>Tahun: ${currentFilters.year}</span>
+                        <button onclick="filterByYear('all')" class="ml-2 text-blue-600 hover:text-blue-800">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                `;
+            }
+            
+            if (currentFilters.format !== 'all') {
+                activeFiltersHTML += `
+                    <div class="flex items-center bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">
+                        <span>Format: ${currentFilters.format}</span>
+                        <button onclick="filterByFormat('all')" class="ml-2 text-blue-600 hover:text-blue-800">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                `;
+            }
+            
+            if (currentFilters.search) {
+                activeFiltersHTML += `
+                    <div class="flex items-center bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">
+                        <span>Pencarian: "${currentFilters.search}"</span>
+                        <button onclick="clearSearch()" class="ml-2 text-blue-600 hover:text-blue-800">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                `;
+            }
+            
+            activeFiltersContainer.innerHTML = activeFiltersHTML;
+        }
+        
+        function clearSearch() {
+            currentFilters.search = '';
+            document.getElementById('filterSearch').value = '';
+            currentPage = 1;
+            updateActiveFilters();
             renderDatasets();
         }
-
-        function setCategory(cat) {
-            currentCategory = cat;
-            document.querySelectorAll('.cat-btn').forEach(btn => {
-                btn.classList.remove('bg-blue-50', 'text-blue-700', 'font-bold');
-                btn.classList.add('text-slate-600');
+        
+        function clearAllFilters() {
+            currentFilters = {
+                category: 'all',
+                year: 'all',
+                format: 'all',
+                search: '',
+                sort: 'newest'
+            };
+            
+            document.getElementById('filterSearch').value = '';
+            document.getElementById('sortOptions').value = 'newest';
+            currentPage = 1;
+            
+            // Reset all filter buttons
+            document.querySelectorAll('.filter-category, .filter-year, .filter-format').forEach(btn => {
+                btn.classList.remove('active-filter', 'bg-blue-600', 'text-white');
+                if (btn.classList.contains('filter-category') || btn.classList.contains('filter-year')) {
+                    btn.classList.add('text-slate-700', 'hover:bg-slate-50');
+                } else {
+                    btn.classList.add('bg-slate-100', 'text-slate-700');
+                }
             });
-            document.querySelector(`[data-cat="${cat}"]`).classList.add('bg-blue-50', 'text-blue-700', 'font-bold');
-            applyFilters();
+            
+            // Set "all" filters as active
+            document.querySelector('.filter-category[onclick*="all"]').classList.add('active-filter', 'bg-blue-600', 'text-white');
+            document.querySelector('.filter-year[onclick*="all"]').classList.add('active-filter', 'bg-blue-600', 'text-white');
+            document.querySelector('.filter-format[onclick*="all"]').classList.add('active-filter', 'bg-blue-600', 'text-white');
+            
+            updateActiveFilters();
+            renderDatasets();
         }
-
-        document.getElementById('searchInput').addEventListener('input', applyFilters);
-        function nextPage() { if (currentPage * itemsPerPage < filteredData.length) { currentPage++; renderDatasets(); window.scrollTo({top: 0, behavior: 'smooth'}); } }
-        function prevPage() { if (currentPage > 1) { currentPage--; renderDatasets(); window.scrollTo({top: 0, behavior: 'smooth'}); } }
-
-        renderDatasets();
+        
+        function sortDatasets(datasetsToSort) {
+            switch(currentFilters.sort) {
+                case 'newest':
+                    return datasetsToSort.sort((a, b) => b.id - a.id);
+                case 'oldest':
+                    return datasetsToSort.sort((a, b) => a.id - b.id);
+                case 'popular':
+                    return datasetsToSort.sort((a, b) => b.downloads - a.downloads);
+                case 'az':
+                    return datasetsToSort.sort((a, b) => a.title.localeCompare(b.title));
+                case 'za':
+                    return datasetsToSort.sort((a, b) => b.title.localeCompare(a.title));
+                default:
+                    return datasetsToSort;
+            }
+        }
+        
+        function renderDatasets() {
+            // Show loading state
+            document.getElementById('loadingState').classList.remove('hidden');
+            document.getElementById('datasetsContainer').innerHTML = '';
+            document.getElementById('noResults').classList.add('hidden');
+            
+            // Filter datasets
+            let filtered = datasets.filter(dataset => {
+                // Category filter
+                if (currentFilters.category !== 'all' && dataset.category !== currentFilters.category) {
+                    return false;
+                }
+                
+                // Year filter
+                if (currentFilters.year !== 'all' && dataset.year !== currentFilters.year) {
+                    return false;
+                }
+                
+                // Format filter
+                if (currentFilters.format !== 'all' && dataset.format !== currentFilters.format) {
+                    return false;
+                }
+                
+                // Search filter
+                if (currentFilters.search && 
+                    !dataset.title.toLowerCase().includes(currentFilters.search) && 
+                    !dataset.description.toLowerCase().includes(currentFilters.search) &&
+                    !dataset.category.toLowerCase().includes(currentFilters.search)) {
+                    return false;
+                }
+                
+                return true;
+            });
+            
+            // Sort datasets
+            filtered = sortDatasets(filtered);
+            
+            // Hide loading state after delay
+            setTimeout(() => {
+                document.getElementById('loadingState').classList.add('hidden');
+                
+                if (filtered.length === 0) {
+                    document.getElementById('noResults').classList.remove('hidden');
+                    document.getElementById('resultsCount').textContent = 'Tidak ada dataset ditemukan';
+                    document.getElementById('totalItems').textContent = '0';
+                    updatePagination(0);
+                    return;
+                }
+                
+                // Update results count
+                document.getElementById('resultsCount').textContent = `Menampilkan ${filtered.length} dataset`;
+                document.getElementById('totalItems').textContent = filtered.length;
+                
+                // Pagination
+                const totalPages = Math.ceil(filtered.length / itemsPerPage);
+                const startIndex = (currentPage - 1) * itemsPerPage;
+                const endIndex = startIndex + itemsPerPage;
+                const paginatedDatasets = filtered.slice(startIndex, endIndex);
+                
+                // Render datasets
+                const container = document.getElementById('datasetsContainer');
+                container.innerHTML = '';
+                
+                paginatedDatasets.forEach(dataset => {
+                    const cardHTML = currentView === 'grid' ? 
+                        renderGridCard(dataset) : 
+                        renderListCard(dataset);
+                    
+                    container.innerHTML += cardHTML;
+                });
+                
+                // Update pagination
+                updatePagination(filtered.length);
+                
+            }, 300); // Simulate loading delay
+        }
+        
+        function renderGridCard(dataset) {
+            const categoryColors = {
+                'Lalu Lintas': 'bg-red-100 text-red-700',
+                'Transportasi': 'bg-purple-100 text-purple-700',
+                'Parkir': 'bg-blue-100 text-blue-700',
+                'Terminal': 'bg-green-100 text-green-700',
+                'Infrastruktur': 'bg-amber-100 text-amber-700',
+                'Personel': 'bg-cyan-100 text-cyan-700'
+            };
+            
+            const formatIcons = {
+                'CSV': 'fas fa-file-csv',
+                'Excel': 'fas fa-file-excel',
+                'JSON': 'fas fa-file-code'
+            };
+            
+            return `
+                <div class="bg-white rounded-2xl shadow-lg border border-slate-100 p-5 card-hover animate-fade-in">
+                    <div class="flex justify-between items-start mb-3">
+                        <span class="px-3 py-1 ${categoryColors[dataset.category]} rounded-full text-xs font-bold">
+                            ${dataset.category}
+                        </span>
+                        ${dataset.featured ? '<span class="text-amber-500"><i class="fas fa-star"></i></span>' : ''}
+                    </div>
+                    
+                    <h3 class="font-bold text-slate-900 mb-2 dataset-title line-clamp-2">${dataset.title}</h3>
+                    <p class="text-slate-600 text-sm mb-4 dataset-desc line-clamp-2">${dataset.description}</p>
+                    
+                    <div class="flex items-center justify-between text-sm text-slate-500 mb-4">
+                        <div class="flex items-center">
+                            <i class="fas fa-calendar mr-1"></i>
+                            <span>${dataset.year}</span>
+                        </div>
+                        <div class="flex items-center">
+                            <i class="${formatIcons[dataset.format] || 'fas fa-file'} mr-1"></i>
+                            <span>${dataset.format}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center justify-between pt-4 border-t border-slate-100">
+                        <div class="flex items-center space-x-3">
+                            <div class="text-xs text-slate-600">
+                                <i class="fas fa-download mr-1"></i>
+                                ${dataset.downloads.toLocaleString()}
+                            </div>
+                            <div class="text-xs text-slate-600">
+                                <i class="fas fa-clock mr-1"></i>
+                                ${dataset.lastUpdate}
+                            </div>
+                        </div>
+                        <a href="detail.html?id=${dataset.id}" class="bg-blue-600 text-white px-4 py-2 rounded-xl font-medium hover:bg-blue-700 transition text-sm">
+                            <i class="fas fa-eye mr-1"></i> Detail
+                        </a>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function renderListCard(dataset) {
+            const categoryColors = {
+                'Lalu Lintas': 'bg-red-100 text-red-700',
+                'Transportasi': 'bg-purple-100 text-purple-700',
+                'Parkir': 'bg-blue-100 text-blue-700',
+                'Terminal': 'bg-green-100 text-green-700',
+                'Infrastruktur': 'bg-amber-100 text-amber-700',
+                'Personel': 'bg-cyan-100 text-cyan-700'
+            };
+            
+            return `
+                <div class="bg-white rounded-2xl shadow-lg border border-slate-100 p-5 card-hover animate-fade-in col-span-1 sm:col-span-2 lg:col-span-3">
+                    <div class="flex flex-col sm:flex-row sm:items-start gap-4">
+                        <div class="sm:w-2/3">
+                            <div class="flex items-center gap-3 mb-2">
+                                <span class="px-3 py-1 ${categoryColors[dataset.category]} rounded-full text-xs font-bold">
+                                    ${dataset.category}
+                                </span>
+                                <span class="text-slate-500 text-sm">${dataset.year}</span>
+                                ${dataset.featured ? '<span class="text-amber-500 text-sm"><i class="fas fa-star"></i> Unggulan</span>' : ''}
+                            </div>
+                            
+                            <h3 class="font-bold text-slate-900 text-lg mb-2">${dataset.title}</h3>
+                            <p class="text-slate-600 mb-4">${dataset.description}</p>
+                            
+                            <div class="flex items-center gap-4 text-sm text-slate-600">
+                                <div class="flex items-center">
+                                    <i class="fas fa-download mr-1"></i>
+                                    <span>${dataset.downloads.toLocaleString()} download</span>
+                                </div>
+                                <div class="flex items-center">
+                                    <i class="fas fa-clock mr-1"></i>
+                                    <span>Update: ${dataset.lastUpdate}</span>
+                                </div>
+                                <div class="flex items-center">
+                                    <i class="fas fa-file mr-1"></i>
+                                    <span>Format: ${dataset.format}</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="sm:w-1/3 flex flex-col items-end justify-between">
+                            <div class="mb-4 sm:mb-0">
+                                <div class="text-right text-sm text-slate-600 mb-2">
+                                    Akses dataset ini
+                                </div>
+                                <div class="flex flex-col sm:flex-row gap-2">
+                                    <a href="detail.html?id=${dataset.id}" class="bg-blue-600 text-white px-4 py-2 rounded-xl font-medium hover:bg-blue-700 transition text-center">
+                                        <i class="fas fa-eye mr-1"></i> Detail
+                                    </a>
+                                    <button class="bg-slate-100 text-slate-700 px-4 py-2 rounded-xl font-medium hover:bg-slate-200 transition">
+                                        <i class="fas fa-download mr-1"></i> Unduh
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function updatePagination(totalItems) {
+            const totalPages = Math.ceil(totalItems / itemsPerPage);
+            const paginationInfo = document.getElementById('paginationInfo');
+            const pageNumbers = document.getElementById('pageNumbers');
+            const prevBtn = document.getElementById('prevPageBtn');
+            const nextBtn = document.getElementById('nextPageBtn');
+            
+            // Update pagination info
+            paginationInfo.textContent = `Halaman ${currentPage} dari ${totalPages}`;
+            
+            // Update button states
+            prevBtn.disabled = currentPage === 1;
+            nextBtn.disabled = currentPage === totalPages;
+            
+            // Generate page numbers
+            let pageNumbersHTML = '';
+            const maxVisiblePages = window.innerWidth < 640 ? 3 : 5;
+            
+            let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+            let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+            
+            if (endPage - startPage + 1 < maxVisiblePages) {
+                startPage = Math.max(1, endPage - maxVisiblePages + 1);
+            }
+            
+            // First page
+            if (startPage > 1) {
+                pageNumbersHTML += `
+                    <button onclick="goToPage(1)" class="w-10 h-10 flex items-center justify-center border border-slate-200 rounded-xl hover:bg-slate-50 transition">
+                        1
+                    </button>
+                    ${startPage > 2 ? '<span class="px-2">...</span>' : ''}
+                `;
+            }
+            
+            // Page numbers
+            for (let i = startPage; i <= endPage; i++) {
+                pageNumbersHTML += `
+                    <button onclick="goToPage(${i})" 
+                        class="w-10 h-10 flex items-center justify-center border rounded-xl transition
+                        ${currentPage === i ? 'bg-blue-600 text-white border-blue-600' : 'border-slate-200 hover:bg-slate-50'}">
+                        ${i}
+                    </button>
+                `;
+            }
+            
+            // Last page
+            if (endPage < totalPages) {
+                pageNumbersHTML += `
+                    ${endPage < totalPages - 1 ? '<span class="px-2">...</span>' : ''}
+                    <button onclick="goToPage(${totalPages})" class="w-10 h-10 flex items-center justify-center border border-slate-200 rounded-xl hover:bg-slate-50 transition">
+                        ${totalPages}
+                    </button>
+                `;
+            }
+            
+            pageNumbers.innerHTML = pageNumbersHTML;
+        }
+        
+        function goToPage(page) {
+            currentPage = page;
+            renderDatasets();
+            // Scroll to top of datasets
+            document.getElementById('datasetsContainer').scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        function prevPage() {
+            if (currentPage > 1) {
+                goToPage(currentPage - 1);
+            }
+        }
+        
+        function nextPage() {
+            const totalItems = datasets.length;
+            const totalPages = Math.ceil(totalItems / itemsPerPage);
+            if (currentPage < totalPages) {
+                goToPage(currentPage + 1);
+            }
+        }
     </script>
 </body>
 </html>
