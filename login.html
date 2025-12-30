@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Pa'lintasang Data</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700;800&display=swap');
+        
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .accent-makassar { 
+            color: #facc15; 
+        }
+        
+        .login-card {
+            background: white;
+            border-radius: 1rem;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease;
+        }
+        
+        .login-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .input-focus:focus {
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+            border-color: #3b82f6;
+        }
+        
+        .btn-login {
+            background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-login:hover {
+            background: linear-gradient(135deg, #1e40af 0%, #1d4ed8 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(30, 64, 175, 0.3);
+        }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen">
+    
+    <!-- Simple Navigation -->
+    <nav class="bg-white/90 backdrop-blur-md py-4 border-b border-slate-200">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-between items-center">
+                <a href="index.html" class="flex items-center space-x-2">
+                    <div class="bg-blue-900 p-2 rounded-lg">
+                        <i class="fas fa-route text-white"></i>
+                    </div>
+                    <span class="font-bold text-blue-900 text-lg">
+                        PA'LINTASANG <span class="text-amber-500">DATA</span>
+                    </span>
+                </a>
+                <a href="index.html" class="text-blue-600 hover:text-blue-800 font-medium">
+                    <i class="fas fa-arrow-left mr-1"></i> Kembali
+                </a>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Main Content -->
+    <main class="flex-grow flex items-center justify-center p-4">
+        <div class="w-full max-w-md">
+            <!-- Login Card -->
+            <div class="login-card p-8">
+                <!-- Header -->
+                <div class="text-center mb-8">
+                    <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-user-lock text-blue-600 text-2xl"></i>
+                    </div>
+                    <h1 class="text-2xl font-bold text-blue-900 mb-2">Login ke Sistem</h1>
+                    <p class="text-slate-600">Portal Data Transportasi Kota Makassar</p>
+                </div>
+                
+                <!-- Login Form -->
+                <form id="loginForm" class="space-y-6">
+                    <!-- Username -->
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-2">
+                            <i class="fas fa-user mr-2 text-blue-600"></i>Username
+                        </label>
+                        <input 
+                            type="text" 
+                            id="username" 
+                            required
+                            class="input-focus w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none transition"
+                            placeholder="Masukkan username"
+                        >
+                    </div>
+                    
+                    <!-- Password -->
+                    <div>
+                        <div class="flex justify-between items-center mb-2">
+                            <label class="block text-sm font-medium text-slate-700">
+                                <i class="fas fa-key mr-2 text-blue-600"></i>Password
+                            </label>
+                            <a href="forgot-password.html" class="text-xs text-blue-600 hover:text-blue-800">
+                                Lupa password?
+                            </a>
+                        </div>
+                        <input 
+                            type="password" 
+                            id="password" 
+                            required
+                            class="input-focus w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none transition"
+                            placeholder="Masukkan password"
+                        >
+                    </div>
+                    
+                    <!-- Error Message -->
+                    <div id="errorMessage" class="hidden bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+                        <i class="fas fa-exclamation-triangle mr-2"></i>
+                        <span id="errorText"></span>
+                    </div>
+                    
+                    <!-- Login Button -->
+                    <button 
+                        type="submit"
+                        id="loginButton"
+                        class="btn-login w-full text-white font-bold py-3 px-4 rounded-lg"
+                    >
+                        <i class="fas fa-sign-in-alt mr-2"></i> Login
+                    </button>
+                    
+                    <!-- Demo Accounts -->
+                    <div class="mt-6 pt-6 border-t border-slate-100">
+                        <p class="text-xs text-slate-500 text-center mb-3">Akun demo untuk testing:</p>
+                        <div class="grid grid-cols-3 gap-2">
+                            <button type="button" onclick="fillDemoCredentials('admin')" 
+                                class="text-xs bg-blue-100 hover:bg-blue-200 text-blue-800 py-2 rounded">
+                                Admin
+                            </button>
+                            <button type="button" onclick="fillDemoCredentials('dishub')" 
+                                class="text-xs bg-green-100 hover:bg-green-200 text-green-800 py-2 rounded">
+                                Staff
+                            </button>
+                            <button type="button" onclick="fillDemoCredentials('user')" 
+                                class="text-xs bg-purple-100 hover:bg-purple-200 text-purple-800 py-2 rounded">
+                                User
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Register Link -->
+                    <div class="text-center mt-6">
+                        <p class="text-slate-600 text-sm">
+                            Belum punya akun?
+                            <a href="register.html" class="text-blue-600 hover:text-blue-800 font-medium ml-1">
+                                Daftar di sini
+                            </a>
+                        </p>
+                    </div>
+                </form>
+            </div>
+            
+            <!-- Footer Note -->
+            <div class="text-center mt-6 text-white text-sm">
+                <p>© 2025 Dinas Perhubungan Kota Makassar</p>
+                <p class="text-white/70 text-xs mt-1">Sistem Informasi Transportasi Terintegrasi</p>
+            </div>
+        </div>
+    </main>
+    
+    <!-- JavaScript -->
+    <script>
+        // Login Form Submission
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value.trim();
+            const errorMessage = document.getElementById('errorMessage');
+            const errorText = document.getElementById('errorText');
+            const loginButton = document.getElementById('loginButton');
+            
+            // Reset error message
+            errorMessage.classList.add('hidden');
+            
+            // Simple validation
+            if (!username || !password) {
+                errorText.textContent = 'Username dan password harus diisi';
+                errorMessage.classList.remove('hidden');
+                return;
+            }
+            
+            // Show loading state
+            const originalButtonText = loginButton.innerHTML;
+            loginButton.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Memproses...';
+            loginButton.disabled = true;
+            
+            // Simulate API call
+            setTimeout(() => {
+                // Demo credentials
+                let isValidLogin = false;
+                let userData = {};
+                
+                // Check credentials
+                if (username === 'admin' && password === 'admin123') {
+                    isValidLogin = true;
+                    userData = { username: 'admin', display: 'Administrator', role: 'admin' };
+                } else if (username === 'dishub' && password === 'dishub123') {
+                    isValidLogin = true;
+                    userData = { username: 'dishub', display: 'Petugas Dishub', role: 'staff' };
+                } else if (username === 'user' && password === 'user12345') {
+                    isValidLogin = true;
+                    userData = { username: 'user', display: 'Pengguna', role: 'user' };
+                } else if (username === 'demo' && password === 'demo123') {
+                    isValidLogin = true;
+                    userData = { username: 'demo', display: 'Demo User', role: 'user' };
+                }
+                
+                if (isValidLogin) {
+                    // Store user data
+                    localStorage.setItem('pd_username', userData.username);
+                    localStorage.setItem('pd_display', userData.display);
+                    localStorage.setItem('pd_role', userData.role);
+                    
+                    // Show success
+                    errorMessage.classList.remove('hidden');
+                    errorMessage.classList.remove('bg-red-50', 'border-red-200', 'text-red-700');
+                    errorMessage.classList.add('bg-green-50', 'border-green-200', 'text-green-700');
+                    errorText.innerHTML = '<i class="fas fa-check-circle mr-2"></i> Login berhasil!';
+                    
+                    // Redirect to home
+                    setTimeout(() => {
+                        window.location.href = 'index.html';
+                    }, 1000);
+                    
+                } else {
+                    // Show error
+                    errorText.textContent = 'Username atau password salah';
+                    errorMessage.classList.remove('hidden');
+                    errorMessage.classList.remove('bg-green-50', 'border-green-200', 'text-green-700');
+                    errorMessage.classList.add('bg-red-50', 'border-red-200', 'text-red-700');
+                    
+                    // Reset button
+                    loginButton.innerHTML = originalButtonText;
+                    loginButton.disabled = false;
+                }
+            }, 1000);
+        });
+        
+        // Demo credentials auto-fill
+        function fillDemoCredentials(role) {
+            if (role === 'admin') {
+                document.getElementById('username').value = 'admin';
+                document.getElementById('password').value = 'admin123';
+            } else if (role === 'dishub') {
+                document.getElementById('username').value = 'dishub';
+                document.getElementById('password').value = 'dishub123';
+            } else if (role === 'user') {
+                document.getElementById('username').value = 'user';
+                document.getElementById('password').value = 'user12345';
+            }
+        }
+        
+        // Check if already logged in
+        document.addEventListener('DOMContentLoaded', function() {
+            const username = localStorage.getItem('pd_username');
+            if (username) {
+                window.location.href = 'index.html';
+            }
+        });
+    </script>
+</body>
+</html>
