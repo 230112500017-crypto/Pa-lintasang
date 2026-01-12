@@ -285,7 +285,7 @@
                     if (selectedFile) {
                         if (!isValidFile(selectedFile)) return;
 
-                        // Convert file to base64 for storage
+                        // Convert file to base64 for Google Sheets upload
                         const reader = new FileReader();
                         await new Promise((resolve, reject) => {
                             reader.onload = resolve;
@@ -299,15 +299,12 @@
                         dataset.format = selectedFile.name.split('.').pop().toUpperCase();
                     }
 
-                    // Send data directly to Google Sheets
-                    alert('📤 Mengirim data ke Google Sheets...');
+                    // Send data directly to Google Sheets for public access
+                    alert('📤 Mengupload data ke Google Sheets...');
                     const sheetsResult = await uploadToGoogleSheets(dataset);
 
                     if (sheetsResult && sheetsResult.success) {
-                        // Save to IndexedDB for public access
-                        await saveDataset(dataset);
-
-                        // Success message
+                        // Success message - data is now publicly accessible
                         const successMessage = `
 ✅ **DATASET BERHASIL DIPUBLIKASIKAN!**
 
@@ -316,9 +313,7 @@ Kategori: ${category}
 Tahun: ${year}
 ID: ${dataset.id}
 
-Data telah disimpan ke:
-• Google Sheets ✓
-• Database publik ✓
+Data telah diupload ke Google Sheets dan dapat diakses oleh semua orang!
 
 Data akan muncul di halaman dataset dalam beberapa detik.
                         `;
@@ -331,42 +326,32 @@ Data akan muncul di halaman dataset dalam beberapa detik.
                         descEl.value = '';
                         fileInput.value = '';
 
-                        // Redirect to Datasets page
+                        // Redirect to Datasets page where everyone can see it
                         setTimeout(() => {
                             window.location.href = `Datasets.html?added=${encodeURIComponent(dataset.id)}`;
                         }, 2000);
 
                     } else {
-                        throw new Error('Gagal mengirim ke Google Sheets');
+                        throw new Error('Gagal mengupload ke Google Sheets');
                     }
 
                 } catch (error) {
-                    console.error('Publish failed:', error);
+                    console.error('Upload failed:', error);
 
-                    // Fallback: Save to IndexedDB only
-                    await saveDataset(dataset);
+                    const errorMessage = `
+❌ **GAGAL UPLOAD DATASET**
 
-                    const fallbackMessage = `
-⚠️ **GOOGLE SHEETS OFFLINE - DISIMPAN LOKAL**
+Error: ${error.message}
 
-Data berhasil disimpan di database lokal:
-ID: ${dataset.id}
+Pastikan:
+• Koneksi internet stabil
+• Google Script URL sudah dikonfigurasi dengan benar
+• API Key valid
 
-Catatan: Data tersimpan dan dapat diakses publik.
-Untuk sinkronisasi ke Google Sheets, coba lagi nanti.
+Silakan coba lagi.
                     `;
 
-                    alert(fallbackMessage);
-
-                    // Reset form
-                    clearTable();
-                    titleEl.value = '';
-                    descEl.value = '';
-
-                    // Redirect to Datasets page
-                    setTimeout(() => {
-                        window.location.href = `Datasets.html?added=${encodeURIComponent(dataset.id)}`;
-                    }, 1500);
+                    alert(errorMessage);
                 }
             });
         })();
