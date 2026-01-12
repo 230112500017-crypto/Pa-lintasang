@@ -1,0 +1,1182 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profil Bidang Angkutan - Pa'lintasang Data</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .hero-gradient { background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%); }
+        .accent-makassar { color: #facc15; } 
+        
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .animate-fadeInUp {
+            animation: fadeInUp 0.5s ease-out forwards;
+        }
+        
+        /* Card Hover Effects */
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Tab Styles */
+        .tab-button {
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .tab-button.active {
+            color: #1e40af;
+            font-weight: 600;
+        }
+        
+        .tab-button.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: #1e40af;
+            border-radius: 3px 3px 0 0;
+        }
+        
+        /* Leadership Card */
+        .leader-card {
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .leader-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .leader-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(to right, #8b5cf6, #3b82f6);
+        }
+        
+        /* Organization Chart */
+        .org-node {
+            position: relative;
+            padding: 1rem;
+            background: white;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .org-node:hover {
+            transform: scale(1.02);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .org-line {
+            position: absolute;
+            background: #cbd5e1;
+        }
+        
+        /* Mission Cards */
+        .mission-card {
+            background: linear-gradient(135deg, #f3f4f6 0%, white 100%);
+            border-left: 4px solid #8b5cf6;
+        }
+        
+        /* Timeline */
+        .timeline-item {
+            position: relative;
+            padding-left: 2rem;
+        }
+        
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0.5rem;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #8b5cf6;
+        }
+        
+        .timeline-item::after {
+            content: '';
+            position: absolute;
+            left: 5px;
+            top: 1.5rem;
+            bottom: -1rem;
+            width: 2px;
+            background: #e5e7eb;
+        }
+        
+        .timeline-item:last-child::after {
+            display: none;
+        }
+        
+        /* Gradient Backgrounds */
+        .gradient-purple {
+            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+        }
+        
+        .gradient-blue {
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+        }
+        
+        .gradient-cyan {
+            background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+        }
+        
+        .gradient-emerald {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        }
+        
+        /* Floating Animation */
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+        
+        .animate-float {
+            animation: float 3s ease-in-out infinite;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-900">
+
+    <!-- Navigation -->
+    <nav class="bg-white/80 backdrop-blur-md sticky top-0 z-50 border-b border-slate-200">
+        <div class="container mx-auto px-4 sm:px-6 py-3 sm:py-4">
+            <div class="flex justify-between items-center">
+                <!-- Logo & Brand -->
+                <div class="flex items-center space-x-2 sm:space-x-3">
+                    <a href="index.html" class="flex items-center space-x-2 sm:space-x-3">
+                        <div class="bg-blue-900 p-2 rounded-lg">
+                            <i class="fas fa-route text-white text-lg sm:text-xl"></i>
+                        </div>
+                        <div>
+                            <h1 class="font-bold text-sm sm:text-xl leading-tight tracking-tight text-blue-900">PA'LINTASANG <span class="text-amber-500">DATA</span></h1>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- Desktop Navigation -->
+                <div class="hidden lg:flex space-x-1 font-medium text-sm items-center">
+                    <a href="index.html" class="text-slate-700 hover:text-blue-600 transition px-3 py-2">Beranda</a>
+                    <a href="katalog.html" class="text-slate-700 hover:text-blue-600 transition px-3 py-2">Katalog</a>
+                    <a href="katalog.html" class="text-blue-600 hover:text-blue-700 transition px-3 py-2">Bidang</a>
+                </div>
+
+                <!-- Desktop Login & Mobile Toggle -->
+                <div class="flex items-center space-x-3">
+                    <a href="login.html" class="hidden sm:block bg-blue-900 text-white px-4 sm:px-5 py-2 rounded-full text-xs sm:text-sm font-semibold hover:bg-blue-800 transition">
+                        Login
+                    </a>
+                    <!-- Mobile Menu Toggle -->
+                    <button id="menuToggle" class="lg:hidden text-blue-900 text-xl p-2">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Mobile Navigation Menu -->
+            <div id="mobileMenu" class="mobile-menu lg:hidden bg-white border-t border-slate-200 mt-3 rounded-lg overflow-hidden">
+                <div class="flex flex-col space-y-1 p-4">
+                    <a href="index.html" class="text-slate-700 hover:bg-blue-50 px-3 py-2 rounded-lg transition">Beranda</a>
+                    <a href="katalog.html" class="text-slate-700 hover:bg-blue-50 px-3 py-2 rounded-lg transition">Katalog</a>
+                    <a href="login.html" class="sm:hidden block w-full bg-blue-900 text-white px-4 py-2 rounded-lg text-xs font-semibold hover:bg-blue-800 transition mt-3 text-center">
+                        Login
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Breadcrumb -->
+    <div class="container mx-auto px-4 sm:px-6 py-4">
+        <nav class="flex text-sm">
+            <a href="index.html" class="text-blue-600 hover:text-blue-700">Beranda</a>
+            <span class="mx-2 text-slate-400">/</span>
+            <a href="katalog.html" class="text-blue-600 hover:text-blue-700">Katalog</a>
+            <span class="mx-2 text-slate-400">/</span>
+            <span class="text-slate-600 font-medium">Bidang Angkutan</span>
+        </nav>
+    </div>
+
+    <!-- Hero Section -->
+    <header class="relative overflow-hidden bg-gradient-to-r from-purple-50 to-white border-b border-purple-100">
+        <div class="absolute inset-0 opacity-5">
+            <div class="absolute top-0 right-0 w-64 h-64 bg-purple-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-float"></div>
+            <div class="absolute bottom-0 left-0 w-64 h-64 bg-blue-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-float" style="animation-delay: 1s"></div>
+        </div>
+        
+        <div class="container mx-auto px-4 sm:px-6 py-8 sm:py-12 relative">
+            <div class="flex flex-col lg:flex-row items-start lg:items-center gap-8">
+                <!-- Icon & Title -->
+                <div class="flex-shrink-0">
+                    <div class="bg-gradient-purple p-4 sm:p-6 rounded-2xl shadow-xl">
+                        <i class="fas fa-bus text-white text-4xl sm:text-5xl"></i>
+                    </div>
+                </div>
+                
+                <!-- Content -->
+                <div class="flex-grow">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
+                        <div>
+                            <span class="inline-block bg-purple-100 text-purple-700 px-3 py-1 rounded-full text-xs font-bold mb-2">
+                                <i class="fas fa-cogs mr-1"></i> Bidang Utama
+                            </span>
+                            <h1 class="text-3xl sm:text-4xl font-bold text-blue-900 mb-2">Bidang Angkutan</h1>
+                            <p class="text-slate-600 text-sm sm:text-base mb-4">Pengaturan, Pengendalian, dan Pengembangan Angkutan Jalan di Kota Makassar</p>
+                        </div>
+                        <div class="flex items-center space-x-4">
+                            <div class="text-center">
+                                <div class="text-2xl sm:text-3xl font-bold text-blue-900">842</div>
+                                <div class="text-xs text-slate-500">Unit Angkot</div>
+                            </div>
+                            <div class="h-8 w-px bg-slate-300"></div>
+                            <div class="text-center">
+                                <div class="text-2xl sm:text-3xl font-bold text-blue-900">8</div>
+                                <div class="text-xs text-slate-500">Dataset</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Tabs -->
+                    <div class="flex space-x-1 border-b border-slate-200 overflow-x-auto">
+                        <button class="tab-button active px-4 py-3 text-sm font-medium whitespace-nowrap" data-tab="profil">
+                            <i class="fas fa-id-card mr-2"></i>Profil
+                        </button>
+                        <button class="tab-button px-4 py-3 text-sm font-medium whitespace-nowrap" data-tab="visi-misi">
+                            <i class="fas fa-bullseye mr-2"></i>Visi & Misi
+                        </button>
+                        <button class="tab-button px-4 py-3 text-sm font-medium whitespace-nowrap" data-tab="organisasi">
+                            <i class="fas fa-sitemap mr-2"></i>Organisasi
+                        </button>
+                        <button class="tab-button px-4 py-3 text-sm font-medium whitespace-nowrap" data-tab="data">
+                            <i class="fas fa-chart-bar mr-2"></i>Data & Statistik
+                        </button>
+                        <button class="tab-button px-4 py-3 text-sm font-medium whitespace-nowrap" data-tab="layanan">
+                            <i class="fas fa-concierge-bell mr-2"></i>Layanan
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 sm:px-6 py-8 sm:py-12">
+        <!-- Tab Content -->
+        <div id="tabContent">
+            <!-- Profil Tab -->
+            <div id="profilTab" class="tab-content active animate-fadeInUp">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <!-- Left Column -->
+                    <div class="lg:col-span-2 space-y-8">
+                        <!-- About Section -->
+                        <div class="bg-white rounded-2xl shadow-lg border border-slate-100 p-6 sm:p-8 card-hover">
+                            <h3 class="text-xl font-bold text-blue-900 mb-6">Tentang Bidang Angkutan</h3>
+                            <div class="space-y-6">
+                                <div class="flex items-start space-x-4">
+                                    <div class="flex-shrink-0">
+                                        <div class="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
+                                            <i class="fas fa-info-circle text-purple-600 text-xl"></i>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <h4 class="text-lg font-semibold text-slate-800 mb-2">Profil Singkat</h4>
+                                        <p class="text-slate-600 leading-relaxed">
+                                            Bidang Angkutan merupakan salah satu bidang utama di Dinas Perhubungan Kota Makassar yang bertanggung jawab penuh atas pengaturan, pengendalian, dan pengembangan sistem angkutan jalan di wilayah Kota Makassar. 
+                                            Dengan fokus pada peningkatan pelayanan transportasi publik yang aman, nyaman, dan terjangkau bagi seluruh masyarakat.
+                                        </p>
+                                    </div>
+                                </div>
+                                
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                                    <div class="flex items-start space-x-3">
+                                        <i class="fas fa-check-circle text-emerald-500 mt-1"></i>
+                                        <div>
+                                            <p class="font-medium text-slate-800">Perizinan Angkutan</p>
+                                            <p class="text-sm text-slate-500">Registrasi dan perpanjangan izin</p>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-start space-x-3">
+                                        <i class="fas fa-check-circle text-emerald-500 mt-1"></i>
+                                        <div>
+                                            <p class="font-medium text-slate-800">Pengawasan Rute</p>
+                                            <p class="text-sm text-slate-500">Monitoring operasional angkutan</p>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-start space-x-3">
+                                        <i class="fas fa-check-circle text-emerald-500 mt-1"></i>
+                                        <div>
+                                            <p class="font-medium text-slate-800">Pengembangan Sistem</p>
+                                            <p class="text-sm text-slate-500">Inovasi sistem angkutan kota</p>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-start space-x-3">
+                                        <i class="fas fa-check-circle text-emerald-500 mt-1"></i>
+                                        <div>
+                                            <p class="font-medium text-slate-800">Penanganan Pengaduan</p>
+                                            <p class="text-sm text-slate-500">Respon keluhan masyarakat</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Timeline History -->
+                        <div class="bg-white rounded-2xl shadow-lg border border-slate-100 p-6 sm:p-8 card-hover">
+                            <h3 class="text-xl font-bold text-blue-900 mb-6">Sejarah Perkembangan</h3>
+                            <div class="space-y-6">
+                                <div class="timeline-item">
+                                    <h4 class="font-semibold text-slate-800 mb-1">2010</h4>
+                                    <p class="text-slate-600 text-sm">Pembentukan Bidang Angkutan sebagai bagian dari Dinas Perhubungan Kota Makassar</p>
+                                </div>
+                                <div class="timeline-item">
+                                    <h4 class="font-semibold text-slate-800 mb-1">2012</h4>
+                                    <p class="text-slate-600 text-sm">Implementasi sistem digital pertama untuk registrasi angkutan umum</p>
+                                </div>
+                                <div class="timeline-item">
+                                    <h4 class="font-semibold text-slate-800 mb-1">2015</h4>
+                                    <p class="text-slate-600 text-sm">Launching aplikasi monitoring angkutan berbasis GPS</p>
+                                </div>
+                                <div class="timeline-item">
+                                    <h4 class="font-semibold text-slate-800 mb-1">2018</h4>
+                                    <p class="text-slate-600 text-sm">Integrasi data angkutan dengan sistem smart city Makassar</p>
+                                </div>
+                                <div class="timeline-item">
+                                    <h4 class="font-semibold text-slate-800 mb-1">2023</h4>
+                                    <p class="text-slate-600 text-sm">Implementasi sistem real-time tracking untuk seluruh angkutan kota</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Column -->
+                    <div class="space-y-8">
+                        <!-- Quick Stats -->
+                        <div class="bg-gradient-purple text-white rounded-2xl p-6 card-hover">
+                            <h3 class="text-lg font-bold mb-6">Statistik Cepat</h3>
+                            <div class="space-y-4">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <p class="text-sm opacity-90">Angkot Aktif</p>
+                                        <p class="text-2xl font-bold">842 Unit</p>
+                                    </div>
+                                    <i class="fas fa-bus-alt text-xl opacity-80"></i>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <p class="text-sm opacity-90">Rute Terdaftar</p>
+                                        <p class="text-2xl font-bold">42 Jalur</p>
+                                    </div>
+                                    <i class="fas fa-route text-xl opacity-80"></i>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <p class="text-sm opacity-90">Penumpang/Hari</p>
+                                        <p class="text-2xl font-bold">350K+</p>
+                                    </div>
+                                    <i class="fas fa-users text-xl opacity-80"></i>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Contact & Hours -->
+                        <div class="bg-white rounded-2xl shadow-lg border border-slate-100 p-6 card-hover">
+                            <h3 class="text-lg font-bold text-blue-900 mb-6">Kontak & Jam Layanan</h3>
+                            <div class="space-y-4">
+                                <div class="flex items-start">
+                                    <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center mr-3 flex-shrink-0">
+                                        <i class="fas fa-map-marker-alt text-purple-600"></i>
+                                    </div>
+                                    <div>
+                                        <p class="font-medium text-slate-800">Lokasi Kantor</p>
+                                        <p class="text-sm text-slate-500">Gedung B Lt. 1 Dishub Makassar, Jl. Mallengkeri Raya No. 18</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center">
+                                    <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mr-3 flex-shrink-0">
+                                        <i class="fas fa-phone text-blue-600"></i>
+                                    </div>
+                                    <div>
+                                        <p class="font-medium text-slate-800">Telepon</p>
+                                        <p class="text-sm text-slate-500">(0411) 884816 ext. 301</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center">
+                                    <div class="w-10 h-10 bg-emerald-100 rounded-lg flex items-center justify-center mr-3 flex-shrink-0">
+                                        <i class="fas fa-clock text-emerald-600"></i>
+                                    </div>
+                                    <div>
+                                        <p class="font-medium text-slate-800">Jam Layanan</p>
+                                        <p class="text-sm text-slate-500">Senin-Jumat: 08.00-16.00 WITA</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center">
+                                    <div class="w-10 h-10 bg-amber-100 rounded-lg flex items-center justify-center mr-3 flex-shrink-0">
+                                        <i class="fas fa-envelope text-amber-600"></i>
+                                    </div>
+                                    <div>
+                                        <p class="font-medium text-slate-800">Email</p>
+                                        <p class="text-sm text-slate-500">angkutan@dishub.makassar.go.id</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Achievement Badges -->
+                        <div class="bg-white rounded-2xl shadow-lg border border-slate-100 p-6 card-hover">
+                            <h3 class="text-lg font-bold text-blue-900 mb-6">Prestasi & Penghargaan</h3>
+                            <div class="space-y-3">
+                                <div class="flex items-center p-3 bg-amber-50 rounded-lg">
+                                    <div class="w-8 h-8 bg-amber-100 rounded-lg flex items-center justify-center mr-3">
+                                        <i class="fas fa-award text-amber-600"></i>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm font-medium text-slate-800">Inovasi Pelayanan Terbaik 2022</p>
+                                        <p class="text-xs text-slate-500">Pemprov Sulawesi Selatan</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center p-3 bg-blue-50 rounded-lg">
+                                    <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
+                                        <i class="fas fa-trophy text-blue-600"></i>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm font-medium text-slate-800">Digital Transformation Award 2023</p>
+                                        <p class="text-xs text-slate-500">Kementerian Perhubungan</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center p-3 bg-emerald-50 rounded-lg">
+                                    <div class="w-8 h-8 bg-emerald-100 rounded-lg flex items-center justify-center mr-3">
+                                        <i class="fas fa-star text-emerald-600"></i>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm font-medium text-slate-800">Sistem Angkutan Terintegrasi 2024</p>
+                                        <p class="text-xs text-slate-500">Kota Makassar</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Visi & Misi Tab -->
+            <div id="visi-misiTab" class="tab-content hidden animate-fadeInUp">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <!-- Vision Card -->
+                    <div class="bg-gradient-blue text-white rounded-2xl p-8 card-hover">
+                        <div class="text-center mb-6">
+                            <div class="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <i class="fas fa-eye text-2xl"></i>
+                            </div>
+                            <h3 class="text-2xl font-bold mb-4">Visi</h3>
+                        </div>
+                        <div class="text-center">
+                            <p class="text-xl font-medium leading-relaxed">
+                                "Mewujudkan Sistem Angkutan Kota Makassar yang Aman, Nyaman, Terjangkau, Berkelanjutan, dan Berbasis Teknologi untuk Mendukung Smart City Makassar"
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Misi Cards -->
+                    <div class="space-y-6">
+                        <div class="mission-card rounded-xl p-6 card-hover">
+                            <div class="flex items-start mb-4">
+                                <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mr-4 flex-shrink-0">
+                                    <i class="fas fa-shield-alt text-purple-600 text-xl"></i>
+                                </div>
+                                <div>
+                                    <h4 class="text-lg font-bold text-slate-800 mb-2">Misi 1</h4>
+                                    <p class="text-slate-600">
+                                        Meningkatkan keselamatan dan keamanan angkutan umum melalui pengawasan ketat dan pemenuhan standar teknis kendaraan.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mission-card rounded-xl p-6 card-hover">
+                            <div class="flex items-start mb-4">
+                                <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mr-4 flex-shrink-0">
+                                    <i class="fas fa-handshake text-blue-600 text-xl"></i>
+                                </div>
+                                <div>
+                                    <h4 class="text-lg font-bold text-slate-800 mb-2">Misi 2</h4>
+                                    <p class="text-slate-600">
+                                        Meningkatkan kenyamanan dan kepuasan pengguna angkutan umum melalui perbaikan kualitas pelayanan dan fasilitas pendukung.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mission-card rounded-xl p-6 card-hover">
+                            <div class="flex items-start mb-4">
+                                <div class="w-12 h-12 bg-emerald-100 rounded-lg flex items-center justify-center mr-4 flex-shrink-0">
+                                    <i class="fas fa-chart-line text-emerald-600 text-xl"></i>
+                                </div>
+                                <div>
+                                    <h4 class="text-lg font-bold text-slate-800 mb-2">Misi 3</h4>
+                                    <p class="text-slate-600">
+                                        Mengembangkan sistem angkutan yang terintegrasi dan berkelanjutan dengan memanfaatkan teknologi informasi terkini.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mission-card rounded-xl p-6 card-hover">
+                            <div class="flex items-start mb-4">
+                                <div class="w-12 h-12 bg-amber-100 rounded-lg flex items-center justify-center mr-4 flex-shrink-0">
+                                    <i class="fas fa-users-cog text-amber-600 text-xl"></i>
+                                </div>
+                                <div>
+                                    <h4 class="text-lg font-bold text-slate-800 mb-2">Misi 4</h4>
+                                    <p class="text-slate-600">
+                                        Meningkatkan kapasitas dan kompetensi sumber daya manusia dalam pengelolaan sistem angkutan kota.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Strategic Goals -->
+                <div class="bg-white rounded-2xl shadow-lg border border-slate-100 p-8 mt-8 card-hover">
+                    <h3 class="text-2xl font-bold text-blue-900 mb-8 text-center">Tujuan Strategis 2024-2028</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        <div class="text-center p-6 bg-gradient-to-b from-purple-50 to-white rounded-xl">
+                            <div class="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <i class="fas fa-percentage text-purple-600 text-2xl"></i>
+                            </div>
+                            <h4 class="font-bold text-slate-800 mb-2">Peningkatan Pelayanan</h4>
+                            <p class="text-sm text-slate-600">Mencapai 95% kepuasan pengguna angkutan umum</p>
+                        </div>
+                        <div class="text-center p-6 bg-gradient-to-b from-blue-50 to-white rounded-xl">
+                            <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <i class="fas fa-leaf text-blue-600 text-2xl"></i>
+                            </div>
+                            <h4 class="font-bold text-slate-800 mb-2">Angkutan Hijau</h4>
+                            <p class="text-sm text-slate-600">30% armada berbasis energi bersih pada 2028</p>
+                        </div>
+                        <div class="text-center p-6 bg-gradient-to-b from-emerald-50 to-white rounded-xl">
+                            <div class="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <i class="fas fa-mobile-alt text-emerald-600 text-2xl"></i>
+                            </div>
+                            <h4 class="font-bold text-slate-800 mb-2">Digitalisasi</h4>
+                            <p class="text-sm text-slate-600">100% pelayanan terdigitalisasi pada 2026</p>
+                        </div>
+                        <div class="text-center p-6 bg-gradient-to-b from-amber-50 to-white rounded-xl">
+                            <div class="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <i class="fas fa-graduation-cap text-amber-600 text-2xl"></i>
+                            </div>
+                            <h4 class="font-bold text-slate-800 mb-2">SDM Unggul</h4>
+                            <p class="text-sm text-slate-600">100% petugas tersertifikasi kompetensi</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Organisasi Tab -->
+            <div id="organisasiTab" class="tab-content hidden animate-fadeInUp">
+                <!-- Leadership -->
+                <div class="bg-white rounded-2xl shadow-lg border border-slate-100 p-8 mb-8 card-hover">
+                    <h3 class="text-2xl font-bold text-blue-900 mb-8 text-center">Kepemimpinan Bidang</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                        <!-- Kepala Bidang -->
+                        <div class="leader-card bg-white rounded-xl border border-slate-200 p-6 text-center">
+                            <div class="w-24 h-24 mx-auto mb-4 rounded-full overflow-hidden border-4 border-purple-100">
+                                <div class="w-full h-full bg-gradient-purple flex items-center justify-center">
+                                    <i class="fas fa-user-tie text-white text-3xl"></i>
+                                </div>
+                            </div>
+                            <h4 class="text-lg font-bold text-slate-800 mb-1">Ir. H. Muhammad Arif, M.T.</h4>
+                            <p class="text-sm text-purple-600 font-semibold mb-2">Kepala Bidang Angkutan</p>
+                            <p class="text-xs text-slate-500 mb-4">S1 Teknik Sipil UGM, S2 Transportasi ITB</p>
+                            <div class="flex justify-center space-x-3">
+                                <a href="#" class="text-slate-400 hover:text-blue-600">
+                                    <i class="fas fa-envelope"></i>
+                                </a>
+                                <a href="#" class="text-slate-400 hover:text-blue-600">
+                                    <i class="fas fa-phone"></i>
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- Sekretaris -->
+                        <div class="leader-card bg-white rounded-xl border border-slate-200 p-6 text-center">
+                            <div class="w-24 h-24 mx-auto mb-4 rounded-full overflow-hidden border-4 border-blue-100">
+                                <div class="w-full h-full bg-gradient-blue flex items-center justify-center">
+                                    <i class="fas fa-user-graduate text-white text-3xl"></i>
+                                </div>
+                            </div>
+                            <h4 class="text-lg font-bold text-slate-800 mb-1">Drs. Andi Baso, M.Si.</h4>
+                            <p class="text-sm text-blue-600 font-semibold mb-2">Sekretaris Bidang</p>
+                            <p class="text-xs text-slate-500 mb-4">S1 Administrasi Negara UNHAS, S2 Manajemen UMI</p>
+                            <div class="flex justify-center space-x-3">
+                                <a href="#" class="text-slate-400 hover:text-blue-600">
+                                    <i class="fas fa-envelope"></i>
+                                </a>
+                                <a href="#" class="text-slate-400 hover:text-blue-600">
+                                    <i class="fas fa-phone"></i>
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- Kabid Operasional -->
+                        <div class="leader-card bg-white rounded-xl border border-slate-200 p-6 text-center">
+                            <div class="w-24 h-24 mx-auto mb-4 rounded-full overflow-hidden border-4 border-emerald-100">
+                                <div class="w-full h-full bg-gradient-emerald flex items-center justify-center">
+                                    <i class="fas fa-user-cog text-white text-3xl"></i>
+                                </div>
+                            </div>
+                            <h4 class="text-lg font-bold text-slate-800 mb-1">Dian Permata, S.T., M.Tr.</h4>
+                            <p class="text-sm text-emerald-600 font-semibold mb-2">Kabid Operasional</p>
+                            <p class="text-xs text-slate-500 mb-4">S1 Teknik Industri UNM, S2 Transportasi UI</p>
+                            <div class="flex justify-center space-x-3">
+                                <a href="#" class="text-slate-400 hover:text-blue-600">
+                                    <i class="fas fa-envelope"></i>
+                                </a>
+                                <a href="#" class="text-slate-400 hover:text-blue-600">
+                                    <i class="fas fa-phone"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Organizational Chart -->
+                <div class="bg-white rounded-2xl shadow-lg border border-slate-100 p-8 mb-8 card-hover">
+                    <h3 class="text-2xl font-bold text-blue-900 mb-8 text-center">Struktur Organisasi</h3>
+                    <div class="relative min-h-[600px]">
+                        <!-- Level 1 - Kepala Bidang -->
+                        <div class="org-node absolute top-0 left-1/2 transform -translate-x-1/2">
+                            <div class="text-center">
+                                <div class="w-12 h-12 bg-gradient-purple rounded-full flex items-center justify-center mx-auto mb-2">
+                                    <i class="fas fa-crown text-white"></i>
+                                </div>
+                                <p class="font-bold text-slate-800">Kepala Bidang</p>
+                                <p class="text-xs text-slate-500">Ir. H. Muhammad Arif, M.T.</p>
+                            </div>
+                        </div>
+
+                        <!-- Level 2 - Sekretaris -->
+                        <div class="org-node absolute top-32 left-1/2 transform -translate-x-1/2">
+                            <div class="text-center">
+                                <div class="w-10 h-10 bg-gradient-blue rounded-full flex items-center justify-center mx-auto mb-2">
+                                    <i class="fas fa-user-tie text-white text-sm"></i>
+                                </div>
+                                <p class="font-semibold text-slate-800">Sekretaris Bidang</p>
+                                <p class="text-xs text-slate-500">Drs. Andi Baso, M.Si.</p>
+                            </div>
+                        </div>
+
+                        <!-- Level 3 - Sub Bidang -->
+                        <div class="org-node absolute top-64 left-1/4 transform -translate-x-1/2">
+                            <div class="text-center">
+                                <div class="w-10 h-10 bg-gradient-cyan rounded-full flex items-center justify-center mx-auto mb-2">
+                                    <i class="fas fa-clipboard-list text-white text-sm"></i>
+                                </div>
+                                <p class="font-semibold text-slate-800">Sub Bidang Perizinan</p>
+                                <p class="text-xs text-slate-500">3 Staff</p>
+                            </div>
+                        </div>
+
+                        <div class="org-node absolute top-64 left-1/2 transform -translate-x-1/2">
+                            <div class="text-center">
+                                <div class="w-10 h-10 bg-gradient-emerald rounded-full flex items-center justify-center mx-auto mb-2">
+                                    <i class="fas fa-road text-white text-sm"></i>
+                                </div>
+                                <p class="font-semibold text-slate-800">Sub Bidang Rute</p>
+                                <p class="text-xs text-slate-500">5 Staff</p>
+                            </div>
+                        </div>
+
+                        <div class="org-node absolute top-64 left-3/4 transform -translate-x-1/2">
+                            <div class="text-center">
+                                <div class="w-10 h-10 bg-gradient-amber rounded-full flex items-center justify-center mx-auto mb-2">
+                                    <i class="fas fa-chart-bar text-white text-sm"></i>
+                                </div>
+                                <p class="font-semibold text-slate-800">Sub Bidang Data</p>
+                                <p class="text-xs text-slate-500">4 Staff</p>
+                            </div>
+                        </div>
+
+                        <!-- Connecting Lines -->
+                        <div class="org-line" style="top: 120px; left: 50%; width: 2px; height: 32px; transform: translateX(-50%);"></div>
+                        <div class="org-line" style="top: 200px; left: 50%; width: 2px; height: 64px; transform: translateX(-50%);"></div>
+                        <div class="org-line" style="top: 264px; left: 50%; width: 400px; height: 2px; transform: translateX(-50%);"></div>
+                        <div class="org-line" style="top: 264px; left: 25%; width: 2px; height: 64px; transform: translateX(-50%);"></div>
+                        <div class="org-line" style="top: 264px; left: 75%; width: 2px; height: 64px; transform: translateX(-50%);"></div>
+                    </div>
+                </div>
+
+                <!-- Staff Statistics -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="bg-white rounded-xl p-6 card-hover">
+                        <div class="text-center">
+                            <div class="text-3xl font-bold text-purple-600 mb-2">18</div>
+                            <p class="text-sm font-medium text-slate-800">Total Staff</p>
+                            <p class="text-xs text-slate-500">Bidang Angkutan</p>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-xl p-6 card-hover">
+                        <div class="text-center">
+                            <div class="text-3xl font-bold text-blue-600 mb-2">12</div>
+                            <p class="text-sm font-medium text-slate-800">Staff Lapangan</p>
+                            <p class="text-xs text-slate-500">Operasional</p>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-xl p-6 card-hover">
+                        <div class="text-center">
+                            <div class="text-3xl font-bold text-emerald-600 mb-2">6</div>
+                            <p class="text-sm font-medium text-slate-800">Staff Kantor</p>
+                            <p class="text-xs text-slate-500">Administrasi</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Data & Statistik Tab -->
+            <div id="dataTab" class="tab-content hidden animate-fadeInUp">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <!-- Fleet Composition Chart -->
+                    <div class="bg-white rounded-2xl shadow-lg border border-slate-100 p-6 card-hover">
+                        <h3 class="text-lg font-bold text-blue-900 mb-4">Komposisi Armada</h3>
+                        <div class="h-64">
+                            <canvas id="fleetChart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <!-- Passenger Volume Trend -->
+                    <div class="bg-white rounded-2xl shadow-lg border border-slate-100 p-6 card-hover">
+                        <h3 class="text-lg font-bold text-blue-900 mb-4">Volume Penumpang Harian</h3>
+                        <div class="h-64">
+                            <canvas id="passengerChart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <!-- Key Statistics -->
+                    <div class="bg-white rounded-2xl shadow-lg border border-slate-100 p-6 card-hover">
+                        <h3 class="text-lg font-bold text-blue-900 mb-6">Statistik Kunci</h3>
+                        <div class="space-y-4">
+                            <div class="flex justify-between items-center">
+                                <span class="text-slate-600">Rute Teraktif</span>
+                                <span class="font-bold text-blue-900">Terminal Daya - CBD</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-slate-600">Penumpang Tertinggi</span>
+                                <span class="font-bold text-blue-900">45,000/hari</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-slate-600">Kepadatan Rata-rata</span>
+                                <span class="font-bold text-blue-900">78%</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-slate-600">Armada Terdaftar 2024</span>
+                                <span class="font-bold text-blue-900">842 unit</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Performance Indicators -->
+                    <div class="bg-white rounded-2xl shadow-lg border border-slate-100 p-6 card-hover">
+                        <h3 class="text-lg font-bold text-blue-900 mb-6">Indikator Kinerja</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <div class="flex justify-between mb-1">
+                                    <span class="text-sm text-slate-600">Kepuasan Pengguna</span>
+                                    <span class="text-sm font-medium text-emerald-600">85%</span>
+                                </div>
+                                <div class="w-full bg-slate-200 rounded-full h-2">
+                                    <div class="bg-emerald-500 h-2 rounded-full" style="width: 85%"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between mb-1">
+                                    <span class="text-sm text-slate-600">Ketepatan Waktu</span>
+                                    <span class="text-sm font-medium text-blue-600">78%</span>
+                                </div>
+                                <div class="w-full bg-slate-200 rounded-full h-2">
+                                    <div class="bg-blue-500 h-2 rounded-full" style="width: 78%"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between mb-1">
+                                    <span class="text-sm text-slate-600">Keselamatan</span>
+                                    <span class="text-sm font-medium text-purple-600">92%</span>
+                                </div>
+                                <div class="w-full bg-slate-200 rounded-full h-2">
+                                    <div class="bg-purple-500 h-2 rounded-full" style="width: 92%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Layanan Tab -->
+            <div id="layananTab" class="tab-content hidden animate-fadeInUp">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <!-- Services Overview -->
+                    <div class="bg-white rounded-2xl shadow-lg border border-slate-100 p-8 card-hover">
+                        <h3 class="text-xl font-bold text-blue-900 mb-6">Pelayanan Publik</h3>
+                        <div class="space-y-6">
+                            <div class="flex items-start space-x-4">
+                                <div class="flex-shrink-0">
+                                    <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                                        <i class="fas fa-file-alt text-purple-600 text-xl"></i>
+                                    </div>
+                                </div>
+                                <div>
+                                    <h4 class="text-lg font-semibold text-slate-800 mb-2">Perizinan Angkutan</h4>
+                                    <p class="text-slate-600">Layanan perizinan angkutan umum, termasuk registrasi baru, perpanjangan, dan perubahan data.</p>
+                                    <div class="mt-2">
+                                        <span class="inline-block bg-purple-50 text-purple-700 px-3 py-1 rounded-full text-xs font-medium">
+                                            <i class="fas fa-clock mr-1"></i> 3 Hari Kerja
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-start space-x-4">
+                                <div class="flex-shrink-0">
+                                    <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                                        <i class="fas fa-route text-blue-600 text-xl"></i>
+                                    </div>
+                                </div>
+                                <div>
+                                    <h4 class="text-lg font-semibold text-slate-800 mb-2">Penetapan Rute</h4>
+                                    <p class="text-slate-600">Penetapan dan perubahan rute angkutan umum berdasarkan analisis kebutuhan masyarakat.</p>
+                                    <div class="mt-2">
+                                        <span class="inline-block bg-blue-50 text-blue-700 px-3 py-1 rounded-full text-xs font-medium">
+                                            <i class="fas fa-clock mr-1"></i> 5 Hari Kerja
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-start space-x-4">
+                                <div class="flex-shrink-0">
+                                    <div class="w-12 h-12 bg-emerald-100 rounded-lg flex items-center justify-center">
+                                        <i class="fas fa-headset text-emerald-600 text-xl"></i>
+                                    </div>
+                                </div>
+                                <div>
+                                    <h4 class="text-lg font-semibold text-slate-800 mb-2">Pengaduan Masyarakat</h4>
+                                    <p class="text-slate-600">Layanan penerimaan dan penanganan pengaduan masyarakat terkait pelayanan angkutan umum.</p>
+                                    <div class="mt-2">
+                                        <span class="inline-block bg-emerald-50 text-emerald-700 px-3 py-1 rounded-full text-xs font-medium">
+                                            <i class="fas fa-clock mr-1"></i> 2 Hari Kerja
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Online Services -->
+                    <div class="bg-gradient-purple text-white rounded-2xl p-8 card-hover">
+                        <h3 class="text-xl font-bold mb-6">Layanan Online</h3>
+                        <div class="space-y-6">
+                            <div class="bg-white/10 backdrop-blur-sm rounded-xl p-6">
+                                <div class="flex items-center mb-4">
+                                    <div class="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center mr-4">
+                                        <i class="fas fa-mobile-alt text-xl"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-bold text-lg">Aplikasi Makassar Transport</h4>
+                                        <p class="text-sm opacity-90">Tracking real-time angkutan</p>
+                                    </div>
+                                </div>
+                                <a href="#" class="inline-flex items-center text-sm font-medium hover:underline">
+                                    Download App <i class="fas fa-arrow-right ml-2"></i>
+                                </a>
+                            </div>
+                            
+                            <div class="bg-white/10 backdrop-blur-sm rounded-xl p-6">
+                                <div class="flex items-center mb-4">
+                                    <div class="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center mr-4">
+                                        <i class="fas fa-globe text-xl"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-bold text-lg">Portal E-Permit</h4>
+                                        <p class="text-sm opacity-90">Perizinan angkutan online</p>
+                                    </div>
+                                </div>
+                                <a href="#" class="inline-flex items-center text-sm font-medium hover:underline">
+                                    Akses Portal <i class="fas fa-arrow-right ml-2"></i>
+                                </a>
+                            </div>
+                            
+                            <div class="bg-white/10 backdrop-blur-sm rounded-xl p-6">
+                                <div class="flex items-center mb-4">
+                                    <div class="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center mr-4">
+                                        <i class="fas fa-comments text-xl"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-bold text-lg">Chatbot Layanan</h4>
+                                        <p class="text-sm opacity-90">AI assistant 24/7</p>
+                                    </div>
+                                </div>
+                                <a href="#" class="inline-flex items-center text-sm font-medium hover:underline">
+                                    Mulai Chat <i class="fas fa-arrow-right ml-2"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Service Requirements -->
+                <div class="bg-white rounded-2xl shadow-lg border border-slate-100 p-8 mt-8 card-hover">
+                    <h3 class="text-xl font-bold text-blue-900 mb-6">Persyaratan Layanan</h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm">
+                            <thead class="bg-slate-50">
+                                <tr>
+                                    <th class="text-left p-4 font-semibold text-slate-700">Jenis Layanan</th>
+                                    <th class="text-left p-4 font-semibold text-slate-700">Persyaratan</th>
+                                    <th class="text-left p-4 font-semibold text-slate-700">Biaya</th>
+                                    <th class="text-left p-4 font-semibold text-slate-700">Waktu</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100">
+                                <tr class="hover:bg-blue-50/30">
+                                    <td class="p-4 font-medium text-slate-800">Izin Angkutan Baru</td>
+                                    <td class="p-4 text-slate-600">KTP, STNK, Surat Keterangan Usaha</td>
+                                    <td class="p-4 font-medium text-emerald-600">Rp 500.000</td>
+                                    <td class="p-4">3-5 hari</td>
+                                </tr>
+                                <tr class="hover:bg-blue-50/30">
+                                    <td class="p-4 font-medium text-slate-800">Perpanjangan Izin</td>
+                                    <td class="p-4 text-slate-600">Izin lama, STNK masih berlaku</td>
+                                    <td class="p-4 font-medium text-emerald-600">Rp 250.000</td>
+                                    <td class="p-4">1-2 hari</td>
+                                </tr>
+                                <tr class="hover:bg-blue-50/30">
+                                    <td class="p-4 font-medium text-slate-800">Perubahan Rute</td>
+                                    <td class="p-4 text-slate-600">Permohonan tertulis, studi kelayakan</td>
+                                    <td class="p-4 font-medium text-emerald-600">Rp 100.000</td>
+                                    <td class="p-4">5-7 hari</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-blue-950 text-white pt-12 sm:pt-16 pb-6 sm:pb-10">
+        <div class="container mx-auto px-4 sm:px-6">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 sm:gap-12 mb-12 sm:mb-16">
+                <div class="font-light opacity-90">
+                    <h4 class="font-bold text-white text-lg sm:text-xl mb-4 sm:mb-6 tracking-tight">PA'LINTASANG <span class="text-amber-500">DATA</span></h4>
+                    <div class="space-y-3 sm:space-y-4 text-xs sm:text-sm">
+                        <p class="flex items-start">
+                            <i class="fas fa-map-marker-alt mt-1 mr-3 sm:mr-4 text-amber-500 flex-shrink-0"></i>
+                            <span>Jl. Mallengkeri Raya No.18, Mangasa, Kec. Tamalate, Kota Makassar, Sulawesi Selatan 90221</span>
+                        </p>
+                        <p class="flex items-center">
+                            <i class="fas fa-phone mr-3 sm:mr-4 text-amber-500"></i>
+                            <span>(0411) 884816 ext. 301</span>
+                        </p>
+                        <p class="flex items-center">
+                            <i class="fas fa-clock mr-3 sm:mr-4 text-amber-500"></i>
+                            <span>Senin - Jumat: 08.00 - 16.00 WITA</span>
+                        </p>
+                    </div>
+                </div>
+
+                <div class="md:col-span-2">
+                    <div class="w-full h-48 sm:h-64 rounded-lg sm:rounded-2xl overflow-hidden shadow-2xl border-2 sm:border-4 border-white/10">
+                        <iframe 
+                            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3973.5393527237223!2d119.42868231527357!3d-5.177579996242398!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2dbee295f756082d%3A0xc3f982142e033f9e!2sDishub%20Kota%20Makassar!5e0!3m2!1sid!2sid!4v1647412345678!5m2!1sid!2sid" 
+                            width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade">
+                        </iframe>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pt-6 sm:pt-8 border-t border-white/10 text-center text-xs sm:text-sm opacity-60">
+                <p>© 2024 PKL STATISTIKA UNM. <b>DATA-DRIVEN POLICY!</b> - Bidang Angkutan Dishub Makassar</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Mobile Menu Toggle
+        document.getElementById('menuToggle').addEventListener('click', function() {
+            const mobileMenu = document.getElementById('mobileMenu');
+            mobileMenu.classList.toggle('active');
+        });
+
+        // Close mobile menu when clicking on a link
+        document.querySelectorAll('#mobileMenu a').forEach(link => {
+            link.addEventListener('click', function() {
+                document.getElementById('mobileMenu').classList.remove('active');
+            });
+        });
+
+        // Tab Functionality
+        const tabButtons = document.querySelectorAll('.tab-button');
+        const tabContents = document.querySelectorAll('.tab-content');
+
+        tabButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const tabId = button.getAttribute('data-tab');
+                
+                // Remove active class from all buttons and contents
+                tabButtons.forEach(btn => btn.classList.remove('active'));
+                tabContents.forEach(content => {
+                    content.classList.remove('active');
+                    content.classList.add('hidden');
+                });
+                
+                // Add active class to clicked button
+                button.classList.add('active');
+                
+                // Show corresponding content
+                const tabContent = document.getElementById(`${tabId}Tab`);
+                if (tabContent) {
+                    tabContent.classList.remove('hidden');
+                    tabContent.classList.add('active');
+                }
+            });
+        });
+
+        // Chart.js for Fleet Composition
+        const fleetCtx = document.getElementById('fleetChart').getContext('2d');
+        new Chart(fleetCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Angkot/Pete2', 'Bus BRT', 'Taksi', 'Angkutan Sekolah', 'Lainnya'],
+                datasets: [{
+                    data: [842, 45, 320, 85, 120],
+                    backgroundColor: [
+                        '#8b5cf6',
+                        '#3b82f6',
+                        '#06b6d4',
+                        '#10b981',
+                        '#f59e0b'
+                    ],
+                    borderWidth: 2,
+                    borderColor: 'white'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+
+        // Chart.js for Passenger Volume
+        const passengerCtx = document.getElementById('passengerChart').getContext('2d');
+        new Chart(passengerCtx, {
+            type: 'line',
+            data: {
+                labels: ['06:00', '08:00', '10:00', '12:00', '14:00', '16:00', '18:00', '20:00'],
+                datasets: [{
+                    label: 'Penumpang (ribu)',
+                    data: [15, 42, 28, 35, 25, 48, 38, 12],
+                    borderColor: '#8b5cf6',
+                    backgroundColor: 'rgba(139, 92, 246, 0.1)',
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return value + 'K';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // Floating animation for background elements
+        const floatElements = document.querySelectorAll('.animate-float');
+        floatElements.forEach((el, index) => {
+            el.style.animationDelay = `${index * 0.5}s`;
+        });
+
+        // Card hover effects
+        document.querySelectorAll('.card-hover').forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                card.style.transition = 'all 0.3s ease';
+            });
+        });
+
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Organization chart interaction
+        document.querySelectorAll('.org-node').forEach(node => {
+            node.addEventListener('click', function() {
+                const title = this.querySelector('p:first-child').textContent;
+                alert(`Informasi: ${title}`);
+            });
+        });
+    </script>
+</body>
+</html>
