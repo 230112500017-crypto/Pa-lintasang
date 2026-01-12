@@ -4,92 +4,37 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pa'lintasang Data - Portal Transportasi Makassar</title>
-    
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    
-    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .hero-gradient { background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%); }
+        .accent-makassar { color: #facc15; } 
+        .bg-makassar { background-color: #facc15; }
         
-        body { 
-            font-family: 'Plus Jakarta Sans', sans-serif; 
+        /* Dropdown Styles */
+        .dropdown-toggle::after {
+            content: '\f078';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            margin-left: 8px;
+            transition: transform 0.3s ease;
         }
         
-        .hero-gradient { 
-            background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%); 
-        }
-        
-        .accent-makassar { 
-            color: #facc15; 
-        }
-        
-        .card-hover {
-            transition: all 0.3s ease;
-        }
-        
-        .card-hover:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        .dropdown-toggle.active::after {
+            transform: rotate(180deg);
         }
         
         .mobile-menu {
             max-height: 0;
             overflow: hidden;
-            transition: max-height 0.3s ease-out;
+            transition: max-height 0.3s ease;
         }
         
         .mobile-menu.active {
             max-height: 500px;
-        }
-        
-        .stat-card {
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .stat-card::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
-            transform: rotate(45deg);
-            transition: all 0.5s ease;
-        }
-        
-        .stat-card:hover::before {
-            left: 100%;
-        }
-        
-        .search-glow {
-            box-shadow: 0 10px 30px rgba(30, 58, 138, 0.2);
-        }
-        
-        .line-clamp-2 {
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-        }
-        
-        .chart-container {
-            position: relative;
-            height: 300px;
-            width: 100%;
-        }
-        
-        @media (max-width: 640px) {
-            .chart-container {
-                height: 250px;
-            }
         }
         
         .dropdown-menu {
@@ -99,1014 +44,848 @@
             border-radius: 0.5rem;
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
             z-index: 100;
-            min-width: 200px;
+            min-width: 280px;
+            animation: fadeIn 0.2s ease;
         }
         
-        .dropdown:hover .dropdown-menu {
+        .dropdown-menu.show {
             display: block;
         }
         
-        /* Responsive adjustments */
-        @media (max-width: 768px) {
-            .stat-number {
-                font-size: 1.75rem;
-            }
-            .stat-label {
-                font-size: 0.75rem;
-            }
+        .dropdown-submenu {
+            display: none;
+            position: absolute;
+            left: 100%;
+            top: 0;
+            background: white;
+            border-radius: 0.5rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            min-width: 280px;
+            margin-left: 2px;
+            animation: fadeIn 0.2s ease;
         }
         
-        @media (max-width: 480px) {
-            .stat-number {
-                font-size: 1.5rem;
-            }
-            .stat-label {
-                font-size: 0.7rem;
-            }
+        .dropdown-submenu.show {
+            display: block;
+        }
+        
+        .mobile-submenu {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+        
+        .mobile-submenu.active {
+            max-height: 300px;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .has-submenu > a::after {
+            content: '\f054';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            margin-left: auto;
+            font-size: 12px;
+            transition: transform 0.2s ease;
+        }
+        
+        .has-submenu.active > a::after {
+            transform: rotate(90deg);
         }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-900">
-    
-    <!-- Navigation -->
-    <nav class="bg-white/90 backdrop-blur-md sticky top-0 z-50 border-b border-slate-200 shadow-sm">
-        <div class="container mx-auto px-4 sm:px-6 py-3">
+
+    <nav class="bg-white/80 backdrop-blur-md sticky top-0 z-50 border-b border-slate-200">
+        <div class="container mx-auto px-4 sm:px-6 py-3 sm:py-4">
             <div class="flex justify-between items-center">
-                <!-- Logo -->
-                <div class="flex items-center space-x-3">
-                    <div class="bg-blue-900 p-2 rounded-xl shadow-lg">
-                        <i class="fas fa-route text-white text-xl"></i>
+                <!-- Logo & Brand -->
+                <div class="flex items-center space-x-2 sm:space-x-3">
+                    <div class="bg-blue-900 p-2 rounded-lg">
+                        <i class="fas fa-route text-white text-lg sm:text-xl"></i>
                     </div>
                     <div>
-                        <h1 class="font-bold text-lg sm:text-xl tracking-tight text-blue-900">
-                            PA'LINTASANG <span class="text-amber-500">DATA</span>
-                        </h1>
-                        <p class="text-[9px] text-slate-500 hidden sm:block">Portal Data Transportasi Makassar</p>
+                        <h1 class="font-bold text-sm sm:text-xl leading-tight tracking-tight text-blue-900">PA'LINTASANG <span class="text-amber-500">DATA</span></h1>
                     </div>
                 </div>
-                
+
                 <!-- Desktop Navigation -->
-                <div class="hidden md:flex items-center space-x-6">
-                    <a href="index.html" class="text-blue-600 font-semibold text-sm hover:text-blue-800 transition border-b-2 border-blue-600 pb-1">
-                        <i class="fas fa-home mr-1"></i> Beranda
-                    </a>
+                <div class="hidden lg:flex space-x-1 font-medium text-sm items-center">
+                    <a href="index.html" class="text-blue-600 hover:text-blue-700 transition px-3 py-2">Beranda</a>
+                    <a href="katalog.html" class="text-slate-700 hover:text-blue-600 transition px-3 py-2">Katalog</a>
                     
-                    <div class="dropdown relative">
-                        <button class="text-slate-700 hover:text-blue-600 text-sm flex items-center space-x-1">
-                            <i class="fas fa-folder"></i>
-                            <span>Kategori</span>
-                            <i class="fas fa-chevron-down text-xs"></i>
+                    <!-- Desktop Kategori Dropdown with Submenus -->
+                    <div class="relative group" id="desktopKategori">
+                        <button class="text-slate-700 hover:text-blue-600 px-3 py-2 rounded-lg hover:bg-blue-50 transition flex items-center dropdown-toggle">
+                            <i class="fas fa-folder mr-2"></i> Kategori
                         </button>
-                        <div class="dropdown-menu mt-2 p-2">
-                            <a href="katalog.html?category=Lalu%20Lintas" class="block px-4 py-2 text-sm hover:bg-blue-50 rounded">
-                                <i class="fas fa-traffic-light text-rose-500 mr-2"></i> Lalu Lintas
-                            </a>
-                            <a href="katalog.html?category=Transportasi" class="block px-4 py-2 text-sm hover:bg-blue-50 rounded">
-                                <i class="fas fa-bus text-purple-500 mr-2"></i> Transportasi
-                            </a>
-                            <a href="katalog.html?category=Parkir" class="block px-4 py-2 text-sm hover:bg-blue-50 rounded">
-                                <i class="fas fa-parking text-blue-500 mr-2"></i> Parkir
-                            </a>
-                            <a href="katalog.html?category=Terminal" class="block px-4 py-2 text-sm hover:bg-blue-50 rounded">
-                                <i class="fas fa-terminal text-emerald-500 mr-2"></i> Terminal
-                            </a>
+                        <div class="dropdown-menu left-0 mt-2">
+                            <!-- Submenu 1: Lalu Lintas & Jalan -->
+                            <div class="has-submenu relative">
+                                <a href="#" class="flex items-center justify-between px-4 py-3 text-slate-800 hover:bg-blue-50 transition border-b border-slate-100">
+                                    <div class="flex items-center">
+                                        <i class="fas fa-traffic-light mr-3 text-rose-500"></i>
+                                        <span class="font-medium">Lalu Lintas</span>
+                                    </div>
+                                </a>
+                                <div class="dropdown-submenu">
+                                    <a href="katalog.html?subcategory=volume-kendaraan" class="block px-4 py-3 text-slate-700 hover:bg-blue-50 transition text-sm border-b border-slate-100">
+                                        <div class="flex items-center">
+                                            <div>
+                                                <p class="font-medium">Kategori</p>
+                                            </div>
+                                        </div>
+                                    </a>
+                                    <a href="katalog.html?subcategory=kemacetan" class="block px-4 py-3 text-slate-700 hover:bg-blue-50 transition text-sm border-b border-slate-100">
+                                        <div class="flex items-center">
+                                            <div>
+                                                <p class="font-medium">Kategori</p>
+                                            </div>
+                                        </div>
+                                    </a>
+                                    <a href="katalog.html?subcategory=rambu-lalu-lintas" class="block px-4 py-3 text-slate-700 hover:bg-blue-50 transition text-sm">
+                                        <div class="flex items-center">
+                                            <div>
+                                                <p class="font-medium">Kategori/p>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </div>
+                            </div>
+                            
+                            <!-- Submenu 2: TPAI -->
+                            <div class="has-submenu relative">
+                                <a href="#" class="flex items-center justify-between px-4 py-3 text-slate-800 hover:bg-blue-50 transition border-b border-slate-100">
+                                    <div class="flex items-center">
+                                        <i class="fas fa-bus mr-3 text-purple-500"></i>
+                                        <span class="font-medium">Angkutan</span>
+                                    </div>
+                                </a>
+                                <div class="dropdown-submenu">
+                                    <a href="katalog.html?subcategory=angkot" class="block px-4 py-3 text-slate-700 hover:bg-blue-50 transition text-sm border-b border-slate-100">
+                                        <div class="flex items-center">
+                                            <div>
+                                                <p class="font-medium">Kategori</p>
+                                            </div>
+                                        </div>
+                                    </a>
+                                    <a href="katalog.html?subcategory=brt" class="block px-4 py-3 text-slate-700 hover:bg-blue-50 transition text-sm border-b border-slate-100">
+                                        <div class="flex items-center">
+                                            <div>
+                                                <p class="font-medium">Kategori</p>
+                                            </div>
+                                        </div>
+                                    </a>
+                                    <a href="katalog.html?subcategory=taksi" class="block px-4 py-3 text-slate-700 hover:bg-blue-50 transition text-sm">
+                                        <div class="flex items-center">
+                                            <div>
+                                                <p class="font-medium">Kategori</p>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </div>
+                            </div>
+                            
+                            <!-- Submenu 3: Parkir & Terminal -->
+                            <div class="has-submenu relative">
+                                <a href="#" class="flex items-center justify-between px-4 py-3 text-slate-800 hover:bg-blue-50 transition border-b border-slate-100">
+                                    <div class="flex items-center">
+                                        <i class="fas fa-parking mr-3 text-blue-500"></i>
+                                        <span class="font-medium">TPAI</span>
+                                    </div>
+                                </a>
+                                <div class="dropdown-submenu">
+                                    <a href="katalog.html?subcategory=parkir-umum" class="block px-4 py-3 text-slate-700 hover:bg-blue-50 transition text-sm border-b border-slate-100">
+                                        <div class="flex items-center">
+                                            <div>
+                                                <p class="font-medium">Kategori</p>
+                                            </div>
+                                        </div>
+                                    </a>
+                                    <a href="katalog.html?subcategory=terminal" class="block px-4 py-3 text-slate-700 hover:bg-blue-50 transition text-sm border-b border-slate-100">
+                                        <div class="flex items-center">
+                                            <div>
+                                                <p class="font-medium">Kategori</p>
+                                            </div>
+                                        </div>
+                                    </a>
+                                    <a href="katalog.html?subcategory=penggembokan" class="block px-4 py-3 text-slate-700 hover:bg-blue-50 transition text-sm">
+                                        <div class="flex items-center">
+                                            <div>
+                                                <p class="font-medium">Kategori</p>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </div>
+                            </div>
+                            
+                            <!-- Submenu 4: Perlengkapan Jalan -->
+                            <div class="has-submenu relative">
+                                <a href="#" class="flex items-center justify-between px-4 py-3 text-slate-800 hover:bg-blue-50 transition border-b border-slate-100">
+                                    <div class="flex items-center">
+                                        <i class="fas fa-lightbulb mr-3 text-yellow-500"></i>
+                                        <span class="font-medium">Perlengkapan Jalan</span>
+                                    </div>
+                                </a>
+                                <div class="dropdown-submenu">
+                                    <a href="katalog.html?subcategory=lampu-jalan" class="block px-4 py-3 text-slate-700 hover:bg-blue-50 transition text-sm border-b border-slate-100">
+                                        <div class="flex items-center">
+                                            <div>
+                                                <p class="font-medium">Kategori</p>
+                                            </div>
+                                        </div>
+                                    </a>
+                                    <a href="katalog.html?subcategory=traffic-light" class="block px-4 py-3 text-slate-700 hover:bg-blue-50 transition text-sm border-b border-slate-100">
+                                        <div class="flex items-center">
+                                            <div>
+                                                <p class="font-medium">Kategori</p>
+                                            </div>
+                                        </div>
+                                    </a>
+                                    <a href="katalog.html?subcategory=perlengkapan-jalan" class="block px-4 py-3 text-slate-700 hover:bg-blue-50 transition text-sm">
+                                        <div class="flex items-center">
+                                            <div>
+                                                <p class="font-medium">Kategori</p>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </div>
+                            </div>
+                            
+                            <!-- Submenu 5: UPTD 1 -->
+                            <div class="has-submenu relative">
+                                <a href="#" class="flex items-center justify-between px-4 py-3 text-slate-800 hover:bg-blue-50 transition">
+                                    <div class="flex items-center">
+                                        <i class="fas fa-users mr-3 text-cyan-500"></i>
+                                        <span class="font-medium">UPTD 1</span>
+                                    </div>
+                                </a>
+                                <div class="dropdown-submenu">
+                                    <a href="katalog.html?subcategory=petugas-lapangan" class="block px-4 py-3 text-slate-700 hover:bg-blue-50 transition text-sm border-b border-slate-100">
+                                        <div class="flex items-center">
+                                            <div>
+                                                <p class="font-medium">Kategori</p>
+                                            </div>
+                                        </div>
+                                    </a>
+                                    <a href="katalog.html?subcategory=administrasi" class="block px-4 py-3 text-slate-700 hover:bg-blue-50 transition text-sm">
+                                        <div class="flex items-center">
+                                            <div>
+                                                <p class="font-medium">Kategori</p>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </div>
+                            </div>
+
+
+                            <!-- Submenu 6: UPTD 2 -->
+                            <div class="has-submenu relative">
+                                <a href="#" class="flex items-center justify-between px-4 py-3 text-slate-800 hover:bg-blue-50 transition">
+                                    <div class="flex items-center">
+                                        <i class="fas fa-users mr-3 text-cyan-500"></i>
+                                        <span class="font-medium">UPTD 2</span>
+                                    </div>
+                                </a>
+                                <div class="dropdown-submenu">
+                                    <a href="katalog.html?subcategory=petugas-lapangan" class="block px-4 py-3 text-slate-700 hover:bg-blue-50 transition text-sm border-b border-slate-100">
+                                        <div class="flex items-center">
+                                            <div>
+                                                <p class="font-medium">Kategori</p>
+                                            </div>
+                                        </div>
+                                    </a>
+                                    <a href="katalog.html?subcategory=administrasi" class="block px-4 py-3 text-slate-700 hover:bg-blue-50 transition text-sm">
+                                        <div class="flex items-center">
+                                            <div>
+                                                <p class="font-medium">Kategori</p>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                    
-                    <a href="katalog.html" class="text-slate-700 hover:text-blue-600 text-sm">
-                        <i class="fas fa-database mr-1"></i> Katalog
-                    </a>
-                    
-                    <a href="upload.html" class="text-slate-700 hover:text-blue-600 text-sm">
-                        <i class="fas fa-upload mr-1"></i> Upload
-                    </a>
-                    
-                    <!-- Auth Buttons -->
-                    <div id="authArea" class="flex items-center space-x-3">
-                        <!-- Will be populated by JavaScript -->
                     </div>
                 </div>
-                
-                <!-- Mobile Menu Button -->
-                <button id="mobileMenuBtn" class="md:hidden text-blue-900 text-xl p-2">
-                    <i class="fas fa-bars"></i>
-                </button>
-            </div>
-            
-            <!-- Mobile Menu -->
-            <div id="mobileMenu" class="mobile-menu md:hidden mt-4 bg-white rounded-lg shadow-lg p-4">
-                <div class="space-y-3">
-                    <a href="index.html" class="block text-blue-600 font-semibold border-l-4 border-blue-600 pl-3">
-                        <i class="fas fa-home mr-2"></i> Beranda
+
+                <!-- Desktop Login & Mobile Toggle -->
+                <div class="flex items-center space-x-3">
+                    <a href="login.html" class="hidden sm:block bg-blue-900 text-white px-4 sm:px-5 py-2 rounded-full text-xs sm:text-sm font-semibold hover:bg-blue-800 transition">
+                        Login
                     </a>
+                    <!-- Mobile Menu Toggle -->
+                    <button id="menuToggle" class="lg:hidden text-blue-900 text-xl p-2">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Mobile Navigation Menu -->
+            <div id="mobileMenu" class="mobile-menu lg:hidden bg-white border-t border-slate-200 mt-3 rounded-lg overflow-hidden">
+                <div class="flex flex-col space-y-1 p-4">
+                    <a href="index.html" class="text-blue-600 hover:bg-blue-50 px-3 py-2 rounded-lg transition">Beranda</a>
+                    <a href="katalog.html" class="text-slate-700 hover:bg-blue-50 px-3 py-2 rounded-lg transition">Katalog</a>
                     
-                    <div class="border-l-2 border-blue-100 pl-3">
-                        <p class="text-xs text-slate-500 font-bold mb-2">KATEGORI</p>
-                        <div class="space-y-2">
-                            <a href="katalog.html?category=Lalu%20Lintas" class="block text-sm text-slate-700">
-                                <i class="fas fa-traffic-light text-rose-500 mr-2 text-xs"></i> Lalu Lintas
-                            </a>
-                            <a href="katalog.html?category=Transportasi" class="block text-sm text-slate-700">
-                                <i class="fas fa-bus text-purple-500 mr-2 text-xs"></i> Transportasi
-                            </a>
-                            <a href="katalog.html?category=Parkir" class="block text-sm text-slate-700">
-                                <i class="fas fa-parking text-blue-500 mr-2 text-xs"></i> Parkir
-                            </a>
+                    <!-- Mobile Kategori Dropdown with Submenus -->
+                    <div class="border-t border-slate-200 mt-2 pt-2">
+                        <button id="mobileKategoriToggle" class="w-full text-left text-slate-700 hover:bg-blue-50 px-3 py-2 rounded-lg transition flex items-center justify-between font-medium">
+                            <span><i class="fas fa-folder mr-2"></i> Kategori</span>
+                            <i class="fas fa-chevron-down text-xs transition"></i>
+                        </button>
+                        <div id="mobileKategoriMenu" class="ml-3 space-y-1 mt-2 border-l-2 border-slate-200 pl-2">
+                            <!-- Mobile Submenu 1 -->
+                            <div class="mb-2">
+                                <button class="mobile-submenu-toggle w-full text-left text-slate-700 hover:bg-blue-50 px-3 py-2 rounded-lg transition flex items-center justify-between text-sm">
+                                    <span class="flex items-center">
+                                        <i class="fas fa-traffic-light mr-2 text-rose-500"></i>
+                                        Lalu Lintas
+                                    </span>
+                                    <i class="fas fa-chevron-right text-xs transition"></i>
+                                </button>
+                                <div class="mobile-submenu ml-3 space-y-1 mt-1 border-l border-slate-200 pl-2">
+                                    <a href="katalog.html?subcategory=volume-kendaraan" class="block text-slate-600 hover:bg-blue-50 px-3 py-2 rounded-lg transition text-xs">
+                                        </i> Kategori
+                                    </a>
+                                    <a href="katalog.html?subcategory=kemacetan" class="block text-slate-600 hover:bg-blue-50 px-3 py-2 rounded-lg transition text-xs">
+                                        </i> Kategori
+                                    </a>
+                                    <a href="katalog.html?subcategory=rambu-lalu-lintas" class="block text-slate-600 hover:bg-blue-50 px-3 py-2 rounded-lg transition text-xs">
+                                        </i> Kategori
+                                    </a>
+                                </div>
+                            </div>
+                            
+                            <!-- Mobile Submenu 2 -->
+                            <div class="mb-2">
+                                <button class="mobile-submenu-toggle w-full text-left text-slate-700 hover:bg-blue-50 px-3 py-2 rounded-lg transition flex items-center justify-between text-sm">
+                                    <span class="flex items-center">
+                                        <i class="fas fa-bus mr-2 text-purple-500"></i>
+                                        Angkutan
+                                    </span>
+                                    <i class="fas fa-chevron-right text-xs transition"></i>
+                                </button>
+                                <div class="mobile-submenu ml-3 space-y-1 mt-1 border-l border-slate-200 pl-2">
+                                    <a href="katalog.html?subcategory=angkot" class="block text-slate-600 hover:bg-blue-50 px-3 py-2 rounded-lg transition text-xs">
+                                        </i> Kategori
+                                    </a>
+                                    <a href="katalog.html?subcategory=brt" class="block text-slate-600 hover:bg-blue-50 px-3 py-2 rounded-lg transition text-xs">
+                                        </i> Kategori
+                                    </a>
+                                    <a href="katalog.html?subcategory=taksi" class="block text-slate-600 hover:bg-blue-50 px-3 py-2 rounded-lg transition text-xs">
+                                        </i> Kategori
+                                    </a>
+                                </div>
+                            </div>
+                            
+                            <!-- Mobile Submenu 3 -->
+                            <div class="mb-2">
+                                <button class="mobile-submenu-toggle w-full text-left text-slate-700 hover:bg-blue-50 px-3 py-2 rounded-lg transition flex items-center justify-between text-sm">
+                                    <span class="flex items-center">
+                                        <i class="fas fa-parking mr-2 text-blue-500"></i>
+                                        TPAI
+                                    </span>
+                                    <i class="fas fa-chevron-right text-xs transition"></i>
+                                </button>
+                                <div class="mobile-submenu ml-3 space-y-1 mt-1 border-l border-slate-200 pl-2">
+                                    <a href="katalog.html?subcategory=parkir-umum" class="block text-slate-600 hover:bg-blue-50 px-3 py-2 rounded-lg transition text-xs">
+                                        </i> Kategori
+                                    </a>
+                                    <a href="katalog.html?subcategory=terminal" class="block text-slate-600 hover:bg-blue-50 px-3 py-2 rounded-lg transition text-xs">
+                                        </i> Kategori
+                                    </a>
+                                    <a href="katalog.html?subcategory=penggembokan" class="block text-slate-600 hover:bg-blue-50 px-3 py-2 rounded-lg transition text-xs">
+                                        </i> Kategori
+                                    </a>
+                                </div>
+                            </div>
+                            
+                            <!-- Mobile Submenu 4 -->
+                            <div class="mb-2">
+                                <button class="mobile-submenu-toggle w-full text-left text-slate-700 hover:bg-blue-50 px-3 py-2 rounded-lg transition flex items-center justify-between text-sm">
+                                    <span class="flex items-center">
+                                        <i class="fas fa-lightbulb mr-2 text-yellow-500"></i>
+                                        Perlengkapan Jalan
+                                    </span>
+                                    <i class="fas fa-chevron-right text-xs transition"></i>
+                                </button>
+                                <div class="mobile-submenu ml-3 space-y-1 mt-1 border-l border-slate-200 pl-2">
+                                    <a href="katalog.html?subcategory=lampu-jalan" class="block text-slate-600 hover:bg-blue-50 px-3 py-2 rounded-lg transition text-xs">
+                                        </i> Kategori
+                                    </a>
+                                    <a href="katalog.html?subcategory=traffic-light" class="block text-slate-600 hover:bg-blue-50 px-3 py-2 rounded-lg transition text-xs">
+                                        </i> Kategori
+                                    </a>
+                                    <a href="katalog.html?subcategory=perlengkapan-jalan" class="block text-slate-600 hover:bg-blue-50 px-3 py-2 rounded-lg transition text-xs">
+                                        </i> Kategori
+                                    </a>
+                                </div>
+                            </div>
+                            
+                            <!-- Mobile Submenu 5 -->
+                            <div class="mb-2">
+                                <button class="mobile-submenu-toggle w-full text-left text-slate-700 hover:bg-blue-50 px-3 py-2 rounded-lg transition flex items-center justify-between text-sm">
+                                    <span class="flex items-center">
+                                        <i class="fas fa-users mr-2 text-cyan-500"></i>
+                                        UPTD 1
+                                    </span>
+                                    <i class="fas fa-chevron-right text-xs transition"></i>
+                                </button>
+                                <div class="mobile-submenu ml-3 space-y-1 mt-1 border-l border-slate-200 pl-2">
+                                    <a href="katalog.html?subcategory=petugas-lapangan" class="block text-slate-600 hover:bg-blue-50 px-3 py-2 rounded-lg transition text-xs">
+                                        </i> Kategori
+                                    </a>
+                                    <a href="katalog.html?subcategory=administrasi" class="block text-slate-600 hover:bg-blue-50 px-3 py-2 rounded-lg transition text-xs">
+                                        </i> Kategori
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="mb-2">
+                                <button class="mobile-submenu-toggle w-full text-left text-slate-700 hover:bg-blue-50 px-3 py-2 rounded-lg transition flex items-center justify-between text-sm">
+                                    <span class="flex items-center">
+                                        <i class="fas fa-users mr-2 text-cyan-500"></i>
+                                        UPTD 2
+                                    </span>
+                                    <i class="fas fa-chevron-right text-xs transition"></i>
+                                </button>
+                                <div class="mobile-submenu ml-3 space-y-1 mt-1 border-l border-slate-200 pl-2">
+                                    <a href="katalog.html?subcategory=petugas-lapangan" class="block text-slate-600 hover:bg-blue-50 px-3 py-2 rounded-lg transition text-xs">
+                                        </i> Kategori
+                                    </a>
+                                    <a href="katalog.html?subcategory=administrasi" class="block text-slate-600 hover:bg-blue-50 px-3 py-2 rounded-lg transition text-xs">
+                                        </i> Kategori
+                                    </a>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     
-                    <a href="katalog.html" class="block text-slate-700">
-                        <i class="fas fa-database mr-2"></i> Katalog Dataset
+                    <a href="login.html" class="sm:hidden block w-full bg-blue-900 text-white px-4 py-2 rounded-lg text-xs font-semibold hover:bg-blue-800 transition mt-3 text-center">
+                        Login
                     </a>
-                    
-                    <a href="upload.html" class="block text-slate-700">
-                        <i class="fas fa-upload mr-2"></i> Upload Data
-                    </a>
-                    
-                    <div class="pt-3 border-t">
-                        <div id="mobileAuthArea"></div>
-                    </div>
                 </div>
             </div>
         </div>
     </nav>
-    
-    <!-- Hero Section -->
-    <header class="hero-gradient text-white relative overflow-hidden">
-        <div class="absolute inset-0 opacity-10">
-            <div class="absolute -top-20 -right-20 w-64 h-64 bg-white rounded-full"></div>
-            <div class="absolute -bottom-20 -left-20 w-64 h-64 bg-amber-400 rounded-full"></div>
-        </div>
-        
-        <div class="container mx-auto px-4 sm:px-6 py-12 sm:py-20 relative">
-            <div class="max-w-4xl mx-auto text-center">
-                <span class="inline-block bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full text-sm font-bold mb-6 border border-white/30">
-                    <i class="fas fa-bullhorn mr-2"></i> Portal Data Terintegrasi Dinas Perhubungan
-                </span>
-                
-                <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold mb-6 leading-tight">
-                    Data Transportasi
-                    <span class="accent-makassar block mt-2">Kota Makassar</span>
-                </h1>
-                
-                <p class="text-lg sm:text-xl text-blue-100 mb-10 max-w-3xl mx-auto px-4">
-                    Akses real-time dataset transportasi, lalu lintas, dan infrastruktur dalam satu platform terpadu untuk pengambilan keputusan berbasis data.
-                </p>
-                
-                <!-- Search Box -->
-                <div class="max-w-2xl mx-auto bg-white p-2 rounded-2xl shadow-2xl flex flex-col sm:flex-row items-center search-glow mx-4">
-                    <div class="flex items-center w-full sm:w-auto sm:flex-1 mb-2 sm:mb-0">
-                        <i class="fas fa-search text-slate-400 ml-4"></i>
-                        <input 
-                            type="text" 
-                            id="searchInput"
-                            placeholder="Cari dataset..." 
-                            class="w-full p-4 text-slate-800 outline-none rounded-xl"
-                        >
-                    </div>
-                    <button 
-                        onclick="searchDataset()"
-                        class="bg-blue-600 hover:bg-blue-700 text-white px-6 sm:px-8 py-4 rounded-xl font-bold transition-all duration-300 transform hover:scale-105 w-full sm:w-auto"
-                    >
-                        <i class="fas fa-search mr-2"></i> Cari
-                    </button>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Wave Divider -->
-        <div class="absolute bottom-0 left-0 right-0">
-            <svg viewBox="0 0 1200 120" preserveAspectRatio="none" class="fill-current text-slate-50 w-full h-12 sm:h-16 md:h-20">
-                <path d="M0,0V46.29c47.79,22.2,103.59,32.17,158,28,70.36-5.37,136.33-33.31,206.8-37.5C438.64,32.43,512.34,53.67,583,72.05c69.27,18,138.3,24.88,209.4,13.08,36.15-6,69.85-17.84,104.45-29.34C989.49,25,1113-14.29,1200,52.47V0Z" opacity=".25"></path>
-                <path d="M0,0V15.81C13,36.92,27.64,56.86,47.69,72.05,99.41,111.27,165,111,224.58,91.58c31.15-10.15,60.09-26.07,89.67-39.8,40.92-19,84.73-46,130.83-49.67,36.26-2.85,70.9,9.42,98.6,31.56,31.77,25.39,62.32,62,103.63,73,40.44,10.79,81.35,6.36,119.13-6.25C750.77,4,787.39-.29,823.68,2.6c58.18,7.11,112.3,23.86,167.18,42.79,48.29,16.89,91.19,42.36,128.45,72.13,1.49,1.24,2.98,2.48,4.46,3.72V0Z" opacity=".5"></path>
-                <path d="M0,0V5.63C149.93,59,314.09,71.32,475.83,42.57c43-7.64,84.23-20.12,127.61-26.46,59-8.63,112.48,12.24,165.56,35.4C827.93,77.22,886,95.24,951.2,90c86.53-7,172.46-45.71,248.8-84.81V0Z"></path>
+
+    <header class="hero-gradient text-white py-12 sm:py-20 md:py-24 relative overflow-hidden">
+        <div class="absolute inset-0 opacity-10 pointer-events-none">
+            <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+                <pattern id="pattern" x="0" y="0" width="40" height="40" patternUnits="userSpaceOnUse">
+                    <path d="M0 40L40 0M0 0L40 40" stroke="white" stroke-width="1"/>
+                </pattern>
+                <rect width="100%" height="100%" fill="url(#pattern)" />
             </svg>
         </div>
+
+        <div class="container mx-auto px-4 sm:px-6 relative z-10 text-center">
+            <span class="inline-block bg-white/10 backdrop-blur-md px-3 sm:px-4 py-1 rounded-full text-xs sm:text-sm font-medium mb-4 sm:mb-6 border border-white/20 text-amber-400">
+                <i class="fas fa-info-circle mr-2"></i>Akses Data Transportasi Terintegrasi
+            </span>
+            <h2 class="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold mb-4 sm:mb-6 leading-tight">
+                Navigasi Data Kota, <br><span class="accent-makassar">Laju & Terpercaya.</span>
+            </h2>
+            <div class="max-w-2xl mx-auto bg-white p-2 rounded-xl sm:rounded-2xl shadow-2xl flex flex-col sm:flex-row items-center mt-6 sm:mt-10 gap-2 sm:gap-0">
+                <i class="fas fa-search text-slate-400 ml-0 sm:ml-4 mb-2 sm:mb-0"></i>
+                <input type="text" placeholder="Cari data (contoh: Kemacetan, BRT, Parkir)..." class="w-full p-2 sm:p-3 text-xs sm:text-base text-slate-800 outline-none rounded-lg sm:rounded-l-xl">
+                <button class="bg-blue-600 hover:bg-blue-700 text-white px-6 sm:px-8 py-2 sm:py-3 rounded-lg sm:rounded-xl font-bold transition w-full sm:w-auto">
+                    Cari
+                </button>
+            </div>
+        </div>
     </header>
-    
-    <!-- Main Content -->
-    <main class="container mx-auto px-4 sm:px-6 py-8 sm:py-12">
-        
-        <!-- Quick Stats Overview -->
-        <section class="mb-12">
-            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8">
-                <div>
-                    <h2 class="text-2xl sm:text-3xl font-bold text-blue-900 mb-2">Statistik <span class="text-amber-500">Transportasi</span></h2>
-                    <p class="text-slate-600">Data real-time seluruh bidang Dinas Perhubungan Kota Makassar</p>
+
+    <section class="container mx-auto px-4 sm:px-6 -mt-8 sm:-mt-10 relative z-20">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-8 sm:mb-12">
+            <!-- Kartu Volume Kendaraan -->
+            <div class="bg-white p-6 sm:p-8 rounded-2xl sm:rounded-3xl shadow-xl border border-slate-100">
+                <div class="flex items-center justify-between mb-4 sm:mb-6">
+                    <h3 class="font-bold text-blue-900 uppercase tracking-wider text-xs sm:text-sm">Jumlah Kendaraan</h3>
+                    <i class="fas fa-car-side text-blue-500 text-lg sm:text-xl"></i>
                 </div>
-                <div class="mt-4 sm:mt-0 text-sm text-slate-500">
-                    <i class="fas fa-sync-alt mr-2"></i> Update: 5 menit lalu
+                <div class="space-y-3 sm:space-y-4">
+                    <div class="flex justify-between items-center text-sm">
+                        <span class="text-slate-500 text-xs sm:text-sm">Pribadi</span>
+                        <span class="font-bold text-lg sm:text-xl">1.240.500</span>
+                    </div>
+                    <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                        <div class="bg-blue-600 h-full" style="width: 85%"></div>
+                    </div>
+                    <div class="flex justify-between items-center text-sm">
+                        <span class="text-slate-500 text-xs sm:text-sm">Publik (Barang/Orang)</span>
+                        <span class="font-bold text-lg sm:text-xl">342.100</span>
+                    </div>
+                    <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                        <div class="bg-amber-500 h-full" style="width: 35%"></div>
+                    </div>
                 </div>
             </div>
-            
-            <!-- Bidang 1: Lalu Lintas -->
-            <div class="mb-10">
-                <div class="flex items-center space-x-3 mb-6">
-                    <div class="w-3 h-8 bg-blue-600 rounded-full"></div>
-                    <h3 class="text-xl font-bold text-blue-900">1. Bidang Lalu Lintas</h3>
+
+            <!-- Kartu Pemetaan Jalan -->
+            <div class="bg-white p-6 sm:p-8 rounded-2xl sm:rounded-3xl shadow-xl border border-slate-100">
+                <div class="flex items-center justify-between mb-4 sm:mb-6">
+                    <h3 class="font-bold text-blue-900 uppercase tracking-wider text-xs sm:text-sm">Pemetaan Jalan</h3>
+                    <i class="fas fa-map-marked-alt text-rose-500 text-lg sm:text-xl"></i>
                 </div>
-                
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-                    <!-- Card 1.1 -->
-                    <div class="stat-card bg-white p-5 rounded-2xl shadow-lg border border-slate-100 card-hover">
-                        <div class="flex items-center justify-between mb-4">
-                            <div>
-                                <p class="text-slate-500 text-sm font-medium">Titik Kemacetan</p>
-                                <p class="text-2xl sm:text-3xl font-bold text-blue-900">24</p>
-                            </div>
-                            <div class="w-10 h-10 sm:w-12 sm:h-12 bg-red-100 rounded-xl flex items-center justify-center">
-                                <i class="fas fa-traffic-light text-red-600 text-lg sm:text-xl"></i>
-                            </div>
-                        </div>
-                        <div class="text-xs text-slate-600">
-                            <div class="flex justify-between mb-1">
-                                <span>Padat Berat</span>
-                                <span class="font-bold text-red-600">8 titik</span>
-                            </div>
-                            <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
-                                <div class="bg-red-500 h-full" style="width: 33%"></div>
-                            </div>
-                        </div>
+                <div class="grid grid-cols-2 gap-3 sm:gap-4">
+                    <div class="bg-rose-50 p-3 sm:p-4 rounded-xl sm:rounded-2xl text-center">
+                        <p class="text-rose-600 font-bold text-xl sm:text-2xl">24</p>
+                        <p class="text-[11px] sm:text-xs text-rose-800 font-semibold">Titik Macet</p>
                     </div>
-                    
-                    <!-- Card 1.2 -->
-                    <div class="stat-card bg-white p-5 rounded-2xl shadow-lg border border-slate-100 card-hover">
-                        <div class="flex items-center justify-between mb-4">
-                            <div>
-                                <p class="text-slate-500 text-sm font-medium">Personil Lapangan</p>
-                                <p class="text-2xl sm:text-3xl font-bold text-blue-900">450</p>
-                            </div>
-                            <div class="w-10 h-10 sm:w-12 sm:h-12 bg-blue-100 rounded-xl flex items-center justify-center">
-                                <i class="fas fa-user-shield text-blue-600 text-lg sm:text-xl"></i>
-                            </div>
-                        </div>
-                        <div class="text-xs text-slate-600">
-                            <div class="flex justify-between">
-                                <span>Aktif Hari Ini</span>
-                                <span class="font-bold text-green-600">420 orang</span>
-                            </div>
-                        </div>
+                    <div class="bg-amber-50 p-3 sm:p-4 rounded-xl sm:rounded-2xl text-center">
+                        <p class="text-amber-600 font-bold text-xl sm:text-2xl">48</p>
+                        <p class="text-[11px] sm:text-xs text-amber-800 font-semibold">Titik Padat</p>
                     </div>
-                    
-                    <!-- Card 1.3 -->
-                    <div class="stat-card bg-white p-5 rounded-2xl shadow-lg border border-slate-100 card-hover">
-                        <div class="flex items-center justify-between mb-4">
-                            <div>
-                                <p class="text-slate-500 text-sm font-medium">Sosialisasi Sekolah</p>
-                                <p class="text-2xl sm:text-3xl font-bold text-blue-900">15</p>
-                            </div>
-                            <div class="w-10 h-10 sm:w-12 sm:h-12 bg-green-100 rounded-xl flex items-center justify-center">
-                                <i class="fas fa-school text-green-600 text-lg sm:text-xl"></i>
-                            </div>
-                        </div>
-                        <div class="text-xs text-slate-600">
-                            <span class="text-blue-600 font-bold">SD 12, SMP 8, SMA 5</span>
-                        </div>
-                    </div>
-                    
-                    <!-- Card 1.4 -->
-                    <div class="stat-card bg-white p-5 rounded-2xl shadow-lg border border-slate-100 card-hover">
-                        <div class="flex items-center justify-between mb-4">
-                            <div>
-                                <p class="text-slate-500 text-sm font-medium">Rekayasa Lalu Lintas</p>
-                                <p class="text-2xl sm:text-3xl font-bold text-blue-900">38</p>
-                            </div>
-                            <div class="w-10 h-10 sm:w-12 sm:h-12 bg-purple-100 rounded-xl flex items-center justify-center">
-                                <i class="fas fa-road text-purple-600 text-lg sm:text-xl"></i>
-                            </div>
-                        </div>
-                        <div class="text-xs text-slate-600">
-                            <span class="text-blue-600 font-bold">Proyek aktif tahun ini</span>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Additional Info for Mobile -->
-                <div class="bg-blue-50 p-4 rounded-xl sm:hidden">
-                    <p class="text-sm text-blue-800 font-medium mb-2"><i class="fas fa-info-circle mr-2"></i>Titik Kemacetan Utama:</p>
-                    <p class="text-xs text-blue-700">Jl. AP Pettarani, Jl. Ahmad Yani, Jl. Urip Sumoharjo, Simpang Lima</p>
                 </div>
             </div>
-            
-            <!-- Bidang 2: TPAI -->
-            <div class="mb-10">
-                <div class="flex items-center space-x-3 mb-6">
-                    <div class="w-3 h-8 bg-amber-600 rounded-full"></div>
-                    <h3 class="text-xl font-bold text-blue-900">2. TPAI (Tempat Penitipan & Penggembokan)</h3>
+
+            <!-- Kartu Personel Dishub -->
+            <div class="bg-white p-6 sm:p-8 rounded-2xl sm:rounded-3xl shadow-xl border border-slate-100">
+                <div class="flex items-center justify-between mb-4 sm:mb-6">
+                    <h3 class="font-bold text-blue-900 uppercase tracking-wider text-xs sm:text-sm">Personel Dishub</h3>
+                    <i class="fas fa-users text-emerald-500 text-lg sm:text-xl"></i>
                 </div>
-                
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
-                    <!-- Card 2.1 -->
-                    <div class="stat-card bg-white p-5 rounded-2xl shadow-lg border border-slate-100 card-hover">
-                        <div class="flex items-center justify-between mb-4">
-                            <div>
-                                <p class="text-slate-500 text-sm font-medium">Penggembokan Bulan Ini</p>
-                                <p class="text-2xl sm:text-3xl font-bold text-blue-900">128</p>
-                            </div>
-                            <div class="w-10 h-10 sm:w-12 sm:h-12 bg-orange-100 rounded-xl flex items-center justify-center">
-                                <i class="fas fa-car-burst text-orange-600 text-lg sm:text-xl"></i>
-                            </div>
-                        </div>
-                        <div class="text-xs text-slate-600">
-                            <div class="flex justify-between mb-1">
-                                <span>Mobil</span>
-                                <span class="font-bold">85 unit</span>
-                            </div>
-                            <div class="flex justify-between">
-                                <span>Motor</span>
-                                <span class="font-bold">43 unit</span>
-                            </div>
+                <div class="space-y-4">
+                    <div class="flex items-center space-x-3 sm:space-x-4">
+                        <div class="bg-emerald-100 p-2 sm:p-3 rounded-lg sm:rounded-xl text-emerald-600"><i class="fas fa-traffic-light text-sm sm:text-base"></i></div>
+                        <div>
+                            <p class="text-[11px] sm:text-xs text-slate-500">Petugas Lapangan</p>
+                            <p class="font-bold text-base sm:text-lg">450 <span class="text-[10px] sm:text-xs font-normal">Orang</span></p>
                         </div>
                     </div>
-                    
-                    <!-- Card 2.2 -->
-                    <div class="stat-card bg-white p-5 rounded-2xl shadow-lg border border-slate-100 card-hover">
-                        <div class="flex items-center justify-between mb-4">
-                            <div>
-                                <p class="text-slate-500 text-sm font-medium">Jalan Dilarang Parkir</p>
-                                <p class="text-2xl sm:text-3xl font-bold text-blue-900">42</p>
-                            </div>
-                            <div class="w-10 h-10 sm:w-12 sm:h-12 bg-red-100 rounded-xl flex items-center justify-center">
-                                <i class="fas fa-ban text-red-600 text-lg sm:text-xl"></i>
-                            </div>
-                        </div>
-                        <div class="text-xs text-slate-600">
-                            <p class="font-bold text-blue-900 mb-1">Area Utama:</p>
-                            <p class="text-slate-700">Jl. AP Pettarani, Jl. Perintis Kemerdekaan, Jl. Sultan Hasanuddin</p>
+                    <div class="flex items-center space-x-3 sm:space-x-4">
+                        <div class="bg-blue-100 p-2 sm:p-3 rounded-lg sm:rounded-xl text-blue-600"><i class="fas fa-user-tie text-sm sm:text-base"></i></div>
+                        <div>
+                            <p class="text-[11px] sm:text-xs text-slate-500">Administrasi</p>
+                            <p class="font-bold text-base sm:text-lg">125 <span class="text-[10px] sm:text-xs font-normal">Orang</span></p>
                         </div>
                     </div>
                 </div>
             </div>
-            
-            <!-- Bidang 3: Angkutan -->
-            <div class="mb-10">
-                <div class="flex items-center space-x-3 mb-6">
-                    <div class="w-3 h-8 bg-purple-600 rounded-full"></div>
-                    <h3 class="text-xl font-bold text-blue-900">3. Bidang Angkutan</h3>
+
+            <!-- Kartu TPAI & Parkir -->
+            <div class="bg-white p-6 sm:p-8 rounded-2xl sm:rounded-3xl shadow-xl border border-slate-100">
+                <div class="flex items-center justify-between mb-4 sm:mb-6">
+                    <h3 class="font-bold text-blue-900 uppercase tracking-wider text-xs sm:text-sm">TPAI & Parkir</h3>
+                    <i class="fas fa-parking text-rose-500 text-lg sm:text-xl"></i>
                 </div>
-                
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-                    <!-- Card 3.1 -->
-                    <div class="stat-card bg-white p-5 rounded-2xl shadow-lg border border-slate-100 card-hover">
-                        <div class="text-center">
-                            <div class="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                                <i class="fas fa-bus text-purple-600 text-2xl"></i>
-                            </div>
-                            <p class="text-slate-500 text-sm font-medium mb-1">Angkot/Pete-pete</p>
-                            <p class="text-2xl sm:text-3xl font-bold text-blue-900 mb-2">842</p>
-                            <div class="text-xs text-slate-600">
-                                <div class="flex justify-between">
-                                    <span>Aktif</span>
-                                    <span class="font-bold text-green-600">798 unit</span>
-                                </div>
-                            </div>
-                        </div>
+                <div class="space-y-4 sm:space-y-6">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs sm:text-sm text-slate-600 font-medium">Penggembokan (Bulan ini)</span>
+                        <span class="bg-rose-100 text-rose-700 px-2 sm:px-3 py-1 rounded-lg font-bold text-lg sm:text-xl">128</span>
                     </div>
-                    
-                    <!-- Card 3.2 -->
-                    <div class="stat-card bg-white p-5 rounded-2xl shadow-lg border border-slate-100 card-hover">
-                        <div class="text-center">
-                            <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                                <i class="fas fa-bus-alt text-blue-600 text-2xl"></i>
+                    <div class="pt-3 sm:pt-4 border-t border-slate-50">
+                        <p class="text-[10px] sm:text-[11px] font-bold text-slate-700 uppercase mb-2 sm:mb-3">Area Pengawasan Utama:</p>
+                        <div class="flex flex-col gap-2">
+                            <div class="flex items-center text-xs sm:text-sm text-slate-600">
+                                <i class="fas fa-location-dot mr-2 text-rose-400"></i> Jl. AP Pettarani
                             </div>
-                            <p class="text-slate-500 text-sm font-medium mb-1">Bus BRT</p>
-                            <p class="text-2xl sm:text-3xl font-bold text-blue-900 mb-2">45</p>
-                            <div class="text-xs text-slate-600">
-                                <div class="flex justify-between">
-                                    <span>Operasional</span>
-                                    <span class="font-bold text-green-600">42 unit</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Card 3.3 -->
-                    <div class="stat-card bg-white p-5 rounded-2xl shadow-lg border border-slate-100 card-hover">
-                        <div class="text-center">
-                            <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                                <i class="fas fa-taxi text-green-600 text-2xl"></i>
-                            </div>
-                            <p class="text-slate-500 text-sm font-medium mb-1">Taksi Online</p>
-                            <p class="text-2xl sm:text-3xl font-bold text-blue-900 mb-2">2,150</p>
-                            <div class="text-xs text-slate-600">
-                                <div class="flex justify-between">
-                                    <span>Teregistrasi</span>
-                                    <span class="font-bold">2,150 unit</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Total Kendaraan Chart -->
-                <div class="bg-white p-5 rounded-2xl shadow-lg border border-slate-100 mb-6">
-                    <h4 class="font-bold text-slate-900 mb-4">Total Kendaraan Kota Makassar</h4>
-                    <div class="chart-container">
-                        <canvas id="vehicleChart"></canvas>
-                    </div>
-                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-4">
-                        <div class="text-center">
-                            <p class="text-2xl font-bold text-blue-900">1.24 jt</p>
-                            <p class="text-xs text-slate-600">Kendaraan Pribadi</p>
-                        </div>
-                        <div class="text-center">
-                            <p class="text-2xl font-bold text-green-900">342k</p>
-                            <p class="text-xs text-slate-600">Kendaraan Publik</p>
-                        </div>
-                        <div class="text-center">
-                            <p class="text-2xl font-bold text-amber-900">48</p>
-                            <p class="text-xs text-slate-600">Titik Padat</p>
-                        </div>
-                        <div class="text-center">
-                            <p class="text-2xl font-bold text-rose-900">24</p>
-                            <p class="text-xs text-slate-600">Titik Macet</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Bidang 4: Sarpras -->
-            <div class="mb-10">
-                <div class="flex items-center space-x-3 mb-6">
-                    <div class="w-3 h-8 bg-green-600 rounded-full"></div>
-                    <h3 class="text-xl font-bold text-blue-900">4. Sarana & Prasarana (Sarpras)</h3>
-                </div>
-                
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
-                    <!-- Card 4.1 -->
-                    <div class="stat-card bg-white p-5 rounded-2xl shadow-lg border border-slate-100 card-hover">
-                        <div class="flex items-center justify-between mb-4">
-                            <div>
-                                <p class="text-slate-500 text-sm font-medium">Rambu Terpasang</p>
-                                <p class="text-2xl sm:text-3xl font-bold text-blue-900">150</p>
-                            </div>
-                            <div class="w-10 h-10 sm:w-12 sm:h-12 bg-green-100 rounded-xl flex items-center justify-center">
-                                <i class="fas fa-sign text-green-600 text-lg sm:text-xl"></i>
-                            </div>
-                        </div>
-                        <div class="text-xs text-slate-600">
-                            <p class="font-bold text-blue-900 mb-1">Lokasi Terbanyak:</p>
-                            <p class="text-slate-700">Jl. AP Pettarani (28), Jl. Urip Sumoharjo (22), Jl. Sultan Hasanuddin (18)</p>
-                        </div>
-                    </div>
-                    
-                    <!-- Card 4.2 -->
-                    <div class="stat-card bg-white p-5 rounded-2xl shadow-lg border border-slate-100 card-hover">
-                        <div class="flex items-center justify-between mb-4">
-                            <div>
-                                <p class="text-slate-500 text-sm font-medium">Traffic Light Aktif</p>
-                                <p class="text-2xl sm:text-3xl font-bold text-blue-900">52</p>
-                            </div>
-                            <div class="w-10 h-10 sm:w-12 sm:h-12 bg-amber-100 rounded-xl flex items-center justify-center">
-                                <i class="fas fa-traffic-light text-amber-600 text-lg sm:text-xl"></i>
-                            </div>
-                        </div>
-                        <div class="text-xs text-slate-600">
-                            <div class="flex justify-between mb-1">
-                                <span>Berfungsi Normal</span>
-                                <span class="font-bold text-green-600">48 unit</span>
-                            </div>
-                            <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
-                                <div class="bg-green-500 h-full" style="width: 92%"></div>
+                            <div class="flex items-center text-xs sm:text-sm text-slate-600">
+                                <i class="fas fa-location-dot mr-2 text-rose-400"></i> Jl. Ahmad Yani
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            
-            <!-- Bidang 5: UPTD Lampu Jalan -->
-            <div class="mb-10">
-                <div class="flex items-center space-x-3 mb-6">
-                    <div class="w-3 h-8 bg-yellow-600 rounded-full"></div>
-                    <h3 class="text-xl font-bold text-blue-900">5. UPTD Lampu Jalan</h3>
+
+            <!-- Kartu Pengujian Kendaraan -->
+            <div class="bg-white p-6 sm:p-8 rounded-2xl sm:rounded-3xl shadow-xl border border-slate-100">
+                <div class="flex items-center justify-between mb-4 sm:mb-6">
+                    <h3 class="font-bold text-blue-900 uppercase tracking-wider text-xs sm:text-sm">Pengujian Kendaraan</h3>
+                    <i class="fas fa-file-invoice text-emerald-500 text-lg sm:text-xl"></i>
                 </div>
-                
-                <div class="stat-card bg-gradient-to-r from-blue-900 to-blue-800 text-white p-6 rounded-2xl shadow-lg">
-                    <div class="flex flex-col sm:flex-row items-center justify-between">
-                        <div class="text-center sm:text-left mb-4 sm:mb-0">
-                            <p class="text-blue-100 text-sm font-medium mb-2">Total Titik Lampu Jalan</p>
-                            <p class="text-4xl sm:text-5xl font-bold">42.150</p>
-                            <p class="text-blue-200 text-xs mt-2">Tersebar di 14 Kecamatan Kota Makassar</p>
-                        </div>
-                        <div class="w-20 h-20 sm:w-24 sm:h-24 bg-white/20 rounded-full flex items-center justify-center">
-                            <i class="fas fa-lightbulb text-yellow-300 text-3xl sm:text-4xl"></i>
-                        </div>
+                <div class="space-y-2 sm:space-y-3 mb-4">
+                    <div class="flex justify-between items-center text-xs sm:text-sm">
+                        <span class="text-slate-500">Lulus Uji</span>
+                        <span class="font-bold text-emerald-600">1.420</span>
                     </div>
-                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 mt-6 pt-6 border-t border-white/20">
-                        <div class="text-center">
-                            <p class="text-xl font-bold">38.925</p>
-                            <p class="text-blue-200 text-xs">Berfungsi Normal</p>
-                        </div>
-                        <div class="text-center">
-                            <p class="text-xl font-bold">3.225</p>
-                            <p class="text-blue-200 text-xs">Perlu Perbaikan</p>
-                        </div>
-                        <div class="text-center">
-                            <p class="text-xl font-bold">92.4%</p>
-                            <p class="text-blue-200 text-xs">Tingkat Fungsi</p>
-                        </div>
+                    <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                        <div class="bg-emerald-500 h-full" style="width: 88%"></div>
+                    </div>
+                </div>
+                <div class="relative h-24 sm:h-32">
+                    <canvas id="miniTestChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Kartu Sarana & Prasarana -->
+            <div class="bg-white p-6 sm:p-8 rounded-2xl sm:rounded-3xl shadow-xl border border-slate-100">
+                <div class="flex items-center justify-between mb-3 sm:mb-4">
+                    <h3 class="font-bold text-blue-900 uppercase tracking-wider text-xs sm:text-sm">Perlengkapan Jalan</h3>
+                    <i class="fas fa-tools text-amber-500 text-lg sm:text-xl"></i>
+                </div>
+                <div class="space-y-2 sm:space-y-3">
+                    <div class="flex items-center space-x-2 sm:space-x-3 text-xs sm:text-sm">
+                        <i class="fas fa-sign text-slate-400"></i>
+                        <span><strong>150</strong> Rambu Baru Terpasang</span>
+                    </div>
+                    <div class="flex items-center space-x-2 sm:space-x-3 text-xs sm:text-sm">
+                        <i class="fas fa-traffic-light text-slate-400"></i>
+                        <span><strong>52</strong> Titik Traffic Light Aktif</span>
                     </div>
                 </div>
             </div>
-            
-            <!-- Bidang 6: UPTD Pengujian Kendaraan -->
-            <div class="mb-12">
-                <div class="flex items-center space-x-3 mb-6">
-                    <div class="w-3 h-8 bg-rose-600 rounded-full"></div>
-                    <h3 class="text-xl font-bold text-blue-900">6. UPTD Pengujian Kendaraan Bermotor</h3>
+
+            <!-- Kartu UPTD Lampu Jalan -->
+            <div class="bg-white p-6 sm:p-8 rounded-2xl sm:rounded-3xl shadow-xl border border-slate-100">
+                <div class="flex items-center justify-between mb-3 sm:mb-4">
+                    <h3 class="font-bold text-blue-900 uppercase tracking-wider text-xs sm:text-sm">UPTD Lampu Jalan</h3>
+                    <i class="fas fa-lightbulb text-yellow-500 text-lg sm:text-xl"></i>
                 </div>
-                
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <!-- Card 6.1 -->
-                    <div class="stat-card bg-white p-5 rounded-2xl shadow-lg border border-slate-100 card-hover">
-                        <div class="flex items-center justify-between mb-6">
-                            <div>
-                                <p class="text-slate-500 text-sm font-medium">Pengujian Bulan Ini</p>
-                                <p class="text-2xl sm:text-3xl font-bold text-blue-900">1.606</p>
-                            </div>
-                            <div class="w-10 h-10 sm:w-12 sm:h-12 bg-rose-100 rounded-xl flex items-center justify-center">
-                                <i class="fas fa-car-side text-rose-600 text-lg sm:text-xl"></i>
-                            </div>
-                        </div>
-                        
-                        <div class="space-y-4">
-                            <div>
-                                <div class="flex justify-between text-sm mb-1">
-                                    <span class="text-slate-600">Lulus Uji</span>
-                                    <span class="font-bold text-green-600">1.420 kendaraan</span>
-                                </div>
-                                <div class="w-full bg-slate-100 h-3 rounded-full overflow-hidden">
-                                    <div class="bg-green-500 h-full" style="width: 88%"></div>
-                                </div>
-                            </div>
-                            
-                            <div>
-                                <div class="flex justify-between text-sm mb-1">
-                                    <span class="text-slate-600">Tidak Lulus</span>
-                                    <span class="font-bold text-red-600">186 kendaraan</span>
-                                </div>
-                                <div class="w-full bg-slate-100 h-3 rounded-full overflow-hidden">
-                                    <div class="bg-red-500 h-full" style="width: 12%"></div>
-                                </div>
-                            </div>
-                        </div>
+                <div class="text-center py-2">
+                    <p class="text-2xl sm:text-3xl font-extrabold text-blue-900">42.150</p>
+                    <p class="text-[10px] sm:text-xs text-slate-500 uppercase font-bold tracking-widest">Total Titik Lampu</p>
+                </div>
+            </div>
+
+            <!-- Kartu Bidang Angkutan -->
+            <div class="bg-white p-6 sm:p-8 rounded-2xl sm:rounded-3xl shadow-xl border border-slate-100">
+                <div class="flex items-center justify-between mb-3 sm:mb-4">
+                    <h3 class="font-bold text-blue-900 uppercase tracking-wider text-xs sm:text-sm">Bidang Angkutan</h3>
+                    <i class="fas fa-bus text-purple-500 text-lg sm:text-xl"></i>
+                </div>
+                <div class="flex justify-around items-center h-full pb-3 sm:pb-4">
+                    <div class="text-center">
+                        <p class="font-bold text-lg sm:text-xl text-purple-700">842</p>
+                        <p class="text-[10px] sm:text-[11px] text-slate-500 uppercase">Angkot/Pete2</p>
                     </div>
-                    
-                    <!-- Card 6.2 - Chart -->
-                    <div class="stat-card bg-white p-5 rounded-2xl shadow-lg border border-slate-100 card-hover">
-                        <h4 class="font-bold text-slate-900 mb-4">Distribusi Pengujian</h4>
-                        <div class="chart-container">
-                            <canvas id="testingChart"></canvas>
-                        </div>
+                    <div class="h-6 sm:h-8 w-[1px] bg-slate-200"></div>
+                    <div class="text-center">
+                        <p class="font-bold text-lg sm:text-xl text-purple-700">45</p>
+                        <p class="text-[10px] sm:text-[11px] text-slate-500 uppercase">Bus BRT</p>
                     </div>
                 </div>
             </div>
-            
-            <!-- Personel Dishub -->
-            <div class="mb-12">
-                <div class="flex items-center space-x-3 mb-6">
-                    <div class="w-3 h-8 bg-cyan-600 rounded-full"></div>
-                    <h3 class="text-xl font-bold text-blue-900">Personel Dinas Perhubungan</h3>
-                </div>
-                
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <!-- Total Pegawai -->
-                    <div class="stat-card bg-white p-5 rounded-2xl shadow-lg border border-slate-100 card-hover">
-                        <div class="text-center">
-                            <div class="w-16 h-16 bg-cyan-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                                <i class="fas fa-users text-cyan-600 text-2xl"></i>
-                            </div>
-                            <p class="text-slate-500 text-sm font-medium mb-1">Total Pegawai</p>
-                            <p class="text-2xl sm:text-3xl font-bold text-blue-900">575</p>
-                            <div class="text-xs text-slate-600 mt-2">
-                                <span class="text-green-600 font-bold">ASN: 278</span> | 
-                                <span class="text-blue-600 font-bold">PPPK: 297</span>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Petugas Lapangan -->
-                    <div class="stat-card bg-white p-5 rounded-2xl shadow-lg border border-slate-100 card-hover">
-                        <div class="text-center">
-                            <div class="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                                <i class="fas fa-hard-hat text-emerald-600 text-2xl"></i>
-                            </div>
-                            <p class="text-slate-500 text-sm font-medium mb-1">Petugas Lapangan</p>
-                            <p class="text-2xl sm:text-3xl font-bold text-blue-900">450</p>
-                            <div class="text-xs text-slate-600 mt-2">
-                                Bertugas langsung di jalan
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Administrasi -->
-                    <div class="stat-card bg-white p-5 rounded-2xl shadow-lg border border-slate-100 card-hover">
-                        <div class="text-center">
-                            <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                                <i class="fas fa-user-tie text-blue-600 text-2xl"></i>
-                            </div>
-                            <p class="text-slate-500 text-sm font-medium mb-1">Administrasi</p>
-                            <p class="text-2xl sm:text-3xl font-bold text-blue-900">125</p>
-                            <div class="text-xs text-slate-600 mt-2">
-                                Bertugas di kantor/administrasi
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Distribusi -->
-                    <div class="stat-card bg-white p-5 rounded-2xl shadow-lg border border-slate-100 card-hover">
-                        <div class="text-center">
-                            <div class="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                                <i class="fas fa-chart-pie text-purple-600 text-2xl"></i>
-                            </div>
-                            <p class="text-slate-500 text-sm font-medium mb-1">Distribusi</p>
-                            <p class="text-2xl sm:text-3xl font-bold text-blue-900">78%</p>
-                            <div class="text-xs text-slate-600 mt-2">
-                                <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden mt-1">
-                                    <div class="bg-emerald-500 h-full" style="width: 78%"></div>
-                                </div>
-                                <p class="mt-1">Petugas Lapangan vs Administrasi</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+        </div>
+    </section>
+
+    <main class="container mx-auto px-4 sm:px-6 py-8 sm:py-10">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-6 sm:mb-10 gap-4">
+            <div>
+                <h3 class="text-2xl sm:text-3xl font-bold text-blue-900 italic">Pa'lintasang Terbaru</h3>
+                <p class="text-xs sm:text-sm text-slate-500">Update dataset terbaru dari sistem Dishub Makassar.</p>
             </div>
-            
-        </section>
-        
-        <!-- CTA Section -->
-        <section class="bg-gradient-to-r from-blue-900 to-blue-800 rounded-2xl p-6 sm:p-8 md:p-12 text-center text-white relative overflow-hidden mb-12">
-            <div class="absolute -top-20 -right-20 w-64 h-64 bg-white/10 rounded-full hidden sm:block"></div>
-            <div class="absolute -bottom-20 -left-20 w-64 h-64 bg-amber-400/10 rounded-full hidden sm:block"></div>
-            
-            <div class="relative z-10 max-w-3xl mx-auto">
-                <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold mb-4">Ingin Mengakses Data Lebih Lengkap?</h2>
-                <p class="text-blue-100 text-base sm:text-lg mb-8">
-                    Bergabunglah dengan sistem Pa'lintasang Data untuk akses dataset lengkap dan fitur analisis canggih.
-                </p>
-                
-                <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                    <a href="login.html" class="bg-amber-400 text-blue-900 px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-bold text-base sm:text-lg hover:bg-amber-300 transition transform hover:scale-105">
-                        <i class="fas fa-sign-in-alt mr-2"></i> Login Sekarang
-                    </a>
-                    <a href="katalog.html" class="bg-white/20 backdrop-blur-sm border border-white/30 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-bold text-base sm:text-lg hover:bg-white/30 transition">
-                        <i class="fas fa-database mr-2"></i> Jelajahi Dataset
-                    </a>
-                </div>
-            </div>
-        </section>
-        
+            <a href="katalog.html" class="text-xs sm:text-base text-blue-600 font-bold flex items-center hover:text-blue-700 transition">
+                Lihat Semua Katalog <i class="fas fa-chevron-right ml-2 text-xs"></i>
+            </a>
+        </div>
+
+        <div class="bg-white rounded-2xl sm:rounded-3xl shadow-xl overflow-hidden border border-slate-100 overflow-x-auto">
+            <table class="w-full text-left text-xs sm:text-sm">
+                <thead class="bg-slate-50 border-b border-slate-100">
+                    <tr>
+                        <th class="px-3 sm:px-8 py-3 sm:py-5 font-bold text-slate-700">Nama Dataset</th>
+                        <th class="px-3 sm:px-8 py-3 sm:py-5 font-bold text-slate-700 hidden sm:table-cell">Kategori</th>
+                        <th class="px-3 sm:px-8 py-3 sm:py-5 font-bold text-slate-700 hidden md:table-cell">Terakhir Update</th>
+                        <th class="px-3 sm:px-8 py-3 sm:py-5 font-bold text-slate-700 text-center">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                    <tr class="hover:bg-blue-50/30 transition">
+                        <td class="px-3 sm:px-8 py-3 sm:py-6 font-semibold text-xs sm:text-sm">Volume Kendaraan Simpang Lima Bandara</td>
+                        <td class="px-3 sm:px-8 py-3 sm:py-6 hidden sm:table-cell"><span class="bg-blue-100 text-blue-700 px-2 sm:px-3 py-1 rounded-full text-[10px] sm:text-xs font-bold">Lalu Lintas</span></td>
+                        <td class="px-3 sm:px-8 py-3 sm:py-6 text-slate-500 text-[10px] sm:text-xs italic hidden md:table-cell">2 jam yang lalu</td>
+                        <td class="px-3 sm:px-8 py-3 sm:py-6 text-center">
+                            <button class="text-blue-600 hover:scale-110 transition"><i class="fas fa-download text-xs sm:text-base"></i></button>
+                        </td>
+                    </tr>
+                    <tr class="hover:bg-blue-50/30 transition">
+                        <td class="px-3 sm:px-8 py-3 sm:py-6 font-semibold text-xs sm:text-sm">Data Okupansi Terminal Daya & Malengkeri</td>
+                        <td class="px-3 sm:px-8 py-3 sm:py-6 hidden sm:table-cell"><span class="bg-purple-100 text-purple-700 px-2 sm:px-3 py-1 rounded-full text-[10px] sm:text-xs font-bold">Terminal</span></td>
+                        <td class="px-3 sm:px-8 py-3 sm:py-6 text-slate-500 text-[10px] sm:text-xs italic hidden md:table-cell">Hari ini, 08:00</td>
+                        <td class="px-3 sm:px-8 py-3 sm:py-6 text-center">
+                            <button class="text-blue-600 hover:scale-110 transition"><i class="fas fa-download text-xs sm:text-base"></i></button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </main>
-    
-    <!-- Footer -->
-    <footer class="bg-blue-950 text-white pt-12 pb-10">
+
+    <footer class="bg-blue-950 text-white pt-12 sm:pt-20 pb-6 sm:pb-10">
         <div class="container mx-auto px-4 sm:px-6">
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-10">
-                <!-- Column 1 -->
-                <div>
-                    <div class="flex items-center space-x-3 mb-6">
-                        <div class="bg-amber-500 p-2 rounded-lg">
-                            <i class="fas fa-route text-white"></i>
-                        </div>
-                        <h3 class="font-bold text-lg">PA'LINTASANG <span class="text-amber-500">DATA</span></h3>
-                    </div>
-                    <p class="text-blue-200 text-sm mb-6">
-                        Sistem Informasi Transportasi Terintegrasi Dinas Perhubungan Kota Makassar.
-                    </p>
-                </div>
-                
-                <!-- Column 2 -->
-                <div>
-                    <h4 class="font-bold text-lg mb-6">Menu Cepat</h4>
-                    <ul class="space-y-3 text-sm">
-                        <li><a href="index.html" class="text-blue-200 hover:text-amber-400 transition">Beranda</a></li>
-                        <li><a href="katalog.html" class="text-blue-200 hover:text-amber-400 transition">Katalog Dataset</a></li>
-                        <li><a href="upload.html" class="text-blue-200 hover:text-amber-400 transition">Upload Data</a></li>
-                        <li><a href="dashboard.html" class="text-blue-200 hover:text-amber-400 transition">Dashboard</a></li>
-                    </ul>
-                </div>
-                
-                <!-- Column 3 -->
-                <div>
-                    <h4 class="font-bold text-lg mb-6">Kontak</h4>
-                    <div class="space-y-4 text-sm">
-                        <div class="flex items-start">
-                            <i class="fas fa-map-marker-alt text-amber-400 mt-1 mr-3"></i>
-                            <p class="text-blue-200">
-                                Jl. Mallengkeri Raya No.18, Mangasa, Tamalate, Kota Makassar
-                            </p>
-                        </div>
-                        <div class="flex items-center">
-                            <i class="fas fa-phone text-amber-400 mr-3"></i>
-                            <p class="text-blue-200">(0411) 884816</p>
-                        </div>
-                        <div class="flex items-center">
-                            <i class="fas fa-envelope text-amber-400 mr-3"></i>
-                            <p class="text-blue-200">dishub@makassar.go.id</p>
-                        </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 sm:gap-12 mb-12 sm:mb-16">
+                <div class="font-light opacity-90">
+                    <h4 class="font-bold text-white text-lg sm:text-xl mb-4 sm:mb-6 tracking-tight">PA'LINTASANG <span class="text-amber-500">DATA</span></h4>
+                    <div class="space-y-3 sm:space-y-4 text-xs sm:text-sm">
+                        <p class="flex items-start">
+                            <i class="fas fa-map-marker-alt mt-1 mr-3 sm:mr-4 text-amber-500 flex-shrink-0"></i>
+                            <span>Jl. Mallengkeri Raya No.18, Mangasa, Kec. Tamalate, Kota Makassar, Sulawesi Selatan 90221</span>
+                        </p>
+                        <p class="flex items-center">
+                            <i class="fas fa-phone mr-3 sm:mr-4 text-amber-500"></i>
+                            <span>(0411) 884816</span>
+                        </p>
+                        <p class="flex items-center">
+                            <i class="fas fa-clock mr-3 sm:mr-4 text-amber-500"></i>
+                            <span>Senin-Kamis : 07.30-16.00 WITA</span>
+                        </p>
+                        <p class="flex items-center">
+                            <i class="fas fa-clock mr-3 sm:mr-4 text-amber-500"></i>
+                            <span>Jumat : 07.30-16.30 WITA</span>
                     </div>
                 </div>
-                
-                <!-- Column 4 -->
-                <div>
-                    <h4 class="font-bold text-lg mb-6">Jam Operasional</h4>
-                    <div class="space-y-2 text-sm">
-                        <div class="flex justify-between">
-                            <span class="text-blue-200">Senin - Kamis</span>
-                            <span class="text-amber-400">08:00 - 16:00</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span class="text-blue-200">Jumat</span>
-                            <span class="text-amber-400">08:00 - 16:30</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span class="text-blue-200">Sabtu - Minggu</span>
-                            <span class="text-amber-400">Libur</span>
-                        </div>
+
+                <div class="md:col-span-2">
+                    <div class="w-full h-48 sm:h-64 rounded-lg sm:rounded-2xl overflow-hidden shadow-2xl border-2 sm:border-4 border-white/10">
+                        <iframe 
+                            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3973.5393527237223!2d119.42868231527357!3d-5.177579996242398!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2dbee295f756082d%3A0xc3f982142e033f9e!2sDishub%20Kota%20Makassar!5e0!3m2!1sid!2sid!4v1647412345678!5m2!1sid!2sid" 
+                            width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade">
+                        </iframe>
                     </div>
                 </div>
             </div>
-            
-            <div class="pt-6 border-t border-blue-800 text-center">
-                <p class="text-blue-300 text-sm">
-                    © 2025 Pa'lintasang Data - Dinas Perhubungan Kota Makassar. 
-                    <span class="text-amber-400 font-bold">DATA-DRIVEN POLICY!</span>
-                </p>
-                <p class="text-blue-400 text-xs mt-2">
-                    PKL Statistika UNM | Sistem Informasi Transportasi Terintegrasi
-                </p>
+
+            <div class="pt-6 sm:pt-8 border-t border-white/10 text-center text-xs sm:text-sm opacity-60">
+                <p>© 2025 PKL STATISTIKA UNM. <b>DATA-DRIVEN POLICY!</b></p>
             </div>
         </div>
     </footer>
-    
-    <!-- JavaScript -->
+
     <script>
         // Mobile Menu Toggle
-        document.getElementById('mobileMenuBtn').addEventListener('click', function() {
+        document.getElementById('menuToggle').addEventListener('click', function() {
             const mobileMenu = document.getElementById('mobileMenu');
             mobileMenu.classList.toggle('active');
-            const icon = this.querySelector('i');
-            if (mobileMenu.classList.contains('active')) {
-                icon.classList.remove('fa-bars');
-                icon.classList.add('fa-times');
-            } else {
-                icon.classList.remove('fa-times');
-                icon.classList.add('fa-bars');
-            }
         });
-        
-        // Close mobile menu when clicking outside
-        document.addEventListener('click', function(event) {
-            const mobileMenu = document.getElementById('mobileMenu');
-            const mobileBtn = document.getElementById('mobileMenuBtn');
-            
-            if (!mobileMenu.contains(event.target) && !mobileBtn.contains(event.target)) {
-                mobileMenu.classList.remove('active');
-                const icon = mobileBtn.querySelector('i');
-                icon.classList.remove('fa-times');
-                icon.classList.add('fa-bars');
-            }
+
+        // Mobile Kategori Toggle
+        document.getElementById('mobileKategoriToggle').addEventListener('click', function() {
+            const mobileKategoriMenu = document.getElementById('mobileKategoriMenu');
+            const icon = this.querySelector('i:last-child');
+            mobileKategoriMenu.classList.toggle('hidden');
+            icon.style.transform = mobileKategoriMenu.classList.contains('hidden') ? 'rotate(0deg)' : 'rotate(180deg)';
         });
-        
-        // Authentication Display
-        function updateAuthDisplay() {
-            const authArea = document.getElementById('authArea');
-            const mobileAuthArea = document.getElementById('mobileAuthArea');
-            const display = localStorage.getItem('pd_display');
-            const username = localStorage.getItem('pd_username');
+
+        // Mobile Submenu Toggle
+        document.querySelectorAll('.mobile-submenu-toggle').forEach(button => {
+            button.addEventListener('click', function() {
+                const submenu = this.nextElementSibling;
+                const icon = this.querySelector('i:last-child');
+                submenu.classList.toggle('active');
+                icon.style.transform = submenu.classList.contains('active') ? 'rotate(90deg)' : 'rotate(0deg)';
+            });
+        });
+
+        // Desktop Dropdown Hover Logic
+        const desktopKategori = document.getElementById('desktopKategori');
+        const desktopDropdown = desktopKategori.querySelector('.dropdown-menu');
+        const desktopSubmenus = desktopKategori.querySelectorAll('.dropdown-submenu');
+
+        // Show main dropdown on hover
+        desktopKategori.addEventListener('mouseenter', function() {
+            clearTimeout(dropdownTimeout);
+            desktopDropdown.classList.add('show');
+        });
+
+        desktopKategori.addEventListener('mouseleave', function () {
+    dropdownTimeout = setTimeout(() => {
+        desktopDropdown.classList.remove('show');
+        desktopSubmenus.forEach(submenu => submenu.classList.remove('show'));
+        desktopKategori.querySelectorAll('.has-submenu').forEach(item => {
+            item.classList.remove('active');
+        });
+    }, 400); // ⏱ delay 400ms (atur sesuai selera)
+});
+
+        // Submenu hover logic
+        desktopKategori.querySelectorAll('.has-submenu').forEach(item => {
+            const submenu = item.querySelector('.dropdown-submenu');
             
-            if (display && username) {
-                // User is logged in
-                const desktopHTML = `
-                    <div class="flex items-center space-x-4">
-                        <div class="text-right hidden sm:block">
-                            <p class="text-sm font-semibold">${display}</p>
-                            <p class="text-xs text-slate-500">${username}</p>
-                        </div>
-                        <div class="relative">
-                            <img src="https://ui-avatars.com/api/?name=${encodeURIComponent(display)}&background=1e3a8a&color=fff" 
-                                 class="w-10 h-10 rounded-full border-2 border-blue-600 cursor-pointer"
-                                 id="userAvatarBtn">
-                            <div class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg hidden" id="userDropdown">
-                                <a href="dashboard.html" class="block px-4 py-3 text-sm hover:bg-slate-100">
-                                    <i class="fas fa-tachometer-alt mr-2"></i> Dashboard
-                                </a>
-                                <a href="upload.html" class="block px-4 py-3 text-sm hover:bg-slate-100">
-                                    <i class="fas fa-upload mr-2"></i> Upload Data
-                                </a>
-                                <hr class="my-1">
-                                <button onclick="logout()" class="w-full text-left px-4 py-3 text-sm text-red-600 hover:bg-red-50">
-                                    <i class="fas fa-sign-out-alt mr-2"></i> Keluar
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                `;
-                
-                const mobileHTML = `
-                    <div class="space-y-3">
-                        <div class="flex items-center space-x-3">
-                            <img src="https://ui-avatars.com/api/?name=${encodeURIComponent(display)}&background=1e3a8a&color=fff" 
-                                 class="w-10 h-10 rounded-full border-2 border-blue-600">
-                            <div>
-                                <p class="font-semibold text-sm">${display}</p>
-                                <p class="text-xs text-slate-500">${username}</p>
-                            </div>
-                        </div>
-                        <div class="grid grid-cols-2 gap-2">
-                            <a href="dashboard.html" class="px-3 py-2 bg-blue-600 text-white rounded-lg text-center text-xs sm:text-sm">
-                                <i class="fas fa-tachometer-alt mr-1"></i> Dashboard
-                            </a>
-                            <button onclick="logout()" class="px-3 py-2 bg-red-600 text-white rounded-lg text-center text-xs sm:text-sm">
-                                <i class="fas fa-sign-out-alt mr-1"></i> Keluar
-                            </button>
-                        </div>
-                    </div>
-                `;
-                
-                if (authArea) authArea.innerHTML = desktopHTML;
-                if (mobileAuthArea) mobileAuthArea.innerHTML = mobileHTML;
-                
-                // Add event listener for user dropdown
-                setTimeout(() => {
-                    const avatarBtn = document.getElementById('userAvatarBtn');
-                    const dropdown = document.getElementById('userDropdown');
-                    
-                    if (avatarBtn && dropdown) {
-                        avatarBtn.addEventListener('click', (e) => {
-                            e.stopPropagation();
-                            dropdown.classList.toggle('hidden');
-                        });
-                        
-                        // Close dropdown when clicking outside
-                        document.addEventListener('click', () => {
-                            dropdown.classList.add('hidden');
-                        });
-                        
-                        // Prevent dropdown from closing when clicking inside
-                        dropdown.addEventListener('click', (e) => {
-                            e.stopPropagation();
-                        });
+            item.addEventListener('mouseenter', function() {
+                // Hide all other submenus
+                desktopSubmenus.forEach(sm => {
+                    if (sm !== submenu) {
+                        sm.classList.remove('show');
                     }
-                }, 100);
-                
-            } else {
-                // User is not logged in
-                if (authArea) {
-                    authArea.innerHTML = `
-                        <a href="login.html" class="bg-blue-600 text-white px-4 sm:px-6 py-2 rounded-lg font-semibold hover:bg-blue-700 transition text-sm">
-                            <i class="fas fa-sign-in-alt mr-2"></i> Login
-                        </a>
-                    `;
-                }
-                
-                if (mobileAuthArea) {
-                    mobileAuthArea.innerHTML = `
-                        <a href="login.html" class="block w-full bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold text-center hover:bg-blue-700 transition text-sm">
-                            <i class="fas fa-sign-in-alt mr-2"></i> Login ke Akun
-                        </a>
-                    `;
-                }
-            }
-        }
-        
-        // Logout function
-        function logout() {
-            if (confirm('Apakah Anda yakin ingin keluar?')) {
-                localStorage.removeItem('pd_username');
-                localStorage.removeItem('pd_display');
-                localStorage.removeItem('pd_role');
-                window.location.href = 'index.html';
-            }
-        }
-        
-        // Search function
-        function searchDataset() {
-            const searchTerm = document.getElementById('searchInput').value.trim();
-            if (searchTerm) {
-                window.location.href = `katalog.html?search=${encodeURIComponent(searchTerm)}`;
-            }
-        }
-        
-        // Initialize charts
-        function initCharts() {
-            // Vehicle Distribution Chart
-            const vehicleCtx = document.getElementById('vehicleChart').getContext('2d');
-            new Chart(vehicleCtx, {
-                type: 'bar',
-                data: {
-                    labels: ['Motor', 'Mobil', 'Truk', 'Bus', 'Lainnya'],
-                    datasets: [{
-                        label: 'Jumlah Kendaraan',
-                        data: [850000, 320000, 42000, 4500, 45000],
-                        backgroundColor: [
-                            '#3b82f6',
-                            '#10b981',
-                            '#f59e0b',
-                            '#8b5cf6',
-                            '#ef4444'
-                        ],
-                        borderRadius: 6,
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { display: false },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    return context.parsed.y.toLocaleString() + ' unit';
-                                }
-                            }
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            grid: { color: 'rgba(0,0,0,0.05)' },
-                            ticks: { 
-                                callback: value => (value / 1000) + 'k',
-                                font: { size: window.innerWidth < 640 ? 10 : 12 }
-                            }
-                        },
-                        x: {
-                            grid: { display: false },
-                            ticks: { 
-                                font: { 
-                                    size: window.innerWidth < 640 ? 10 : 12,
-                                    weight: 'bold' 
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-            
-            // Testing Distribution Chart
-            const testingCtx = document.getElementById('testingChart').getContext('2d');
-            new Chart(testingCtx, {
-                type: 'doughnut',
-                data: {
-                    labels: ['Lulus', 'Tidak Lulus', 'Perbaikan'],
-                    datasets: [{
-                        data: [1420, 120, 66],
-                        backgroundColor: [
-                            '#10b981',
-                            '#ef4444',
-                            '#f59e0b'
-                        ],
-                        borderWidth: 2,
-                        borderColor: '#fff'
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: 'bottom',
-                            labels: {
-                                padding: 15,
-                                usePointStyle: true,
-                                font: { size: window.innerWidth < 640 ? 10 : 12 }
-                            }
-                        }
-                    },
-                    cutout: '65%'
-                }
-            });
-        }
-        
-        // Initialize everything when page loads
-        document.addEventListener('DOMContentLoaded', function() {
-            updateAuthDisplay();
-            initCharts();
-            
-            // Add search on Enter key
-            document.getElementById('searchInput').addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    searchDataset();
-                }
-            });
-            
-            // Responsive chart resizing
-            window.addEventListener('resize', function() {
-                // Reinitialize charts on resize for better responsiveness
-                setTimeout(initCharts, 100);
-            });
-            
-            // Add click animation to stat cards
-            document.querySelectorAll('.stat-card').forEach(card => {
-                card.addEventListener('click', function() {
-                    this.style.transform = 'scale(0.98)';
-                    setTimeout(() => {
-                        this.style.transform = '';
-                    }, 150);
                 });
+                // Remove active from all items
+                desktopKategori.querySelectorAll('.has-submenu').forEach(itm => {
+                    if (itm !== item) {
+                        itm.classList.remove('active');
+                    }
+                });
+                
+                // Show this submenu
+                submenu.classList.add('show');
+                item.classList.add('active');
             });
+
+            item.addEventListener('mouseleave', function(e) {
+                // Only hide submenu if mouse is not over submenu
+                if (!submenu.contains(e.relatedTarget)) {
+                    submenu.classList.remove('show');
+                    item.classList.remove('active');
+                }
+            });
+
+            // Keep submenu visible when hovering over it
+            submenu.addEventListener('mouseleave', function(e) {
+                if (!item.contains(e.relatedTarget)) {
+                    submenu.classList.remove('show');
+                    item.classList.remove('active');
+                }
+            });
+        });
+
+        // Close mobile menu when clicking on a link
+        document.querySelectorAll('#mobileMenu a').forEach(link => {
+            link.addEventListener('click', function() {
+                document.getElementById('mobileMenu').classList.remove('active');
+            });
+        });
+
+        // Chart.js untuk visualisasi data
+        const ctx = document.getElementById('miniTestChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Lulus', 'Tidak Lulus'],
+                datasets: [{
+                    label: 'Hasil Pengujian',
+                    data: [1420, 186],
+                    backgroundColor: [
+                        '#10b981',
+                        '#ef4444'
+                    ],
+                    borderRadius: 8,
+                    borderSkipped: false
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return context.parsed.y + ' kendaraan';
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        display: true,
+                        grid: { display: false },
+                        ticks: { font: { size: 11, weight: 'bold' } }
+                    },
+                    y: {
+                        display: true,
+                        beginAtZero: true,
+                        ticks: {
+                            font: { size: 10 }
+                        },
+                        grid: {
+                            color: 'rgba(0, 0, 0, 0.05)'
+                        }
+                    }
+                }
+            }
         });
     </script>
 </body>

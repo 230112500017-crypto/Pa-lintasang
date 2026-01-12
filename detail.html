@@ -4,1708 +4,399 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Detail Dataset - Pa'lintasang Data</title>
-    
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Font Awesome -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    
-    <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    
+    <script src="lib/db.js"></script>
+    <script src="lib/helpers.js"></script>
+    <script src="lib/config.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700;800&display=swap');
-        
-        body { 
-            font-family: 'Plus Jakarta Sans', sans-serif; 
-            background-color: #f8fafc;
-        }
-        
-        .hero-gradient { 
-            background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%); 
-        }
-        
-        .accent-makassar { 
-            color: #facc15; 
-        }
-        
-        .sidebar {
-            transition: all 0.3s ease;
-        }
-        
-        .card-hover {
-            transition: all 0.3s ease;
-        }
-        
-        .card-hover:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-        }
-        
-        .data-table {
-            max-height: 500px;
-            overflow-y: auto;
-        }
-        
-        .data-table table {
-            min-width: 100%;
-        }
-        
-        .data-table th {
-            position: sticky;
-            top: 0;
-            background-color: #f1f5f9;
-            z-index: 10;
-        }
-        
-        .sidebar-link {
-            transition: all 0.2s ease;
-        }
-        
-        .sidebar-link:hover {
-            background-color: rgba(59, 130, 246, 0.1);
-        }
-        
-        .sidebar-link.active {
-            background-color: rgba(59, 130, 246, 0.15);
-            border-right: 4px solid #3b82f6;
-            font-weight: 600;
-        }
-        
-        .mobile-sidebar {
-            transform: translateX(-100%);
-            transition: transform 0.3s ease;
-        }
-        
-        .mobile-sidebar.open {
-            transform: translateX(0);
-        }
-        
-        .overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 40;
-        }
-        
-        .overlay.active {
-            display: block;
-        }
-        
-        .chart-container {
-            position: relative;
-            height: 300px;
-            width: 100%;
-        }
-        
-        .tab-content {
-            display: none;
-        }
-        
-        .tab-content.active {
-            display: block;
-            animation: fadeIn 0.3s ease;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        
-        .tab-button.active {
-            border-bottom: 3px solid #3b82f6;
-            color: #3b82f6;
-            font-weight: 600;
-        }
-        
-        .stat-card {
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .stat-card::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
-            transform: rotate(45deg);
-            transition: all 0.5s ease;
-        }
-        
-        .stat-card:hover::before {
-            left: 100%;
-        }
-        
-        .file-icon {
-            transition: transform 0.3s ease;
-        }
-        
-        .file-icon:hover {
-            transform: scale(1.1);
-        }
-        
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 50;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .modal.active {
-            display: flex;
-        }
-        
-        .modal-content {
-            animation: modalFadeIn 0.3s ease;
-        }
-        
-        @keyframes modalFadeIn {
-            from { 
-                opacity: 0;
-                transform: translateY(-20px);
-            }
-            to { 
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .hero-gradient { background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%); }
+        .accent-makassar { color: #facc15; }
+        .glass-card { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-900">
-    
-    <!-- Top Navigation -->
-    <nav class="bg-white shadow-md fixed top-0 left-0 right-0 z-30">
-        <div class="px-4 sm:px-6 py-3">
-            <div class="flex justify-between items-center">
-                <!-- Left: Menu Button and Logo -->
-                <div class="flex items-center space-x-4">
-                    <!-- Mobile Menu Button -->
-                    <button id="mobileMenuBtn" class="md:hidden text-blue-900 text-xl">
-                        <i class="fas fa-bars"></i>
-                    </button>
-                    
-                    <!-- Logo -->
-                    <a href="index.html" class="flex items-center space-x-2">
-                        <div class="bg-blue-900 p-2 rounded-lg">
-                            <i class="fas fa-route text-white"></i>
-                        </div>
-                        <div>
-                            <h1 class="font-bold text-blue-900">
-                                PA'LINTASANG <span class="text-amber-500">DATA</span>
-                            </h1>
-                            <p class="text-[10px] text-slate-500">Detail Dataset</p>
-                        </div>
-                    </a>
-                </div>
-                
-                <!-- Right: User Menu -->
-                <div class="flex items-center space-x-4">
-                    <!-- Back Button -->
-                    <a href="katalog.html" class="text-blue-600 hover:text-blue-800 font-medium text-sm hidden md:block">
-                        <i class="fas fa-arrow-left mr-1"></i> Kembali ke Katalog
-                    </a>
-                    
-                    <!-- User Profile -->
-                    <div class="relative" id="userDropdownContainer">
-                        <button class="flex items-center space-x-2" id="userDropdownBtn">
-                            <img src="https://ui-avatars.com/api/?name=User+Detail&background=1e3a8a&color=fff" 
-                                 class="w-8 h-8 rounded-full border-2 border-blue-600">
-                            <div class="hidden md:block text-left">
-                                <p class="text-sm font-semibold" id="userName">Loading...</p>
-                                <p class="text-xs text-slate-500" id="userRole">Loading...</p>
-                            </div>
-                            <i class="fas fa-chevron-down text-xs text-slate-500"></i>
-                        </button>
-                        
-                        <!-- Dropdown Menu -->
-                        <div class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg hidden border border-slate-200" id="userDropdown">
-                            <div class="px-4 py-3 border-b border-slate-100">
-                                <p class="text-sm font-semibold" id="dropdownName"></p>
-                                <p class="text-xs text-slate-500" id="dropdownRole"></p>
-                            </div>
-                            <a href="dashboard.html" class="block px-4 py-3 text-sm hover:bg-slate-100">
-                                <i class="fas fa-tachometer-alt mr-2"></i> Dashboard
-                            </a>
-                            <a href="upload.html" class="block px-4 py-3 text-sm hover:bg-slate-100">
-                                <i class="fas fa-upload mr-2"></i> Upload Data
-                            </a>
-                            <a href="my-datasets.html" class="block px-4 py-3 text-sm hover:bg-slate-100">
-                                <i class="fas fa-database mr-2"></i> Dataset Saya
-                            </a>
-                            <hr class="my-1">
-                            <button onclick="logout()" class="w-full text-left px-4 py-3 text-sm text-red-600 hover:bg-red-50">
-                                <i class="fas fa-sign-out-alt mr-2"></i> Keluar
-                            </button>
-                        </div>
+
+    <nav class="bg-white/80 backdrop-blur-md sticky top-0 z-50 border-b border-slate-200">
+        <div class="container mx-auto px-6 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <a href="index.html" class="flex items-center space-x-2">
+                    <div class="bg-blue-900 p-1.5 rounded-lg">
+                        <i class="fas fa-route text-white text-lg"></i>
                     </div>
-                </div>
+                    <h1 class="font-bold text-lg tracking-tight text-blue-900 uppercase">PA'LINTASANG <span class="text-amber-500">DATA</span></h1>
+                </a>
             </div>
+            <div class="hidden lg:flex space-x-6 font-medium text-xs">
+                <a href="index.html" class="hover:text-blue-600 transition">Beranda</a>
+                <a href="katalog.html" class="text-blue-600 font-bold">Katalog</a>
+                <a href="index.html" class="hover:text-blue-600 transition">Visualisasi</a>
+            </div>
+            <div id="authArea"></div>
         </div>
     </nav>
-    
-    <!-- Overlay for Mobile -->
-    <div class="overlay" id="overlay"></div>
-    
-    <!-- Sidebar for Mobile -->
-    <div class="mobile-sidebar fixed left-0 top-0 bottom-0 w-64 bg-white shadow-lg z-50 md:hidden" id="mobileSidebar">
-        <div class="p-4 border-b border-slate-200">
-            <div class="flex justify-between items-center">
-                <div class="flex items-center space-x-2">
-                    <div class="bg-blue-900 p-2 rounded-lg">
-                        <i class="fas fa-route text-white"></i>
-                    </div>
-                    <span class="font-bold text-blue-900">DETAIL DATASET</span>
-                </div>
-                <button id="closeMobileMenu" class="text-slate-600">
-                    <i class="fas fa-times"></i>
-                </button>
+
+    <header class="hero-gradient text-white py-12 relative overflow-hidden">
+        <div class="container mx-auto px-6 relative z-10">
+            <div class="flex items-center space-x-2 text-[10px] font-bold uppercase tracking-widest opacity-60 mb-4">
+                <a href="katalog.html" class="hover:text-amber-400">Katalog</a>
+                <span>/</span>
+                <span class="text-amber-400">Lalu Lintas</span>
+            </div>
+            <h2 id="detailTitle" class="text-3xl md:text-4xl font-extrabold italic uppercase leading-tight mb-4">
+                Data Volume Lalu Lintas <br><span id="detailAccent" class="accent-makassar">Jalan Kota Makassar 2022</span>
+            </h2>
+            <div class="flex flex-wrap gap-4 text-xs">
+                <span id="detailUpdate" class="flex items-center"><i class="far fa-calendar-check mr-2 text-amber-400"></i> Update: 15 Okt 2022</span>
+                <span id="detailRows" class="flex items-center"><i class="fas fa-database mr-2 text-amber-400"></i> 12,450 Baris</span>
             </div>
         </div>
-        <div class="p-4" id="mobileMenuContent">
-            <!-- Will be populated by JavaScript -->
-        </div>
-    </div>
-    
-    <!-- Main Layout -->
-    <div class="flex pt-14">
-        <!-- Desktop Sidebar -->
-        <aside class="sidebar hidden md:block w-64 bg-white shadow-md min-h-[calc(100vh-56px)]">
-            <div class="p-6 border-b border-slate-200">
-                <h2 class="font-bold text-blue-900 text-lg">Menu Dataset</h2>
-            </div>
-            <nav class="p-4 space-y-1" id="desktopMenu">
-                <!-- Will be populated by JavaScript -->
-            </nav>
+        <div class="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -mr-20 -mt-20 blur-3xl"></div>
+    </header>
+
+    <main class="container mx-auto px-6 py-10">
+        <div class="flex flex-col lg:flex-row gap-8">
             
-            <!-- Dataset Quick Info -->
-            <div class="p-4 mt-8 border-t border-slate-200">
-                <h3 class="font-bold text-slate-900 text-sm mb-3">
-                    <i class="fas fa-info-circle mr-2 text-blue-600"></i> Info Dataset
-                </h3>
-                <div class="space-y-3 text-xs text-slate-600">
-                    <div class="flex justify-between">
-                        <span>Format:</span>
-                        <span id="sidebarFormat" class="font-medium">CSV</span>
+            <div class="w-full lg:w-2/3 space-y-8">
+                
+                <section class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-slate-100">
+                    <h3 class="text-lg font-extrabold text-blue-900 mb-4 uppercase tracking-tight flex items-center">
+                        <span class="w-8 h-1 bg-amber-500 rounded-full mr-3"></span> Deskripsi Dataset
+                    </h3>
+                    <p id="detailDesc" class="text-slate-600 text-sm leading-relaxed mb-6">
+                        Dataset ini berisi informasi volume lalu lintas pada ruas-ruas jalan utama di Kota Makassar selama tahun 2022. Data dikumpulkan melalui sistem penghitung kendaraan otomatis yang dipasang di 25 titik pemantauan strategis. Dataset mencakup jumlah kendaraan berdasarkan kategori (motor, mobil penumpang, angkutan umum, truk) serta waktu pengambilan data (jam sibuk pagi, siang, dan sore).
+                    </p>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div class="p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                            <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Format</p>
+                            <p id="metaFormat" class="text-sm font-bold text-blue-900">CSV, XLS, JSON</p>
+                        </div>
+                        <div class="p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                            <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Update</p>
+                            <p id="metaUpdate" class="text-sm font-bold text-blue-900">Triwulan</p>
+                        </div>
+                        <div class="p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                            <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Ukuran</p>
+                            <p id="metaSize" class="text-sm font-bold text-blue-900">4.2 MB</p>
+                        </div>
+                        <div class="p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                            <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Status</p>
+                            <p id="metaStatus" class="text-sm font-bold text-emerald-600 italic">Terverifikasi</p>
+                        </div>
                     </div>
-                    <div class="flex justify-between">
-                        <span>Ukuran:</span>
-                        <span id="sidebarSize" class="font-medium">2.4 MB</span>
+                </section>
+
+                <section class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-slate-100 overflow-hidden">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-lg font-extrabold text-blue-900 uppercase tracking-tight flex items-center">
+                            <span class="w-8 h-1 bg-amber-500 rounded-full mr-3"></span> Preview Data
+                        </h3>
+                        <span class="text-[10px] font-bold text-slate-400 italic">Menampilkan 5 Baris Pertama</span>
                     </div>
-                    <div class="flex justify-between">
-                        <span>Baris:</span>
-                        <span id="sidebarRows" class="font-medium">1,250</span>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs border-collapse">
+                            <thead>
+                                <tr class="bg-blue-900 text-white">
+                                    <th class="p-3 rounded-tl-xl font-bold uppercase tracking-tighter">Lokasi Jalan</th>
+                                    <th class="p-3 font-bold uppercase tracking-tighter">Motor</th>
+                                    <th class="p-3 font-bold uppercase tracking-tighter">Mobil</th>
+                                    <th class="p-3 font-bold uppercase tracking-tighter">Truk/Bus</th>
+                                    <th class="p-3 rounded-tr-xl font-bold uppercase tracking-tighter">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody id="previewBody" class="text-slate-600">
+                                <tr><td colspan="5" class="p-4 text-slate-400 italic">Pratinjau tidak tersedia untuk dataset ini.</td></tr>
+                            </tbody>
+                        </table>
                     </div>
-                    <div class="flex justify-between">
-                        <span>Kolom:</span>
-                        <span id="sidebarCols" class="font-medium">12</span>
-                    </div>
-                </div>
+                </section>
             </div>
-        </aside>
-        
-        <!-- Main Content -->
-        <main class="flex-1 p-4 md:p-6">
-            <!-- Dataset Header -->
-            <div class="bg-white rounded-xl shadow border border-slate-100 p-6 mb-6">
-                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                    <div>
-                        <div class="flex items-center space-x-2 mb-2">
-                            <span id="categoryBadge" class="px-3 py-1 bg-blue-100 text-blue-800 text-sm rounded-full">Lalu Lintas</span>
-                            <span id="yearBadge" class="px-3 py-1 bg-green-100 text-green-800 text-sm rounded-full">2025</span>
-                            <span id="statusBadge" class="px-3 py-1 bg-green-100 text-green-800 text-sm rounded-full">
-                                <i class="fas fa-check-circle mr-1"></i> Verified
-                            </span>
-                        </div>
-                        <h1 class="text-2xl md:text-3xl font-bold text-blue-900 mb-2" id="datasetTitle">Data Lalu Lintas Harian Kota Makassar 2025</h1>
-                        <p class="text-slate-600" id="datasetDescription">Data lalu lintas harian di titik-titik strategis Kota Makassar periode Januari-Maret 2025</p>
-                    </div>
-                    
-                    <div class="flex flex-wrap gap-2">
-                        <button onclick="downloadDataset()" class="flex items-center bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition">
-                            <i class="fas fa-download mr-2"></i> Download
+
+            <div class="w-full lg:w-1/3 space-y-6">
+                
+                <div class="bg-blue-900 p-8 rounded-[2.5rem] text-white shadow-xl shadow-blue-900/20">
+                    <h4 class="font-extrabold uppercase text-xs tracking-[0.2em] mb-6 text-amber-400">Unduh Dataset</h4>
+                    <div class="space-y-3">
+                        <button id="downloadCsv" class="w-full bg-white/10 hover:bg-amber-500 hover:text-blue-900 p-4 rounded-2xl flex items-center justify-between transition group">
+                            <span class="text-xs font-bold uppercase tracking-widest">File Format CSV</span>
+                            <i class="fas fa-download text-sm group-hover:scale-125 transition"></i>
                         </button>
-                        <button onclick="showShareModal()" class="flex items-center bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium transition">
-                            <i class="fas fa-share-alt mr-2"></i> Share
+                        <button id="downloadJson" class="w-full bg-white/10 hover:bg-amber-500 hover:text-blue-900 p-4 rounded-2xl flex items-center justify-between transition group">
+                            <span class="text-xs font-bold uppercase tracking-widest">File Format JSON</span>
+                            <i class="fas fa-file-code text-sm"></i>
                         </button>
-                        <button onclick="toggleBookmark()" class="flex items-center bg-amber-500 hover:bg-amber-600 text-white px-4 py-2 rounded-lg font-medium transition" id="bookmarkBtn">
-                            <i class="far fa-bookmark mr-2"></i> Bookmark
+                        <button id="downloadXls" class="w-full bg-white/10 hover:bg-amber-500 hover:text-blue-900 p-4 rounded-2xl flex items-center justify-between transition group">
+                            <span class="text-xs font-bold uppercase tracking-widest">File Format XLS</span>
+                            <i class="fas fa-file-excel text-sm"></i>
                         </button>
                     </div>
                 </div>
-                
-                <!-- Stats Row -->
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6 pt-6 border-t border-slate-100">
-                    <div class="text-center">
-                        <p class="text-2xl font-bold text-blue-900" id="viewsCount">1,245</p>
-                        <p class="text-xs text-slate-600">Dilihat</p>
-                    </div>
-                    <div class="text-center">
-                        <p class="text-2xl font-bold text-blue-900" id="downloadsCount">328</p>
-                        <p class="text-xs text-slate-600">Download</p>
-                    </div>
-                    <div class="text-center">
-                        <p class="text-2xl font-bold text-blue-900" id="lastUpdated">5 hari lalu</p>
-                        <p class="text-xs text-slate-600">Update Terakhir</p>
-                    </div>
-                    <div class="text-center">
-                        <p class="text-2xl font-bold text-blue-900" id="qualityScore">98%</p>
-                        <p class="text-xs text-slate-600">Kualitas Data</p>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Tabs Navigation -->
-            <div class="border-b border-slate-200 mb-6">
-                <div class="flex space-x-6 overflow-x-auto">
-                    <button class="tab-button py-3 text-slate-700 hover:text-blue-600 whitespace-nowrap active" data-tab="overview">
-                        <i class="fas fa-info-circle mr-2"></i> Overview
-                    </button>
-                    <button class="tab-button py-3 text-slate-700 hover:text-blue-600 whitespace-nowrap" data-tab="data">
-                        <i class="fas fa-table mr-2"></i> Data Preview
-                    </button>
-                    <button class="tab-button py-3 text-slate-700 hover:text-blue-600 whitespace-nowrap" data-tab="analytics">
-                        <i class="fas fa-chart-bar mr-2"></i> Analytics
-                    </button>
-                    <button class="tab-button py-3 text-slate-700 hover:text-blue-600 whitespace-nowrap" data-tab="metadata">
-                        <i class="fas fa-tags mr-2"></i> Metadata
-                    </button>
-                    <button class="tab-button py-3 text-slate-700 hover:text-blue-600 whitespace-nowrap" data-tab="related">
-                        <i class="fas fa-project-diagram mr-2"></i> Related Data
-                    </button>
-                </div>
-            </div>
-            
-            <!-- Tab Contents -->
-            <div id="tabContents">
-                
-                <!-- Tab 1: Overview -->
-                <div class="tab-content active" id="overview-tab">
-                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                        <!-- Left Column -->
-                        <div class="lg:col-span-2 space-y-6">
-                            <!-- Dataset Summary -->
-                            <div class="bg-white rounded-xl shadow border border-slate-100 p-6 card-hover">
-                                <h2 class="font-bold text-blue-900 text-lg mb-4">
-                                    <i class="fas fa-file-alt mr-2"></i>Ringkasan Dataset
-                                </h2>
-                                
-                                <div class="space-y-4">
-                                    <div>
-                                        <h3 class="font-medium text-slate-900 mb-2">Deskripsi Lengkap</h3>
-                                        <p class="text-slate-600" id="fullDescription">
-                                            Dataset ini berisi data lalu lintas harian di 15 titik strategis Kota Makassar. Data dikumpulkan melalui sensor lalu lintas dan pengamatan langsung petugas Dinas Perhubungan. Dataset mencakup volume kendaraan, kecepatan rata-rata, tingkat kemacetan, dan kondisi cuaca setiap hari.
-                                        </p>
-                                    </div>
-                                    
-                                    <div>
-                                        <h3 class="font-medium text-slate-900 mb-2">Ruang Lingkup Data</h3>
-                                        <ul class="list-disc list-inside text-slate-600 space-y-1">
-                                            <li>Periode: 1 Januari - 31 Maret 2025</li>
-                                            <li>Lokasi: 15 titik strategis Kota Makassar</li>
-                                            <li>Frekuensi: Data harian (90 hari)</li>
-                                            <li>Variabel: Volume kendaraan, kecepatan, tingkat kemacetan</li>
-                                            <li>Sumber: Sensor lalu lintas & petugas lapangan</li>
-                                        </ul>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <!-- Quick Stats -->
-                            <div class="bg-white rounded-xl shadow border border-slate-100 p-6 card-hover">
-                                <h2 class="font-bold text-blue-900 text-lg mb-4">
-                                    <i class="fas fa-chart-line mr-2"></i>Statistik Cepat
-                                </h2>
-                                
-                                <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
-                                    <div class="stat-card bg-blue-50 p-4 rounded-lg">
-                                        <div class="flex items-center justify-between">
-                                            <div>
-                                                <p class="text-xs text-slate-600">Volume Tertinggi</p>
-                                                <p class="text-xl font-bold text-blue-900">42,850</p>
-                                            </div>
-                                            <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                                                <i class="fas fa-car text-blue-600"></i>
-                                            </div>
-                                        </div>
-                                        <p class="text-xs text-slate-500 mt-2">Jl. AP Pettarani, 15 Mar</p>
-                                    </div>
-                                    
-                                    <div class="stat-card bg-green-50 p-4 rounded-lg">
-                                        <div class="flex items-center justify-between">
-                                            <div>
-                                                <p class="text-xs text-slate-600">Rata-rata Kendaraan/Hari</p>
-                                                <p class="text-xl font-bold text-blue-900">28,450</p>
-                                            </div>
-                                            <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-                                                <i class="fas fa-chart-bar text-green-600"></i>
-                                            </div>
-                                        </div>
-                                        <p class="text-xs text-slate-500 mt-2">Seluruh titik pengamatan</p>
-                                    </div>
-                                    
-                                    <div class="stat-card bg-purple-50 p-4 rounded-lg">
-                                        <div class="flex items-center justify-between">
-                                            <div>
-                                                <p class="text-xs text-slate-600">Titik Padat</p>
-                                                <p class="text-xl font-bold text-blue-900">8</p>
-                                            </div>
-                                            <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
-                                                <i class="fas fa-traffic-light text-purple-600"></i>
-                                            </div>
-                                        </div>
-                                        <p class="text-xs text-slate-500 mt-2">Titik dengan volume >35k</p>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <!-- Data Structure -->
-                            <div class="bg-white rounded-xl shadow border border-slate-100 p-6 card-hover">
-                                <h2 class="font-bold text-blue-900 text-lg mb-4">
-                                    <i class="fas fa-sitemap mr-2"></i>Struktur Data
-                                </h2>
-                                
-                                <div class="overflow-x-auto">
-                                    <table class="w-full text-sm">
-                                        <thead>
-                                            <tr class="border-b border-slate-200">
-                                                <th class="text-left py-3 px-2 text-slate-600 font-medium">Kolom</th>
-                                                <th class="text-left py-3 px-2 text-slate-600 font-medium">Tipe Data</th>
-                                                <th class="text-left py-3 px-2 text-slate-600 font-medium">Deskripsi</th>
-                                                <th class="text-left py-3 px-2 text-slate-600 font-medium">Contoh</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="structureTable">
-                                            <!-- Will be populated by JavaScript -->
-                                        </tbody>
-                                    </table>
-                                </div>
+
+                <div class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-slate-100">
+                    <h4 class="font-extrabold uppercase text-xs tracking-widest mb-6 text-blue-900">Informasi Metadata</h4>
+                    <div class="space-y-4">
+                        <div>
+                            <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">ID Dataset</p>
+                            <p id="datasetId" class="text-xs font-bold text-slate-700">DISHUB-MKS-TRF-2022-001</p>
+                        </div>
+                        <div>
+                            <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Penanggung Jawab</p>
+                            <p id="datasetOwner" class="text-xs font-bold text-slate-700">Bidang Lalu Lintas</p>
+                        </div>
+                        <div>
+                            <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Kata Kunci</p>
+                            <div class="flex flex-wrap gap-2 mt-2">
+                                <span class="px-2 py-1 bg-slate-100 rounded text-[9px] font-bold text-slate-500 uppercase">Volume</span>
+                                <span class="px-2 py-1 bg-slate-100 rounded text-[9px] font-bold text-slate-500 uppercase">Transportasi</span>
                             </div>
                         </div>
-                        
-                        <!-- Right Column -->
-                        <div class="space-y-6">
-                            <!-- Dataset Info Card -->
-                            <div class="bg-white rounded-xl shadow border border-slate-100 p-6 card-hover">
-                                <h2 class="font-bold text-blue-900 text-lg mb-4">
-                                    <i class="fas fa-info-circle mr-2"></i>Informasi Dataset
-                                </h2>
-                                
-                                <div class="space-y-4">
-                                    <div>
-                                        <p class="text-xs text-slate-500 mb-1">Pemilik Data</p>
-                                        <div class="flex items-center">
-                                            <img src="https://ui-avatars.com/api/?name=Dinas+Perhubungan&background=1e3a8a&color=fff" 
-                                                 class="w-8 h-8 rounded-full mr-3">
-                                            <div>
-                                                <p class="font-medium text-sm">Dinas Perhubungan Makassar</p>
-                                                <p class="text-xs text-slate-500">Bidang Lalu Lintas</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
-                                    <div>
-                                        <p class="text-xs text-slate-500 mb-1">Tanggal Upload</p>
-                                        <p class="font-medium">15 Maret 2025</p>
-                                    </div>
-                                    
-                                    <div>
-                                        <p class="text-xs text-slate-500 mb-1">Format File</p>
-                                        <div class="flex items-center">
-                                            <div class="file-icon w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center mr-3">
-                                                <i class="fas fa-file-csv text-green-600"></i>
-                                            </div>
-                                            <div>
-                                                <p class="font-medium text-sm">CSV (Comma Separated Values)</p>
-                                                <p class="text-xs text-slate-500" id="fileSize">2.4 MB</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
-                                    <div>
-                                        <p class="text-xs text-slate-500 mb-1">Lisensi</p>
-                                        <div class="flex items-center">
-                                            <i class="fas fa-balance-scale text-blue-600 mr-3"></i>
-                                            <div>
-                                                <p class="font-medium text-sm">CC BY 4.0</p>
-                                                <p class="text-xs text-slate-500">Atribusi 4.0 International</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
-                                    <div>
-                                        <p class="text-xs text-slate-500 mb-1">ID Dataset</p>
-                                        <div class="flex items-center justify-between">
-                                            <code class="text-sm bg-slate-100 px-2 py-1 rounded">TL-2025-015-MKS</code>
-                                            <button onclick="copyDatasetId()" class="text-blue-600 hover:text-blue-800">
-                                                <i class="fas fa-copy"></i>
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <div class="mt-6 pt-6 border-t border-slate-100">
-                                    <button onclick="reportDataset()" class="w-full flex items-center justify-center text-red-600 hover:text-red-800 text-sm">
-                                        <i class="fas fa-flag mr-2"></i> Laporkan Masalah
-                                    </button>
-                                </div>
-                            </div>
-                            
-                            <!-- Tags -->
-                            <div class="bg-white rounded-xl shadow border border-slate-100 p-6 card-hover">
-                                <h2 class="font-bold text-blue-900 text-lg mb-4">
-                                    <i class="fas fa-tags mr-2"></i>Tag & Kata Kunci
-                                </h2>
-                                
-                                <div class="flex flex-wrap gap-2" id="tagsContainer">
-                                    <!-- Tags will be populated by JavaScript -->
-                                </div>
-                            </div>
-                            
-                            <!-- Download Options -->
-                            <div class="bg-white rounded-xl shadow border border-slate-100 p-6 card-hover">
-                                <h2 class="font-bold text-blue-900 text-lg mb-4">
-                                    <i class="fas fa-download mr-2"></i>Opsi Download
-                                </h2>
-                                
-                                <div class="space-y-3">
-                                    <button onclick="downloadFormat('csv')" class="w-full flex items-center justify-between p-3 bg-blue-50 hover:bg-blue-100 rounded-lg transition">
-                                        <div class="flex items-center">
-                                            <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
-                                                <i class="fas fa-file-csv text-blue-600"></i>
-                                            </div>
-                                            <div>
-                                                <p class="font-medium">Format CSV</p>
-                                                <p class="text-xs text-slate-600">Original file</p>
-                                            </div>
-                                        </div>
-                                        <i class="fas fa-download text-slate-400"></i>
-                                    </button>
-                                    
-                                    <button onclick="downloadFormat('excel')" class="w-full flex items-center justify-between p-3 bg-green-50 hover:bg-green-100 rounded-lg transition">
-                                        <div class="flex items-center">
-                                            <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center mr-3">
-                                                <i class="fas fa-file-excel text-green-600"></i>
-                                            </div>
-                                            <div>
-                                                <p class="font-medium">Format Excel</p>
-                                                <p class="text-xs text-slate-600">.xlsx format</p>
-                                            </div>
-                                        </div>
-                                        <i class="fas fa-download text-slate-400"></i>
-                                    </button>
-                                    
-                                    <button onclick="downloadFormat('json')" class="w-full flex items-center justify-between p-3 bg-purple-50 hover:bg-purple-100 rounded-lg transition">
-                                        <div class="flex items-center">
-                                            <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center mr-3">
-                                                <i class="fas fa-file-code text-purple-600"></i>
-                                            </div>
-                                            <div>
-                                                <p class="font-medium">Format JSON</p>
-                                                <p class="text-xs text-slate-600">For APIs</p>
-                                            </div>
-                                        </div>
-                                        <i class="fas fa-download text-slate-400"></i>
-                                    </button>
-                                </div>
-                                
-                                <div class="mt-4 pt-4 border-t border-slate-100">
-                                    <p class="text-xs text-slate-500">
-                                        <i class="fas fa-info-circle mr-1"></i>
-                                        Semua format mengandung data lengkap
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Tab 2: Data Preview -->
-                <div class="tab-content" id="data-tab">
-                    <div class="bg-white rounded-xl shadow border border-slate-100 p-6 mb-6">
-                        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
-                            <h2 class="font-bold text-blue-900 text-lg">
-                                <i class="fas fa-table mr-2"></i>Preview Data
-                            </h2>
-                            <div class="flex items-center space-x-4 mt-2 md:mt-0">
-                                <div class="flex items-center">
-                                    <span class="text-sm text-slate-600 mr-2">Tampilkan:</span>
-                                    <select id="rowsPerPage" class="border border-slate-300 rounded px-3 py-1 text-sm">
-                                        <option value="10">10 baris</option>
-                                        <option value="25" selected>25 baris</option>
-                                        <option value="50">50 baris</option>
-                                        <option value="100">100 baris</option>
-                                    </select>
-                                </div>
-                                <button onclick="exportPreview()" class="text-blue-600 hover:text-blue-800 text-sm">
-                                    <i class="fas fa-file-export mr-1"></i> Export Preview
-                                </button>
-                            </div>
-                        </div>
-                        
-                        <!-- Data Table -->
-                        <div class="data-table border border-slate-200 rounded-lg">
-                            <table class="w-full text-sm">
-                                <thead>
-                                    <tr id="dataHeaders" class="bg-slate-100">
-                                        <!-- Headers will be populated by JavaScript -->
-                                    </tr>
-                                </thead>
-                                <tbody id="dataRows">
-                                    <!-- Rows will be populated by JavaScript -->
-                                </tbody>
-                            </table>
-                        </div>
-                        
-                        <!-- Pagination -->
-                        <div class="flex flex-col md:flex-row justify-between items-center mt-4 pt-4 border-t border-slate-200">
-                            <p class="text-sm text-slate-600 mb-2 md:mb-0" id="paginationInfo">Menampilkan 1-25 dari 1,250 baris</p>
-                            <div class="flex items-center space-x-2">
-                                <button onclick="prevPage()" class="w-8 h-8 flex items-center justify-center border border-slate-300 rounded disabled:opacity-50" id="prevBtn">
-                                    <i class="fas fa-chevron-left"></i>
-                                </button>
-                                <div class="flex space-x-1" id="pageNumbers">
-                                    <!-- Page numbers will be added here -->
-                                </div>
-                                <button onclick="nextPage()" class="w-8 h-8 flex items-center justify-center border border-slate-300 rounded disabled:opacity-50" id="nextBtn">
-                                    <i class="fas fa-chevron-right"></i>
-                                </button>
-                            </div>
-                        </div>
-                        
-                        <!-- Data Summary -->
-                        <div class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <div class="bg-blue-50 p-4 rounded-lg">
-                                <p class="text-xs text-slate-600 mb-1">Total Baris</p>
-                                <p class="text-xl font-bold text-blue-900">1,250</p>
-                            </div>
-                            <div class="bg-green-50 p-4 rounded-lg">
-                                <p class="text-xs text-slate-600 mb-1">Total Kolom</p>
-                                <p class="text-xl font-bold text-blue-900">12</p>
-                            </div>
-                            <div class="bg-purple-50 p-4 rounded-lg">
-                                <p class="text-xs text-slate-600 mb-1">Data Kosong</p>
-                                <p class="text-xl font-bold text-blue-900">8 (0.6%)</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Tab 3: Analytics -->
-                <div class="tab-content" id="analytics-tab">
-                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                        <!-- Left Column -->
-                        <div class="lg:col-span-2 space-y-6">
-                            <!-- Visualization -->
-                            <div class="bg-white rounded-xl shadow border border-slate-100 p-6 card-hover">
-                                <h2 class="font-bold text-blue-900 text-lg mb-4">
-                                    <i class="fas fa-chart-bar mr-2"></i>Visualisasi Data
-                                </h2>
-                                
-                                <div class="mb-4">
-                                    <select id="chartType" class="border border-slate-300 rounded px-3 py-2">
-                                        <option value="bar">Bar Chart - Volume Kendaraan</option>
-                                        <option value="line">Line Chart - Trend Harian</option>
-                                        <option value="pie">Pie Chart - Distribusi Lokasi</option>
-                                    </select>
-                                </div>
-                                
-                                <div class="chart-container">
-                                    <canvas id="dataChart"></canvas>
-                                </div>
-                            </div>
-                            
-                            <!-- Statistical Analysis -->
-                            <div class="bg-white rounded-xl shadow border border-slate-100 p-6 card-hover">
-                                <h2 class="font-bold text-blue-900 text-lg mb-4">
-                                    <i class="fas fa-calculator mr-2"></i>Analisis Statistik
-                                </h2>
-                                
-                                <div class="overflow-x-auto">
-                                    <table class="w-full text-sm">
-                                        <thead>
-                                            <tr class="border-b border-slate-200">
-                                                <th class="text-left py-3 px-2 text-slate-600 font-medium">Variabel</th>
-                                                <th class="text-left py-3 px-2 text-slate-600 font-medium">Rata-rata</th>
-                                                <th class="text-left py-3 px-2 text-slate-600 font-medium">Median</th>
-                                                <th class="text-left py-3 px-2 text-slate-600 font-medium">Std. Deviasi</th>
-                                                <th class="text-left py-3 px-2 text-slate-600 font-medium">Min</th>
-                                                <th class="text-left py-3 px-2 text-slate-600 font-medium">Max</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="statsTable">
-                                            <!-- Will be populated by JavaScript -->
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Right Column -->
-                        <div class="space-y-6">
-                            <!-- Insights -->
-                            <div class="bg-white rounded-xl shadow border border-slate-100 p-6 card-hover">
-                                <h2 class="font-bold text-blue-900 text-lg mb-4">
-                                    <i class="fas fa-lightbulb mr-2"></i>Insights
-                                </h2>
-                                
-                                <div class="space-y-4">
-                                    <div class="p-3 bg-blue-50 rounded-lg">
-                                        <div class="flex items-start">
-                                            <i class="fas fa-chart-line text-blue-600 mt-1 mr-3"></i>
-                                            <div>
-                                                <p class="font-medium text-sm mb-1">Puncak Lalu Lintas</p>
-                                                <p class="text-xs text-slate-600">Jam 07:00-09:00 & 16:00-18:00</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="p-3 bg-green-50 rounded-lg">
-                                        <div class="flex items-start">
-                                            <i class="fas fa-map-marker-alt text-green-600 mt-1 mr-3"></i>
-                                            <div>
-                                                <p class="font-medium text-sm mb-1">Titik Terpadat</p>
-                                                <p class="text-xs text-slate-600">Jl. AP Pettarani & Jl. Urip Sumoharjo</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="p-3 bg-amber-50 rounded-lg">
-                                        <div class="flex items-start">
-                                            <i class="fas fa-calendar-alt text-amber-600 mt-1 mr-3"></i>
-                                            <div>
-                                                <p class="font-medium text-sm mb-1">Hari Tertinggi</p>
-                                                <p class="text-xs text-slate-600">Senin & Jumat</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="p-3 bg-purple-50 rounded-lg">
-                                        <div class="flex items-start">
-                                            <i class="fas fa-car text-purple-600 mt-1 mr-3"></i>
-                                            <div>
-                                                <p class="font-medium text-sm mb-1">Komposisi Kendaraan</p>
-                                                <p class="text-xs text-slate-600">65% Motor, 25% Mobil, 10% Lainnya</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <!-- Export Analysis -->
-                            <div class="bg-white rounded-xl shadow border border-slate-100 p-6 card-hover">
-                                <h2 class="font-bold text-blue-900 text-lg mb-4">
-                                    <i class="fas fa-file-export mr-2"></i>Ekspor Analisis
-                                </h2>
-                                
-                                <div class="space-y-3">
-                                    <button onclick="exportAnalysis('pdf')" class="w-full flex items-center justify-between p-3 bg-red-50 hover:bg-red-100 rounded-lg transition">
-                                        <div class="flex items-center">
-                                            <div class="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center mr-3">
-                                                <i class="fas fa-file-pdf text-red-600"></i>
-                                            </div>
-                                            <div>
-                                                <p class="font-medium">PDF Report</p>
-                                                <p class="text-xs text-slate-600">Laporan lengkap</p>
-                                            </div>
-                                        </div>
-                                        <i class="fas fa-download text-slate-400"></i>
-                                    </button>
-                                    
-                                    <button onclick="exportAnalysis('excel')" class="w-full flex items-center justify-between p-3 bg-green-50 hover:bg-green-100 rounded-lg transition">
-                                        <div class="flex items-center">
-                                            <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center mr-3">
-                                                <i class="fas fa-file-excel text-green-600"></i>
-                                            </div>
-                                            <div>
-                                                <p class="font-medium">Excel Summary</p>
-                                                <p class="text-xs text-slate-600">Statistik & grafik</p>
-                                            </div>
-                                        </div>
-                                        <i class="fas fa-download text-slate-400"></i>
-                                    </button>
-                                    
-                                    <button onclick="exportAnalysis('image')" class="w-full flex items-center justify-between p-3 bg-blue-50 hover:bg-blue-100 rounded-lg transition">
-                                        <div class="flex items-center">
-                                            <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
-                                                <i class="fas fa-image text-blue-600"></i>
-                                            </div>
-                                            <div>
-                                                <p class="font-medium">Grafik Gambar</p>
-                                                <p class="text-xs text-slate-600">PNG/JPEG format</p>
-                                            </div>
-                                        </div>
-                                        <i class="fas fa-download text-slate-400"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Tab 4: Metadata -->
-                <div class="tab-content" id="metadata-tab">
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        <!-- Technical Metadata -->
-                        <div class="bg-white rounded-xl shadow border border-slate-100 p-6 card-hover">
-                            <h2 class="font-bold text-blue-900 text-lg mb-4">
-                                <i class="fas fa-cogs mr-2"></i>Metadata Teknis
-                            </h2>
-                            
-                            <div class="space-y-4">
-                                <div class="grid grid-cols-2 gap-4">
-                                    <div>
-                                        <p class="text-xs text-slate-500 mb-1">Format File</p>
-                                        <p class="font-medium">CSV</p>
-                                    </div>
-                                    <div>
-                                        <p class="text-xs text-slate-500 mb-1">Encoding</p>
-                                        <p class="font-medium">UTF-8</p>
-                                    </div>
-                                </div>
-                                
-                                <div class="grid grid-cols-2 gap-4">
-                                    <div>
-                                        <p class="text-xs text-slate-500 mb-1">Pemisah Kolom</p>
-                                        <p class="font-medium">Koma (,)</p>
-                                    </div>
-                                    <div>
-                                        <p class="text-xs text-slate-500 mb-1">Pemisah Baris</p>
-                                        <p class="font-medium">CRLF</p>
-                                    </div>
-                                </div>
-                                
-                                <div>
-                                    <p class="text-xs text-slate-500 mb-1">Skema Data</p>
-                                    <pre class="bg-slate-50 p-4 rounded text-sm overflow-x-auto">
-tanggal, lokasi, volume_kendaraan, kecepatan_rata, tingkat_macet, cuaca, petugas, shift, kendaraan_motor, kendaraan_mobil, kendaraan_bus, kendaraan_truk</pre>
-                                </div>
-                                
-                                <div>
-                                    <p class="text-xs text-slate-500 mb-1">Checksum (MD5)</p>
-                                    <code class="text-sm bg-slate-100 px-2 py-1 rounded block overflow-x-auto">
-                                        a1b2c3d4e5f67890123456789abcdef0
-                                    </code>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Administrative Metadata -->
-                        <div class="bg-white rounded-xl shadow border border-slate-100 p-6 card-hover">
-                            <h2 class="font-bold text-blue-900 text-lg mb-4">
-                                <i class="fas fa-user-tie mr-2"></i>Metadata Administratif
-                            </h2>
-                            
-                            <div class="space-y-4">
-                                <div>
-                                    <p class="text-xs text-slate-500 mb-1">Pembuat Data</p>
-                                    <p class="font-medium">Bidang Lalu Lintas - Dinas Perhubungan Makassar</p>
-                                </div>
-                                
-                                <div>
-                                    <p class="text-xs text-slate-500 mb-1">Kontak</p>
-                                    <p class="font-medium">dishub.lalin@makassar.go.id</p>
-                                </div>
-                                
-                                <div>
-                                    <p class="text-xs text-slate-500 mb-1">Tanggal Pembuatan</p>
-                                    <p class="font-medium">1 April 2025</p>
-                                </div>
-                                
-                                <div>
-                                    <p class="text-xs text-slate-500 mb-1">Tanggal Publikasi</p>
-                                    <p class="font-medium">15 April 2025</p>
-                                </div>
-                                
-                                <div>
-                                    <p class="text-xs text-slate-500 mb-1">Siklus Update</p>
-                                    <p class="font-medium">Bulanan</p>
-                                </div>
-                                
-                                <div>
-                                    <p class="text-xs text-slate-500 mb-1">Versi Dataset</p>
-                                    <div class="flex items-center justify-between">
-                                        <span class="font-medium">v2.1.0</span>
-                                        <button class="text-blue-600 hover:text-blue-800 text-sm">
-                                            <i class="fas fa-history mr-1"></i> Lihat Riwayat
-                                        </button>
-                                    </div>
-                                </div>
-                                
-                                <div>
-                                    <p class="text-xs text-slate-500 mb-1">DOI (Digital Object Identifier)</p>
-                                    <code class="text-sm bg-slate-100 px-2 py-1 rounded block">
-                                        10.12345/palintasang.2025.015
-                                    </code>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Tab 5: Related Data -->
-                <div class="tab-content" id="related-tab">
-                    <div class="bg-white rounded-xl shadow border border-slate-100 p-6">
-                        <h2 class="font-bold text-blue-900 text-lg mb-6">
-                            <i class="fas fa-project-diagram mr-2"></i>Dataset Terkait
-                        </h2>
-                        
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                            <!-- Related Dataset 1 -->
-                            <div class="border border-slate-200 rounded-xl p-4 hover:border-blue-300 transition card-hover">
-                                <div class="flex items-center mb-3">
-                                    <span class="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded mr-2">Transportasi</span>
-                                    <span class="px-2 py-1 bg-green-100 text-green-800 text-xs rounded">2025</span>
-                                </div>
-                                <h3 class="font-bold text-blue-900 mb-2">Data Angkutan Umum</h3>
-                                <p class="text-sm text-slate-600 mb-3">Data trayek dan frekuensi angkutan umum Kota Makassar</p>
-                                <div class="flex items-center justify-between">
-                                    <span class="text-xs text-slate-500">842 baris • CSV</span>
-                                    <a href="detail.html?dataset=2" class="text-blue-600 hover:text-blue-800 text-sm">
-                                        Lihat <i class="fas fa-arrow-right ml-1"></i>
-                                    </a>
-                                </div>
-                            </div>
-                            
-                            <!-- Related Dataset 2 -->
-                            <div class="border border-slate-200 rounded-xl p-4 hover:border-blue-300 transition card-hover">
-                                <div class="flex items-center mb-3">
-                                    <span class="px-2 py-1 bg-amber-100 text-amber-800 text-xs rounded mr-2">Parkir</span>
-                                    <span class="px-2 py-1 bg-green-100 text-green-800 text-xs rounded">2024</span>
-                                </div>
-                                <h3 class="font-bold text-blue-900 mb-2">Data Parkir Publik</h3>
-                                <p class="text-sm text-slate-600 mb-3">Kapasitas dan utilisasi parkir di area publik Makassar</p>
-                                <div class="flex items-center justify-between">
-                                    <span class="text-xs text-slate-500">156 baris • Excel</span>
-                                    <a href="detail.html?dataset=3" class="text-blue-600 hover:text-blue-800 text-sm">
-                                        Lihat <i class="fas fa-arrow-right ml-1"></i>
-                                    </a>
-                                </div>
-                            </div>
-                            
-                            <!-- Related Dataset 3 -->
-                            <div class="border border-slate-200 rounded-xl p-4 hover:border-blue-300 transition card-hover">
-                                <div class="flex items-center mb-3">
-                                    <span class="px-2 py-1 bg-purple-100 text-purple-800 text-xs rounded mr-2">Kecelakaan</span>
-                                    <span class="px-2 py-1 bg-green-100 text-green-800 text-xs rounded">2024</span>
-                                </div>
-                                <h3 class="font-bold text-blue-900 mb-2">Data Kecelakaan Lalu Lintas</h3>
-                                <p class="text-sm text-slate-600 mb-3">Statistik kecelakaan lalu lintas tahun 2024</p>
-                                <div class="flex items-center justify-between">
-                                    <span class="text-xs text-slate-500">89 baris • JSON</span>
-                                    <a href="detail.html?dataset=4" class="text-blue-600 hover:text-blue-800 text-sm">
-                                        Lihat <i class="fas fa-arrow-right ml-1"></i>
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="mt-8 pt-6 border-t border-slate-200">
-                            <h3 class="font-bold text-blue-900 text-lg mb-4">
-                                <i class="fas fa-link mr-2"></i>Link Terkait
-                            </h3>
-                            <div class="space-y-2">
-                                <a href="#" class="flex items-center text-blue-600 hover:text-blue-800">
-                                    <i class="fas fa-external-link-alt mr-3"></i>
-                                    <span>Dashboard Lalu Lintas Kota Makassar</span>
-                                </a>
-                                <a href="#" class="flex items-center text-blue-600 hover:text-blue-800">
-                                    <i class="fas fa-external-link-alt mr-3"></i>
-                                    <span>Kebijakan Transportasi Makassar 2025</span>
-                                </a>
-                                <a href="#" class="flex items-center text-blue-600 hover:text-blue-800">
-                                    <i class="fas fa-external-link-alt mr-3"></i>
-                                    <span>Masterplan Transportasi 2025-2030</span>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </main>
-    </div>
-    
-    <!-- Share Modal -->
-    <div class="modal" id="shareModal">
-        <div class="modal-content bg-white rounded-xl shadow-2xl max-w-md w-full mx-4">
-            <div class="p-6">
-                <div class="flex justify-between items-center mb-6">
-                    <h3 class="font-bold text-blue-900 text-lg">Bagikan Dataset</h3>
-                    <button onclick="closeShareModal()" class="text-slate-400 hover:text-slate-600">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-                
-                <div class="space-y-4">
-                    <div>
-                        <label class="block text-sm font-medium text-slate-700 mb-2">Link Bagikan</label>
-                        <div class="flex">
-                            <input 
-                                type="text" 
-                                id="shareLink"
-                                value="https://palintasang-data.makassar.go.id/dataset/TL-2025-015-MKS"
-                                readonly
-                                class="flex-1 border border-r-0 border-slate-300 rounded-l-lg px-4 py-2 focus:outline-none"
-                            >
-                            <button onclick="copyShareLink()" class="bg-blue-600 text-white px-4 rounded-r-lg hover:bg-blue-700">
-                                <i class="fas fa-copy"></i>
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <div>
-                        <label class="block text-sm font-medium text-slate-700 mb-2">Bagikan ke Media Sosial</label>
-                        <div class="flex space-x-3">
-                            <button class="w-10 h-10 bg-blue-500 text-white rounded-full hover:bg-blue-600">
-                                <i class="fab fa-facebook-f"></i>
-                            </button>
-                            <button class="w-10 h-10 bg-blue-400 text-white rounded-full hover:bg-blue-500">
-                                <i class="fab fa-twitter"></i>
-                            </button>
-                            <button class="w-10 h-10 bg-red-500 text-white rounded-full hover:bg-red-600">
-                                <i class="fab fa-whatsapp"></i>
-                            </button>
-                            <button class="w-10 h-10 bg-gray-800 text-white rounded-full hover:bg-gray-900">
-                                <i class="fab fa-github"></i>
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <div>
-                        <label class="block text-sm font-medium text-slate-700 mb-2">Embed Code</label>
-                        <textarea 
-                            id="embedCode"
-                            readonly
-                            rows="3"
-                            class="w-full border border-slate-300 rounded-lg px-4 py-2 focus:outline-none bg-slate-50 font-mono text-sm"
-                        ><iframe src="https://palintasang-data.makassar.go.id/embed/TL-2025-015-MKS" width="100%" height="400"></iframe></textarea>
-                    </div>
-                    
-                    <div class="pt-4 border-t border-slate-200">
-                        <button onclick="closeShareModal()" class="w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 transition">
-                            Tutup
-                        </button>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-    
-    <!-- JavaScript -->
+
+        <div class="mt-16">
+            <h3 class="text-xl font-extrabold text-blue-900 mb-8 uppercase italic tracking-tighter">
+                Dataset <span class="text-amber-500">Terkait</span>
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-white p-6 rounded-3xl border border-slate-100 hover:border-amber-400 transition-all shadow-sm group">
+                    <span class="text-[9px] font-black text-blue-600 bg-blue-50 px-2 py-1 rounded mb-3 inline-block uppercase">Angkutan</span>
+                    <h4 class="font-bold text-sm text-blue-900 mb-2 leading-tight group-hover:text-blue-600">Data Rute Angkutan Umum Kota Makassar</h4>
+                    <p class="text-slate-400 text-[10px] line-clamp-2 italic mb-4">Informasi lengkap rute pete-pete, bus kota, dan BRT.</p>
+                    <a href="detail.html" class="text-amber-600 text-[10px] font-black uppercase tracking-widest hover:mr-2 transition-all">Lihat Detail <i class="fas fa-arrow-right ml-1"></i></a>
+                </div>
+                <div class="bg-white p-6 rounded-3xl border border-slate-100 hover:border-amber-400 transition-all shadow-sm group">
+                    <span class="text-[9px] font-black text-purple-600 bg-purple-50 px-2 py-1 rounded mb-3 inline-block uppercase">Infrastruktur</span>
+                    <h4 class="font-bold text-sm text-blue-900 mb-2 leading-tight group-hover:text-blue-600">Data Lampu Lalu Lintas Makassar</h4>
+                    <p class="text-slate-400 text-[10px] line-clamp-2 italic mb-4">Lokasi dan kondisi teknis lampu lalin persimpangan.</p>
+                    <a href="detail.html" class="text-amber-600 text-[10px] font-black uppercase tracking-widest hover:mr-2 transition-all">Lihat Detail <i class="fas fa-arrow-right ml-1"></i></a>
+                </div>
+                <div class="bg-white p-6 rounded-3xl border border-slate-100 hover:border-amber-400 transition-all shadow-sm group">
+                    <span class="text-[9px] font-black text-rose-600 bg-rose-50 px-2 py-1 rounded mb-3 inline-block uppercase">Lalu Lintas</span>
+                    <h4 class="font-bold text-sm text-blue-900 mb-2 leading-tight group-hover:text-blue-600">Statistik Kecelakaan Lalin 2022</h4>
+                    <p class="text-slate-400 text-[10px] line-clamp-2 italic mb-4">Data tingkat keparahan dan sebaran titik kecelakaan.</p>
+                    <a href="detail.html" class="text-amber-600 text-[10px] font-black uppercase tracking-widest hover:mr-2 transition-all">Lihat Detail <i class="fas fa-arrow-right ml-1"></i></a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-blue-950 text-white pt-16 pb-10 mt-20">
+        <div class="container mx-auto px-6 text-center">
+            <h4 class="font-bold text-lg mb-6 tracking-widest uppercase">PA'LINTASANG <span class="text-amber-500">DATA</span></h4>
+            <div class="h-[1px] bg-white/10 w-full mb-8"></div>
+            <p class="text-[10px] text-white/40 uppercase tracking-[0.3em]">© 2025 PKL STATISTIKA UNM  | Data Driven Policy</p>
+        </div>
+    </footer>
+
     <script>
-        // Dataset data
-        const dataset = {
-            id: 'TL-2025-015-MKS',
-            title: 'Data Lalu Lintas Harian Kota Makassar 2025',
-            category: 'Lalu Lintas',
-            year: '2025',
-            description: 'Data lalu lintas harian di titik-titik strategis Kota Makassar periode Januari-Maret 2025',
-            fullDescription: 'Dataset ini berisi data lalu lintas harian di 15 titik strategis Kota Makassar. Data dikumpulkan melalui sensor lalu lintas dan pengamatan langsung petugas Dinas Perhubungan. Dataset mencakup volume kendaraan, kecepatan rata-rata, tingkat kemacetan, dan kondisi cuaca setiap hari.',
-            owner: 'Dinas Perhubungan Makassar',
-            department: 'Bidang Lalu Lintas',
-            uploadDate: '15 Maret 2025',
-            format: 'CSV',
-            size: '2.4 MB',
-            rows: 1250,
-            columns: 12,
-            views: 1245,
-            downloads: 328,
-            lastUpdate: '5 hari lalu',
-            quality: '98%',
-            license: 'CC BY 4.0',
-            tags: ['lalu lintas', 'transportasi', 'makassar', 'volume kendaraan', 'kemacetan', 'data harian', 'traffic', 'mobility'],
-            structure: [
-                { column: 'tanggal', type: 'Date', description: 'Tanggal pengamatan', example: '2025-01-01' },
-                { column: 'lokasi', type: 'String', description: 'Lokasi pengamatan', example: 'Jl. AP Pettarani' },
-                { column: 'volume_kendaraan', type: 'Integer', description: 'Total kendaraan per hari', example: '28450' },
-                { column: 'kecepatan_rata', type: 'Float', description: 'Kecepatan rata-rata (km/jam)', example: '32.5' },
-                { column: 'tingkat_macet', type: 'String', description: 'Tingkat kemacetan', example: 'Sedang' },
-                { column: 'cuaca', type: 'String', description: 'Kondisi cuaca', example: 'Cerah' },
-                { column: 'petugas', type: 'String', description: 'Nama petugas', example: 'Ahmad Yani' },
-                { column: 'shift', type: 'String', description: 'Shift pengamatan', example: 'Pagi' },
-                { column: 'kendaraan_motor', type: 'Integer', description: 'Jumlah motor', example: '18492' },
-                { column: 'kendaraan_mobil', type: 'Integer', description: 'Jumlah mobil', example: '7101' },
-                { column: 'kendaraan_bus', type: 'Integer', description: 'Jumlah bus', example: '568' },
-                { column: 'kendaraan_truk', type: 'Integer', description: 'Jumlah truk', example: '289' }
-            ],
-            stats: [
-                { variable: 'volume_kendaraan', mean: 28450, median: 28120, std: 4250, min: 21500, max: 42850 },
-                { variable: 'kecepatan_rata', mean: 32.5, median: 32.1, std: 4.2, min: 18.5, max: 45.2 },
-                { variable: 'kendaraan_motor', mean: 18492, median: 18210, std: 3120, min: 14250, max: 27850 },
-                { variable: 'kendaraan_mobil', mean: 7101, median: 6980, std: 1250, min: 5200, max: 10500 }
-            ]
-        };
-        
-        // Pagination variables
-        let currentPage = 1;
-        let rowsPerPage = 25;
-        let totalPages = Math.ceil(dataset.rows / rowsPerPage);
-        
-        // Initialize dashboard
-        function initDashboard() {
-            // Get user data from localStorage
-            const username = localStorage.getItem('pd_username') || 'guest';
-            const display = localStorage.getItem('pd_display') || 'Pengguna';
-            const role = localStorage.getItem('pd_role') || 'user';
-            
-            // If no user data, redirect to login
-            if (!localStorage.getItem('pd_username')) {
-                window.location.href = 'login.html';
-                return;
+        (function(){
+            function getParam(name){
+                return new URLSearchParams(window.location.search).get(name);
             }
-            
-            // Update UI with user data
-            document.getElementById('userName').textContent = display;
-            document.getElementById('userRole').textContent = getRoleName(role);
-            document.getElementById('dropdownName').textContent = display;
-            document.getElementById('dropdownRole').textContent = getRoleName(role);
-            
-            // Load menu based on role
-            loadMenu(role);
-            
-            // Load dataset data
-            loadDatasetData();
-            
-            // Initialize charts
-            initCharts();
-            
-            // Initialize pagination
-            initPagination();
-            
-            // Update sidebar info
-            updateSidebarInfo();
-        }
-        
-        // Get role name
-        function getRoleName(role) {
-            const roles = {
-                'admin': 'Administrator',
-                'staff': 'Staff Dishub',
-                'user': 'Pengguna'
-            };
-            return roles[role] || 'Pengguna';
-        }
-        
-        // Load menu
-        function loadMenu(role) {
-            const menuItems = {
-                admin: [
-                    { icon: 'fas fa-tachometer-alt', text: 'Dashboard', link: 'dashboard.html' },
-                    { icon: 'fas fa-database', text: 'Semua Dataset', link: 'datasets.html' },
-                    { icon: 'fas fa-upload', text: 'Upload Data', link: 'upload.html' },
-                    { icon: 'fas fa-users', text: 'Pengguna', link: 'users.html' },
-                    { icon: 'fas fa-cog', text: 'Pengaturan', link: 'settings.html' }
-                ],
-                staff: [
-                    { icon: 'fas fa-tachometer-alt', text: 'Dashboard', link: 'dashboard.html' },
-                    { icon: 'fas fa-database', text: 'Dataset Saya', link: 'my-datasets.html' },
-                    { icon: 'fas fa-upload', text: 'Upload Data', link: 'upload.html' },
-                    { icon: 'fas fa-chart-bar', text: 'Analisis', link: 'analytics.html' },
-                    { icon: 'fas fa-user-cog', text: 'Profil', link: 'profile.html' }
-                ],
-                user: [
-                    { icon: 'fas fa-tachometer-alt', text: 'Dashboard', link: 'dashboard.html' },
-                    { icon: 'fas fa-database', text: 'Dataset Saya', link: 'my-datasets.html' },
-                    { icon: 'fas fa-upload', text: 'Upload Data', link: 'upload.html' },
-                    { icon: 'fas fa-user-cog', text: 'Profil', link: 'profile.html' }
-                ]
-            };
-            
-            const items = menuItems[role] || menuItems.user;
-            const desktopMenu = document.getElementById('desktopMenu');
-            const mobileMenuContent = document.getElementById('mobileMenuContent');
-            
-            // Clear existing menu
-            desktopMenu.innerHTML = '';
-            mobileMenuContent.innerHTML = '';
-            
-            // Create menu items
-            items.forEach(item => {
-                const menuItem = `
-                    <a href="${item.link}" class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-lg text-slate-700 hover:text-blue-600">
-                        <i class="${item.icon} w-5"></i>
-                        <span>${item.text}</span>
-                    </a>
-                `;
-                
-                desktopMenu.innerHTML += menuItem;
-                mobileMenuContent.innerHTML += menuItem;
-            });
-            
-            // Add logout to mobile menu
-            mobileMenuContent.innerHTML += `
-                <div class="mt-6 pt-6 border-t border-slate-200">
-                    <button onclick="logout()" class="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-red-600 hover:bg-red-50">
-                        <i class="fas fa-sign-out-alt w-5"></i>
-                        <span>Keluar</span>
-                    </button>
-                </div>
-            `;
-        }
-        
-        // Load dataset data
-        function loadDatasetData() {
-            // Basic info
-            document.getElementById('datasetTitle').textContent = dataset.title;
-            document.getElementById('datasetDescription').textContent = dataset.description;
-            document.getElementById('fullDescription').textContent = dataset.fullDescription;
-            document.getElementById('categoryBadge').textContent = dataset.category;
-            document.getElementById('yearBadge').textContent = dataset.year;
-            
-            // Stats
-            document.getElementById('viewsCount').textContent = dataset.views.toLocaleString();
-            document.getElementById('downloadsCount').textContent = dataset.downloads.toLocaleString();
-            document.getElementById('lastUpdated').textContent = dataset.lastUpdate;
-            document.getElementById('qualityScore').textContent = dataset.quality;
-            
-            // File info
-            document.getElementById('fileSize').textContent = dataset.size;
-            
-            // Tags
-            const tagsContainer = document.getElementById('tagsContainer');
-            dataset.tags.forEach(tag => {
-                const tagElement = document.createElement('span');
-                tagElement.className = 'inline-block px-3 py-1 bg-slate-100 text-slate-800 text-sm rounded-full mr-2 mb-2';
-                tagElement.textContent = tag;
-                tagsContainer.appendChild(tagElement);
-            });
-            
-            // Structure table
-            const structureTable = document.getElementById('structureTable');
-            dataset.structure.forEach(item => {
-                const row = document.createElement('tr');
-                row.className = 'border-b border-slate-100 hover:bg-slate-50';
-                row.innerHTML = `
-                    <td class="py-3 px-2 font-medium">${item.column}</td>
-                    <td class="py-3 px-2"><span class="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded">${item.type}</span></td>
-                    <td class="py-3 px-2">${item.description}</td>
-                    <td class="py-3 px-2 font-mono text-xs">${item.example}</td>
-                `;
-                structureTable.appendChild(row);
-            });
-            
-            // Stats table
-            const statsTable = document.getElementById('statsTable');
-            dataset.stats.forEach(stat => {
-                const row = document.createElement('tr');
-                row.className = 'border-b border-slate-100 hover:bg-slate-50';
-                row.innerHTML = `
-                    <td class="py-3 px-2 font-medium">${stat.variable}</td>
-                    <td class="py-3 px-2">${typeof stat.mean === 'number' ? stat.mean.toLocaleString() : stat.mean}</td>
-                    <td class="py-3 px-2">${typeof stat.median === 'number' ? stat.median.toLocaleString() : stat.median}</td>
-                    <td class="py-3 px-2">${typeof stat.std === 'number' ? stat.std.toLocaleString() : stat.std}</td>
-                    <td class="py-3 px-2">${typeof stat.min === 'number' ? stat.min.toLocaleString() : stat.min}</td>
-                    <td class="py-3 px-2">${typeof stat.max === 'number' ? stat.max.toLocaleString() : stat.max}</td>
-                `;
-                statsTable.appendChild(row);
-            });
-        }
-        
-        // Update sidebar info
-        function updateSidebarInfo() {
-            document.getElementById('sidebarFormat').textContent = dataset.format;
-            document.getElementById('sidebarSize').textContent = dataset.size;
-            document.getElementById('sidebarRows').textContent = dataset.rows.toLocaleString();
-            document.getElementById('sidebarCols').textContent = dataset.columns;
-        }
-        
-        // Initialize charts
-        function initCharts() {
-            const ctx = document.getElementById('dataChart').getContext('2d');
-            window.dataChart = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-                    datasets: [{
-                        label: 'Volume Kendaraan (ribuan)',
-                        data: [28.4, 29.1, 31.2, 30.8, 29.5, 28.9],
-                        backgroundColor: '#3b82f6',
-                        borderRadius: 6
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: 'top',
-                        },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    return context.parsed.y.toLocaleString() + ' ribu kendaraan';
-                                }
-                            }
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            grid: { color: 'rgba(0,0,0,0.05)' },
-                            title: {
-                                display: true,
-                                text: 'Volume Kendaraan (ribuan)'
-                            }
-                        },
-                        x: {
-                            grid: { display: false }
-                        }
+
+            function findInMock(id){
+                // small mock fallback
+                const mock = [
+                    { id: '0', title: 'Analisis Volume Kendaraan Titik 1', category: 'Lalu Lintas', format: 'CSV', year: '2024', date: '10 Des 2024', desc: 'Contoh dataset mock', rows: 12450 },
+                    { id: '1', title: 'Trayek Angkutan Kota Jalur 1', category: 'Transportasi', format: 'JSON', year: '2023', date: '05 Nov 2023', desc: 'Contoh dataset mock 2', rows: 5320 }
+                ];
+                return mock.find(d => d.id == id) || null;
+            }
+
+            function renderTableFromArray(arr){
+                if (!arr || !arr.length) return;
+                const table = document.getElementById('previewBody').closest('table');
+                const thead = table.querySelector('thead');
+                const headers = arr[0];
+                thead.innerHTML = `<tr class="bg-blue-900 text-white">${headers.map(h => `<th class="p-3 font-bold uppercase tracking-tighter">${h || ''}</th>`).join('')}</tr>`;
+                const body = document.getElementById('previewBody');
+                body.innerHTML = arr.slice(1).map(r => `<tr class="border-b border-slate-50 hover:bg-slate-50">${r.map(c => `<td class="p-3">${c}</td>`).join('')}</tr>`).join('');
+            }
+
+            function populate(item){
+                if(!item) return;
+                document.getElementById('detailTitle').innerHTML = item.title;
+                if (document.getElementById('detailAccent')) document.getElementById('detailAccent').innerText = item.title;
+                document.getElementById('detailDesc').innerText = item.desc || '';
+                document.getElementById('datasetId').innerText = item.id || '';
+                document.getElementById('datasetOwner').innerText = item.owner || 'Pengunggah';
+                document.getElementById('metaFormat').innerText = item.format || 'CSV';
+                document.getElementById('metaUpdate').innerText = item.update || (item.date || '');
+                document.getElementById('metaSize').innerText = item.size || '-';
+                document.getElementById('metaStatus').innerText = item.status || 'Terverifikasi';
+                document.getElementById('detailUpdate').innerText = 'Update: ' + (item.date || '');
+                document.getElementById('detailRows').innerText = (item.rows ? item.rows.toLocaleString() : '-') + ' Baris';
+                // If original file data exists, parse and render full sheet; else use saved preview
+                if (item.fileData) {
+                    try {
+                        const dataUrl = item.fileData;
+                        const base64 = dataUrl.split(',')[1];
+                        const wb = XLSX.read(base64, { type: 'base64' });
+                        const first = wb.SheetNames[0];
+                        const ws = wb.Sheets[first];
+                        const arr = XLSX.utils.sheet_to_json(ws, { header: 1 });
+                        if (arr && arr.length) renderTableFromArray(arr);
+                    } catch (err) {
+                        console.error('Gagal parse fileData untuk preview', err);
+                        if (item.preview) renderTableFromArray(item.preview);
                     }
+                } else if (item.preview) {
+                    renderTableFromArray(item.preview);
+                }
+            }
+
+            const id = getParam('id') || getParam('added');
+            let dataset = null;
+
+            // Prefer Apps Script (Google Sheets) then fallback to local storage / getAllDatasets()
+            const { GOOGLE_SCRIPT_URL, API_KEY } = (window.APP_CONFIG || {});
+            if (!GOOGLE_SCRIPT_URL) console.warn('GOOGLE_SCRIPT_URL not configured. Set lib/config.js');
+
+            async function fetchFromAppsScript(id){
+                try{
+                    const res = await fetch(`${GOOGLE_SCRIPT_URL}?method=getDataset&api_key=${API_KEY}&id=${encodeURIComponent(id)}`);
+                    if (!res.ok) throw new Error('HTTP ' + res.status);
+                    const json = await res.json();
+                    if (json && json.id) return json;
+                }catch(e){ console.warn('AppsScript fetch failed', e); }
+                return null;
+            }
+
+            // Adapter so existing populate() is used by the new flow
+            function populateDetailPage(d){
+                if (!d) return;
+                dataset = d;
+                populate(d);
+                const params = new URLSearchParams(window.location.search);
+                if (params.get('download') === '1' && dataset && dataset.file_url) {
+                    window.location.href = dataset.file_url;
+                }
+            }
+
+            async function loadDatasetDetail(id){
+                if (!id) return;
+                try {
+                    // Try Google Apps Script first
+                    const ds = await fetchFromAppsScript(id);
+                    if (ds) {
+                        populateDetailPage(ds);
+                        return;
+                    }
+                } catch (error) {
+                    console.warn('Failed to load from Google Sheet:', error);
+                }
+
+                // Fallback to local datasets (prefer getAllDatasets if provided)
+                try {
+                    let localDatasets = [];
+                    if (typeof getAllDatasets === 'function') {
+                        localDatasets = await getAllDatasets();
+                    } else {
+                        const raw = localStorage.getItem('userDatasets');
+                        localDatasets = raw ? JSON.parse(raw) : [];
+                    }
+                    const found = localDatasets.find(d => d.id == id);
+                    if (found) {
+                        populateDetailPage(found);
+                        return;
+                    }
+                } catch (e) {
+                    console.warn('Failed to load from local storage:', e);
+                }
+
+                // Last resort: mock
+                const mockData = findInMock(id);
+                if (mockData) {
+                    populateDetailPage(mockData);
+                } else {
+                    document.getElementById('detailTitle').innerHTML = 'Dataset tidak ditemukan';
+                }
+            }
+
+            // Panggil fungsi ini ketika halaman detail dimuat
+            const urlParams = new URLSearchParams(window.location.search);
+            const datasetId = urlParams.get('id') || urlParams.get('added');
+            if (datasetId) loadDatasetDetail(datasetId);
+
+            // Download button helpers (export minimal CSV/JSON/XLSX using simple conversion)
+            function downloadText(filename, content, mime){
+                const blob = new Blob([content], { type: mime || 'text/plain;charset=utf-8' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a'); a.href = url; a.download = filename; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+            }
+
+            function dataURLtoBlob(dataurl){
+                const arr = dataurl.split(',');
+                const mime = arr[0].match(/:(.*?);/)[1];
+                const bstr = atob(arr[1]);
+                let n = bstr.length;
+                const u8 = new Uint8Array(n);
+                while(n--) u8[n] = bstr.charCodeAt(n);
+                return new Blob([u8], { type: mime });
+            }
+
+            document.getElementById('downloadJson').addEventListener('click', ()=>{
+                if (!dataset) return alert('Tidak ada data untuk diunduh.');
+                // If original file available, provide original as JSON fallback too
+                if (dataset.fileData && dataset.originalName && dataset.originalName.toLowerCase().endsWith('.json')){
+                    const blob = dataURLtoBlob(dataset.fileData);
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a'); a.href = url; a.download = dataset.originalName; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+                } else {
+                    downloadText((dataset.title||'dataset') + '.json', JSON.stringify(dataset, null, 2), 'application/json');
                 }
             });
-            
-            // Chart type change
-            document.getElementById('chartType').addEventListener('change', function() {
-                const type = this.value;
-                window.dataChart.config.type = type;
-                window.dataChart.update();
+
+            document.getElementById('downloadCsv').addEventListener('click', ()=>{
+                if (!dataset) return alert('Tidak ada data untuk diunduh.');
+                if (dataset.fileData && dataset.originalName){
+                    // if original is csv or xlsx, prefer original
+                    const blob = dataURLtoBlob(dataset.fileData);
+                    const url = URL.createObjectURL(blob);
+                    const suggested = dataset.originalName || ((dataset.title||'dataset') + '.csv');
+                    const a = document.createElement('a'); a.href = url; a.download = suggested; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+                    return;
+                }
+                // try to convert preview to csv
+                if (dataset.preview && dataset.preview.length){
+                    const csv = dataset.preview.map(r => r.map(c => `"${(''+c).replace(/"/g,'""')}"`).join(',')).join('\n');
+                    downloadText((dataset.title||'dataset') + '.csv', csv, 'text/csv');
+                } else {
+                    downloadText((dataset.title||'dataset') + '.csv', '', 'text/csv');
+                }
             });
-        }
-        
-        // Initialize pagination
-        function initPagination() {
-            updatePagination();
-            generateDataPreview();
-        }
-        
-        // Generate data preview
-        function generateDataPreview() {
-            const headers = document.getElementById('dataHeaders');
-            const rows = document.getElementById('dataRows');
-            
-            // Clear existing
-            headers.innerHTML = '';
-            rows.innerHTML = '';
-            
-            // Generate headers
-            dataset.structure.forEach(item => {
-                const th = document.createElement('th');
-                th.className = 'px-4 py-3 text-left text-xs font-medium text-slate-700';
-                th.textContent = item.column;
-                headers.appendChild(th);
+
+            document.getElementById('downloadXls').addEventListener('click', ()=>{
+                if (!dataset) return alert('Tidak ada data untuk diunduh.');
+                if (dataset.fileData && dataset.originalName){
+                    const blob = dataURLtoBlob(dataset.fileData);
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a'); a.href = url; a.download = dataset.originalName; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+                    return;
+                }
+                // fallback: export JSON with .xls extension
+                downloadText((dataset.title||'dataset') + '.xls', JSON.stringify(dataset), 'application/vnd.ms-excel');
             });
-            
-            // Generate sample data (first page)
-            const start = (currentPage - 1) * rowsPerPage;
-            const end = Math.min(start + rowsPerPage, dataset.rows);
-            
-            for (let i = start; i < end; i++) {
-                const tr = document.createElement('tr');
-                tr.className = 'border-t border-slate-100 hover:bg-slate-50';
-                
-                dataset.structure.forEach(item => {
-                    const td = document.createElement('td');
-                    td.className = 'px-4 py-3 text-sm text-slate-700';
-                    
-                    // Generate sample data based on column type
-                    let value = '';
-                    switch(item.type) {
-                        case 'Date':
-                            value = `2025-${String(Math.floor(Math.random() * 3) + 1).padStart(2, '0')}-${String(Math.floor(Math.random() * 28) + 1).padStart(2, '0')}`;
-                            break;
-                        case 'Integer':
-                            value = Math.floor(Math.random() * 50000).toLocaleString();
-                            break;
-                        case 'Float':
-                            value = (Math.random() * 50 + 20).toFixed(1);
-                            break;
-                        case 'String':
-                            if (item.column === 'lokasi') {
-                                const locations = ['Jl. AP Pettarani', 'Jl. Urip Sumoharjo', 'Jl. Sultan Hasanuddin', 'Jl. Perintis Kemerdekaan', 'Jl. Ahmad Yani'];
-                                value = locations[Math.floor(Math.random() * locations.length)];
-                            } else if (item.column === 'tingkat_macet') {
-                                const levels = ['Rendah', 'Sedang', 'Tinggi', 'Sangat Tinggi'];
-                                value = levels[Math.floor(Math.random() * levels.length)];
-                            } else if (item.column === 'cuaca') {
-                                const weather = ['Cerah', 'Berawan', 'Hujan Ringan', 'Hujan Sedang'];
-                                value = weather[Math.floor(Math.random() * weather.length)];
-                            } else if (item.column === 'shift') {
-                                const shifts = ['Pagi', 'Siang', 'Sore', 'Malam'];
-                                value = shifts[Math.floor(Math.random() * shifts.length)];
-                            } else if (item.column === 'petugas') {
-                                const officers = ['Ahmad Yani', 'Siti Nurhaliza', 'Budi Santoso', 'Rina Wijaya', 'Dewi Sartika'];
-                                value = officers[Math.floor(Math.random() * officers.length)];
-                            } else {
-                                value = 'Sample Data';
-                            }
-                            break;
-                        default:
-                            value = 'Data';
-                    }
-                    
-                    td.textContent = value;
-                    tr.appendChild(td);
-                });
-                
-                rows.appendChild(tr);
-            }
-            
-            // Update pagination info
-            updatePaginationInfo(start, end);
-        }
-        
-        // Update pagination
-        function updatePagination() {
-            const pageNumbers = document.getElementById('pageNumbers');
-            const prevBtn = document.getElementById('prevBtn');
-            const nextBtn = document.getElementById('nextBtn');
-            
-            // Update buttons
-            prevBtn.disabled = currentPage === 1;
-            nextBtn.disabled = currentPage === totalPages;
-            
-            // Generate page numbers
-            pageNumbers.innerHTML = '';
-            
-            let startPage = Math.max(1, currentPage - 2);
-            let endPage = Math.min(totalPages, startPage + 4);
-            
-            if (endPage - startPage < 4) {
-                startPage = Math.max(1, endPage - 4);
-            }
-            
-            for (let i = startPage; i <= endPage; i++) {
-                const button = document.createElement('button');
-                button.className = `w-8 h-8 flex items-center justify-center border rounded ${i === currentPage ? 'bg-blue-600 text-white border-blue-600' : 'border-slate-300'}`;
-                button.textContent = i;
-                button.onclick = () => goToPage(i);
-                pageNumbers.appendChild(button);
-            }
-            
-            // Add ellipsis if needed
-            if (endPage < totalPages) {
-                const ellipsis = document.createElement('span');
-                ellipsis.className = 'px-2';
-                ellipsis.textContent = '...';
-                pageNumbers.appendChild(ellipsis);
-                
-                const lastButton = document.createElement('button');
-                lastButton.className = 'w-8 h-8 flex items-center justify-center border border-slate-300 rounded';
-                lastButton.textContent = totalPages;
-                lastButton.onclick = () => goToPage(totalPages);
-                pageNumbers.appendChild(lastButton);
-            }
-        }
-        
-        // Update pagination info
-        function updatePaginationInfo(start, end) {
-            const info = document.getElementById('paginationInfo');
-            info.textContent = `Menampilkan ${start + 1}-${end} dari ${dataset.rows.toLocaleString()} baris`;
-        }
-        
-        // Go to page
-        function goToPage(page) {
-            currentPage = page;
-            generateDataPreview();
-            updatePagination();
-        }
-        
-        // Previous page
-        function prevPage() {
-            if (currentPage > 1) {
-                goToPage(currentPage - 1);
-            }
-        }
-        
-        // Next page
-        function nextPage() {
-            if (currentPage < totalPages) {
-                goToPage(currentPage + 1);
-            }
-        }
-        
-        // Rows per page change
-        document.getElementById('rowsPerPage').addEventListener('change', function() {
-            rowsPerPage = parseInt(this.value);
-            totalPages = Math.ceil(dataset.rows / rowsPerPage);
-            currentPage = 1;
-            generateDataPreview();
-            updatePagination();
-        });
-        
-        // Tab switching
-        document.querySelectorAll('.tab-button').forEach(button => {
-            button.addEventListener('click', function() {
-                const tab = this.getAttribute('data-tab');
-                
-                // Update active tab button
-                document.querySelectorAll('.tab-button').forEach(btn => {
-                    btn.classList.remove('active');
-                });
-                this.classList.add('active');
-                
-                // Show active tab content
-                document.querySelectorAll('.tab-content').forEach(content => {
-                    content.classList.remove('active');
-                });
-                document.getElementById(`${tab}-tab`).classList.add('active');
-            });
-        });
-        
-        // Download functions
-        function downloadDataset() {
-            showToast('Memulai download dataset...');
-            // Simulate download
-            setTimeout(() => {
-                showToast('Download berhasil!');
-                // Update download count
-                dataset.downloads++;
-                document.getElementById('downloadsCount').textContent = dataset.downloads.toLocaleString();
-            }, 1500);
-        }
-        
-        function downloadFormat(format) {
-            showToast(`Download format ${format} dimulai...`);
-        }
-        
-        // Share modal
-        function showShareModal() {
-            document.getElementById('shareModal').classList.add('active');
-        }
-        
-        function closeShareModal() {
-            document.getElementById('shareModal').classList.remove('active');
-        }
-        
-        function copyShareLink() {
-            const shareLink = document.getElementById('shareLink');
-            shareLink.select();
-            document.execCommand('copy');
-            showToast('Link berhasil disalin!');
-        }
-        
-        // Bookmark
-        function toggleBookmark() {
-            const button = document.getElementById('bookmarkBtn');
-            const icon = button.querySelector('i');
-            
-            if (icon.classList.contains('far')) {
-                icon.classList.remove('far');
-                icon.classList.add('fas');
-                button.classList.remove('bg-amber-500');
-                button.classList.add('bg-amber-600');
-                showToast('Dataset ditambahkan ke bookmark');
+
+        })();
+    </script>
+
+    <script>
+        (function updateAuthArea(){
+            const auth = document.getElementById('authArea');
+            const display = localStorage.getItem('pd_display');
+            if (!auth) return;
+            if (display) {
+                auth.innerHTML = `<div class="flex items-center space-x-3"><div class="text-sm font-bold text-black">${display}</div><a href="dashboard.html" class="ml-3 bg-blue-900 text-white px-3 py-1 rounded-full text-xs">Dashboard</a></div>`;
             } else {
-                icon.classList.remove('fas');
-                icon.classList.add('far');
-                button.classList.remove('bg-amber-600');
-                button.classList.add('bg-amber-500');
-                showToast('Dataset dihapus dari bookmark');
+                auth.innerHTML = `<a href="login.html" class="bg-blue-900 text-white px-5 py-2 rounded-full text-xs font-bold hover:bg-amber-500 transition shadow-lg shadow-blue-900/20">Login</a>`;
             }
-        }
-        
-        // Copy dataset ID
-        function copyDatasetId() {
-            navigator.clipboard.writeText(dataset.id);
-            showToast('ID dataset berhasil disalin!');
-        }
-        
-        // Export functions
-        function exportPreview() {
-            showToast('Mengekspor preview data...');
-        }
-        
-        function exportAnalysis(format) {
-            showToast(`Mengekspor analisis format ${format}...`);
-        }
-        
-        // Report dataset
-        function reportDataset() {
-            if (confirm('Laporkan masalah pada dataset ini?')) {
-                showToast('Laporan telah dikirim. Terima kasih atas masukan Anda!');
-            }
-        }
-        
-        // Toast notification
-        function showToast(message) {
-            // Create toast element
-            const toast = document.createElement('div');
-            toast.className = 'fixed bottom-4 right-4 bg-green-600 text-white px-4 py-3 rounded-lg shadow-lg z-50 transform translate-y-full opacity-0 transition-all duration-300';
-            toast.innerHTML = `
-                <div class="flex items-center">
-                    <i class="fas fa-check-circle mr-2"></i>
-                    <span>${message}</span>
-                </div>
-            `;
-            
-            document.body.appendChild(toast);
-            
-            // Show toast
-            setTimeout(() => {
-                toast.classList.remove('translate-y-full', 'opacity-0');
-                toast.classList.add('translate-y-0', 'opacity-100');
-            }, 10);
-            
-            // Hide toast after 3 seconds
-            setTimeout(() => {
-                toast.classList.remove('translate-y-0', 'opacity-100');
-                toast.classList.add('translate-y-full', 'opacity-0');
-                
-                // Remove from DOM after transition
-                setTimeout(() => {
-                    document.body.removeChild(toast);
-                }, 300);
-            }, 3000);
-        }
-        
-        // Mobile menu toggle
-        document.getElementById('mobileMenuBtn').addEventListener('click', function() {
-            document.getElementById('mobileSidebar').classList.add('open');
-            document.getElementById('overlay').classList.add('active');
-        });
-        
-        document.getElementById('closeMobileMenu').addEventListener('click', function() {
-            document.getElementById('mobileSidebar').classList.remove('open');
-            document.getElementById('overlay').classList.remove('active');
-        });
-        
-        document.getElementById('overlay').addEventListener('click', function() {
-            document.getElementById('mobileSidebar').classList.remove('open');
-            this.classList.remove('active');
-        });
-        
-        // User dropdown
-        document.getElementById('userDropdownBtn').addEventListener('click', function(e) {
-            e.stopPropagation();
-            const dropdown = document.getElementById('userDropdown');
-            dropdown.classList.toggle('hidden');
-        });
-        
-        // Close dropdown when clicking outside
-        document.addEventListener('click', function() {
-            document.getElementById('userDropdown').classList.add('hidden');
-        });
-        
-        // Prevent dropdown from closing when clicking inside
-        document.getElementById('userDropdown').addEventListener('click', function(e) {
-            e.stopPropagation();
-        });
-        
-        // Logout function
-        function logout() {
-            if (confirm('Apakah Anda yakin ingin keluar?')) {
-                localStorage.removeItem('pd_username');
-                localStorage.removeItem('pd_display');
-                localStorage.removeItem('pd_role');
-                window.location.href = 'login.html';
-            }
-        }
-        
-        // Initialize on page load
-        document.addEventListener('DOMContentLoaded', initDashboard);
+        })();
     </script>
 </body>
 </html>

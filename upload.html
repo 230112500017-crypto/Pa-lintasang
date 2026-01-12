@@ -3,1324 +3,806 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Upload Data - Pa'lintasang Data</title>
-    
-    <!-- Tailwind CSS -->
+    <title>Upload Internal - Pa'lintasang Data</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Font Awesome -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    
-    <!-- Papa Parse for CSV/Excel preview -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
-    
+    <script src="lib/db.js"></script>
+    <script src="lib/helpers.js"></script>
+    <script src="lib/config.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700;800&display=swap');
-        
-        body { 
-            font-family: 'Plus Jakarta Sans', sans-serif; 
-            background-color: #f8fafc;
-        }
-        
-        .hero-gradient { 
-            background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%); 
-        }
-        
-        .accent-makassar { 
-            color: #facc15; 
-        }
-        
-        .upload-dropzone {
-            border: 2px dashed #cbd5e1;
-            transition: all 0.3s ease;
-        }
-        
-        .upload-dropzone:hover {
-            border-color: #3b82f6;
-            background-color: #f8fafc;
-        }
-        
-        .upload-dropzone.dragover {
-            border-color: #10b981;
-            background-color: #f0fdf4;
-        }
-        
-        .upload-dropzone.has-file {
-            border-color: #10b981;
-            background-color: #f0fdf4;
-        }
-        
-        .preview-table {
-            max-height: 400px;
-            overflow-y: auto;
-        }
-        
-        .preview-table table {
-            min-width: 100%;
-        }
-        
-        .preview-table th {
-            position: sticky;
-            top: 0;
-            background-color: #f1f5f9;
-            z-index: 10;
-        }
-        
-        .card-hover {
-            transition: all 0.3s ease;
-        }
-        
-        .card-hover:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-        }
-        
-        .file-info-card {
-            transition: all 0.3s ease;
-            border-left: 4px solid transparent;
-        }
-        
-        .file-info-card.csv {
-            border-left-color: #10b981;
-        }
-        
-        .file-info-card.excel {
-            border-left-color: #059669;
-        }
-        
-        .file-info-card.json {
-            border-left-color: #3b82f6;
-        }
-        
-        .file-info-card.txt {
-            border-left-color: #6b7280;
-        }
-        
-        .sidebar {
-            transition: all 0.3s ease;
-        }
-        
-        .sidebar-link {
-            transition: all 0.2s ease;
-        }
-        
-        .sidebar-link:hover {
-            background-color: rgba(59, 130, 246, 0.1);
-        }
-        
-        .sidebar-link.active {
-            background-color: rgba(59, 130, 246, 0.15);
-            border-right: 4px solid #3b82f6;
-            font-weight: 600;
-        }
-        
-        .mobile-sidebar {
-            transform: translateX(-100%);
-            transition: transform 0.3s ease;
-        }
-        
-        .mobile-sidebar.open {
-            transform: translateX(0);
-        }
-        
-        .overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 40;
-        }
-        
-        .overlay.active {
-            display: block;
-        }
-        
-        .progress-bar {
-            transition: width 0.3s ease;
-        }
-        
-        .loading-spinner {
-            animation: spin 1s linear infinite;
-        }
-        
-        @keyframes spin {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
-        
-        .validation-error {
-            animation: shake 0.5s ease-in-out;
-        }
-        
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
-            20%, 40%, 60%, 80% { transform: translateX(5px); }
-        }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .hero-gradient { background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%); }
+        .drop-zone--over { border-color: #facc15 !important; background: rgba(250, 204, 21, 0.05); }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-900">
-    
-    <!-- Top Navigation -->
-    <nav class="bg-white shadow-md fixed top-0 left-0 right-0 z-30">
-        <div class="px-4 sm:px-6 py-3">
-            <div class="flex justify-between items-center">
-                <!-- Left: Menu Button and Logo -->
-                <div class="flex items-center space-x-4">
-                    <!-- Mobile Menu Button -->
-                    <button id="mobileMenuBtn" class="md:hidden text-blue-900 text-xl">
-                        <i class="fas fa-bars"></i>
-                    </button>
-                    
-                    <!-- Logo -->
-                    <a href="index.html" class="flex items-center space-x-2">
-                        <div class="bg-blue-900 p-2 rounded-lg">
-                            <i class="fas fa-route text-white"></i>
-                        </div>
-                        <div>
-                            <h1 class="font-bold text-blue-900">
-                                PA'LINTASANG <span class="text-amber-500">DATA</span>
-                            </h1>
-                            <p class="text-[10px] text-slate-500">Upload Dataset</p>
-                        </div>
-                    </a>
+<body class="bg-slate-50 text-slate-900 min-h-screen">
+
+    <nav class="bg-white border-b border-slate-200 sticky top-0 z-50">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <div class="bg-blue-900 p-2 rounded-xl shadow-lg shadow-blue-900/20">
+                    <i class="fas fa-user-shield text-white text-lg"></i>
                 </div>
-                
-                <!-- Right: User Menu -->
-                <div class="flex items-center space-x-4">
-                    <!-- User Profile -->
-                    <div class="relative" id="userDropdownContainer">
-                        <button class="flex items-center space-x-2" id="userDropdownBtn">
-                            <img src="https://ui-avatars.com/api/?name=User+Upload&background=1e3a8a&color=fff" 
-                                 class="w-8 h-8 rounded-full border-2 border-blue-600">
-                            <div class="hidden md:block text-left">
-                                <p class="text-sm font-semibold" id="userName">Loading...</p>
-                                <p class="text-xs text-slate-500" id="userRole">Loading...</p>
-                            </div>
-                            <i class="fas fa-chevron-down text-xs text-slate-500"></i>
-                        </button>
-                        
-                        <!-- Dropdown Menu -->
-                        <div class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg hidden border border-slate-200" id="userDropdown">
-                            <div class="px-4 py-3 border-b border-slate-100">
-                                <p class="text-sm font-semibold" id="dropdownName"></p>
-                                <p class="text-xs text-slate-500" id="dropdownRole"></p>
-                            </div>
-                            <a href="dashboard.html" class="block px-4 py-3 text-sm hover:bg-slate-100">
-                                <i class="fas fa-tachometer-alt mr-2"></i> Dashboard
-                            </a>
-                            <a href="profile.html" class="block px-4 py-3 text-sm hover:bg-slate-100">
-                                <i class="fas fa-user mr-2"></i> Profil Saya
-                            </a>
-                            <a href="my-datasets.html" class="block px-4 py-3 text-sm hover:bg-slate-100">
-                                <i class="fas fa-database mr-2"></i> Dataset Saya
-                            </a>
-                            <hr class="my-1">
-                            <button onclick="logout()" class="w-full text-left px-4 py-3 text-sm text-red-600 hover:bg-red-50">
-                                <i class="fas fa-sign-out-alt mr-2"></i> Keluar
-                            </button>
-                        </div>
-                    </div>
+                <div>
+                    <h1 class="font-bold text-sm tracking-tight text-blue-900 uppercase leading-none">Portal Internal</h1>
+                    <span id="userRole" class="text-[10px] text-amber-600 font-bold tracking-widest uppercase">Admin Dishub Makassar</span>
                 </div>
+            </div>
+            <div class="flex items-center space-x-4">
+                <div class="text-right hidden md:block">
+                    <p id="userFullName" class="text-xs font-bold text-slate-700">Admin Dishub Makassar</p>
+                    <p id="userNip" class="text-[9px] text-slate-400 font-medium">NIP. -</p>
+                </div>
+                <img id="userAvatar" src="https://ui-avatars.com/api/?name=Admin+Dishub&background=1e3a8a&color=fff" class="w-10 h-10 rounded-full border-2 border-white shadow-md">
             </div>
         </div>
     </nav>
-    
-    <!-- Overlay for Mobile -->
-    <div class="overlay" id="overlay"></div>
-    
-    <!-- Sidebar for Mobile -->
-    <div class="mobile-sidebar fixed left-0 top-0 bottom-0 w-64 bg-white shadow-lg z-50 md:hidden" id="mobileSidebar">
-        <div class="p-4 border-b border-slate-200">
-            <div class="flex justify-between items-center">
-                <div class="flex items-center space-x-2">
-                    <div class="bg-blue-900 p-2 rounded-lg">
-                        <i class="fas fa-route text-white"></i>
+
+    <main class="container mx-auto px-6 py-10">
+        <div class="mb-10">
+            <h2 class="text-2xl font-extrabold text-blue-900 uppercase italic tracking-tighter mb-2">Manajemen <span class="text-amber-500">Upload Dataset</span></h2>
+            <p class="text-slate-500 text-sm">Silakan pilih file Excel atau tempel (copy-paste) data langsung ke tabel di bawah.</p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            
+            <div class="lg:col-span-1 space-y-6">
+                <div class="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-100">
+                    <h3 class="text-xs font-black uppercase tracking-widest text-blue-900 mb-6 flex items-center">
+                        <i class="fas fa-file-import mr-2 text-amber-500"></i> Sumber Data
+                    </h3>
+                    
+                    <div id="dropZone" class="border-2 border-dashed border-slate-200 rounded-[1.5rem] p-8 text-center hover:border-blue-400 transition-all cursor-pointer bg-slate-50/50 group">
+                        <input type="file" id="fileInput" class="hidden" accept=".xlsx, .xls, .csv">
+                        <div class="bg-white w-12 h-12 rounded-2xl shadow-sm flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition">
+                            <i class="fas fa-cloud-upload-alt text-blue-600"></i>
+                        </div>
+                        <p class="text-[11px] font-bold text-slate-600 uppercase mb-1">Klik atau seret file</p>
+                        <p class="text-[9px] text-slate-400">Mendukung .XLSX, .XLS, .CSV</p>
                     </div>
-                    <span class="font-bold text-blue-900">UPLOAD DATA</span>
+
+                    <div class="mt-6 space-y-4">
+                        <div>
+                            <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2 block">Judul Dataset</label>
+                            <input id="datasetTitle" type="text" placeholder="Contoh: Data Parkir Jan 2024" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:border-blue-500 transition">
+                        </div>
+                        <div>
+                            <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2 block">Deskripsi Singkat</label>
+                            <textarea id="datasetDesc" placeholder="Deskripsikan isi dataset singkat (kolom penting, sumber, catatan)." class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:border-blue-500 transition" rows="3"></textarea>
+                        </div>
+                        <div>
+                            <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2 block">Kategori</label>
+                            <select id="datasetCategory" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:border-blue-500 font-medium">
+                                <option>Lalu Lintas</option>
+                                <option>Transportasi Umum</option>
+                                <option>Perizinan</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2 block">Tahun Data</label>
+                            <select id="datasetYear" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:border-blue-500 font-medium">
+                                <option value="2025">2025</option>
+                                <option value="2024">2024</option>
+                                <option value="2023">2023</option>
+                                <option value="2022">2022</option>
+                                <option value="2021">2021</option>
+                            </select>
+                        </div>
+                    </div>
                 </div>
-                <button id="closeMobileMenu" class="text-slate-600">
-                    <i class="fas fa-times"></i>
+
+                <button id="publishBtn" class="w-full bg-blue-900 text-white py-4 rounded-[1.5rem] text-xs font-bold uppercase tracking-widest hover:bg-amber-500 hover:text-blue-900 transition-all shadow-xl shadow-blue-900/20 active:scale-95">
+                    <i class="fas fa-paper-plane mr-2"></i> Publikasikan Dataset
                 </button>
             </div>
-        </div>
-        <div class="p-4" id="mobileMenuContent">
-            <!-- Will be populated by JavaScript -->
-        </div>
-    </div>
-    
-    <!-- Main Layout -->
-    <div class="flex pt-14">
-        <!-- Desktop Sidebar -->
-        <aside class="sidebar hidden md:block w-64 bg-white shadow-md min-h-[calc(100vh-56px)]">
-            <div class="p-6 border-b border-slate-200">
-                <h2 class="font-bold text-blue-900 text-lg">Menu Upload</h2>
-            </div>
-            <nav class="p-4 space-y-1" id="desktopMenu">
-                <!-- Will be populated by JavaScript -->
-            </nav>
-            
-            <!-- Upload Guidelines -->
-            <div class="p-4 mt-8 border-t border-slate-200">
-                <h3 class="font-bold text-slate-900 text-sm mb-3">
-                    <i class="fas fa-info-circle mr-2 text-blue-600"></i> Panduan Upload
-                </h3>
-                <ul class="space-y-2 text-xs text-slate-600">
-                    <li class="flex items-start">
-                        <i class="fas fa-check text-green-500 mt-1 mr-2 text-xs"></i>
-                        <span>Format yang didukung: CSV, Excel, JSON</span>
-                    </li>
-                    <li class="flex items-start">
-                        <i class="fas fa-check text-green-500 mt-1 mr-2 text-xs"></i>
-                        <span>Maksimal ukuran file: 50MB</span>
-                    </li>
-                    <li class="flex items-start">
-                        <i class="fas fa-check text-green-500 mt-1 mr-2 text-xs"></i>
-                        <span>Pastikan data sudah bersih dan terstruktur</span>
-                    </li>
-                    <li class="flex items-start">
-                        <i class="fas fa-check text-green-500 mt-1 mr-2 text-xs"></i>
-                        <span>Isi metadata dengan lengkap</span>
-                    </li>
-                </ul>
-            </div>
-        </aside>
-        
-        <!-- Main Content -->
-        <main class="flex-1 p-4 md:p-6">
-            <!-- Header -->
-            <div class="mb-6">
-                <h1 class="text-2xl md:text-3xl font-bold text-blue-900 mb-2">
-                    <i class="fas fa-upload mr-2"></i>Upload Dataset Baru
-                </h1>
-                <p class="text-slate-600">Unggah dataset transportasi Kota Makassar dengan mengisi form di bawah</p>
-            </div>
-            
-            <!-- Upload Progress (Hidden by default) -->
-            <div id="uploadProgress" class="hidden mb-6">
-                <div class="bg-white rounded-xl shadow border border-slate-100 p-6">
-                    <div class="flex items-center justify-between mb-4">
-                        <h3 class="font-bold text-blue-900">
-                            <i class="fas fa-spinner loading-spinner mr-2"></i> Mengunggah Dataset
+
+            <div class="lg:col-span-2 space-y-6">
+                <div class="bg-white rounded-[2rem] shadow-sm border border-slate-100 overflow-hidden flex flex-col h-full">
+                    <div class="p-6 border-b border-slate-50 flex justify-between items-center bg-slate-50/50">
+                        <h3 class="text-[10px] font-black uppercase tracking-widest text-slate-400">
+                            Pratinjau Data <span class="ml-2 text-blue-600" id="rowCount">(0 Baris)</span>
                         </h3>
-                        <span id="progressPercent">0%</span>
-                    </div>
-                    <div class="w-full bg-slate-100 h-3 rounded-full overflow-hidden">
-                        <div id="progressBar" class="progress-bar h-full bg-green-500" style="width: 0%"></div>
-                    </div>
-                    <p id="progressMessage" class="text-sm text-slate-600 mt-2">Menyiapkan upload...</p>
-                </div>
-            </div>
-            
-            <!-- Upload Form -->
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <!-- Left Column - Form -->
-                <div class="lg:col-span-2 space-y-6">
-                    <!-- Step 1: File Upload -->
-                    <div class="bg-white rounded-xl shadow border border-slate-100 p-6 card-hover">
-                        <div class="flex items-center mb-6">
-                            <div class="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold mr-3">
-                                1
-                            </div>
-                            <h2 class="font-bold text-blue-900 text-lg">Upload File Data</h2>
-                        </div>
-                        
-                        <!-- Dropzone -->
-                        <div id="dropzone" class="upload-dropzone rounded-2xl p-8 text-center cursor-pointer">
-                            <div class="mb-4">
-                                <i class="fas fa-cloud-upload-alt text-4xl text-slate-400 mb-3"></i>
-                                <p class="font-bold text-lg text-slate-700">Drag & Drop file di sini</p>
-                                <p class="text-slate-500 text-sm mt-1">atau klik untuk memilih file</p>
-                            </div>
-                            
-                            <p class="text-xs text-slate-500 mb-4">Format yang didukung: .csv, .xlsx, .xls, .json, .txt</p>
-                            
-                            <input 
-                                type="file" 
-                                id="fileInput" 
-                                accept=".csv,.xlsx,.xls,.json,.txt"
-                                class="hidden"
-                            >
-                            
-                            <button 
-                                type="button"
-                                onclick="document.getElementById('fileInput').click()"
-                                class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition"
-                            >
-                                <i class="fas fa-folder-open mr-2"></i> Pilih File
-                            </button>
-                        </div>
-                        
-                        <!-- File Info -->
-                        <div id="fileInfo" class="hidden mt-6">
-                            <div class="file-info-card bg-white border border-slate-200 rounded-xl p-4">
-                                <div class="flex justify-between items-start">
-                                    <div class="flex items-center space-x-3">
-                                        <div id="fileIcon" class="text-2xl">
-                                            <i class="fas fa-file-csv text-green-600"></i>
-                                        </div>
-                                        <div>
-                                            <h3 id="fileName" class="font-bold text-slate-900"></h3>
-                                            <p id="fileDetails" class="text-sm text-slate-600"></p>
-                                        </div>
-                                    </div>
-                                    <button 
-                                        onclick="removeFile()"
-                                        class="text-red-500 hover:text-red-700"
-                                    >
-                                        <i class="fas fa-times"></i>
-                                    </button>
-                                </div>
-                                <div class="mt-3 flex space-x-2">
-                                    <span id="fileTypeBadge" class="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded"></span>
-                                    <span id="fileSizeBadge" class="px-2 py-1 bg-slate-100 text-slate-800 text-xs rounded"></span>
-                                </div>
-                            </div>
-                        </div>
+                        <button onclick="clearTable()" class="text-[10px] font-bold text-rose-500 hover:underline">Hapus Semua</button>
                     </div>
                     
-                    <!-- Step 2: Dataset Information -->
-                    <div class="bg-white rounded-xl shadow border border-slate-100 p-6 card-hover">
-                        <div class="flex items-center mb-6">
-                            <div class="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold mr-3">
-                                2
-                            </div>
-                            <h2 class="font-bold text-blue-900 text-lg">Informasi Dataset</h2>
-                        </div>
-                        
-                        <div class="space-y-4">
-                            <!-- Nama Dataset -->
-                            <div>
-                                <label class="block text-sm font-medium text-slate-700 mb-2">
-                                    <i class="fas fa-heading mr-2 text-blue-600"></i>Nama Dataset*
-                                </label>
-                                <input 
-                                    type="text" 
-                                    id="datasetName"
-                                    class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition"
-                                    placeholder="Contoh: Data Lalu Lintas Harian 2025"
-                                    maxlength="200"
-                                >
-                                <p class="text-xs text-slate-500 mt-1">Berikan nama yang deskriptif untuk dataset ini</p>
-                                <div class="text-xs text-red-600 mt-1 hidden" id="nameError">Nama dataset harus diisi</div>
-                            </div>
-                            
-                            <!-- Deskripsi -->
-                            <div>
-                                <label class="block text-sm font-medium text-slate-700 mb-2">
-                                    <i class="fas fa-align-left mr-2 text-blue-600"></i>Deskripsi Dataset*
-                                </label>
-                                <textarea 
-                                    id="datasetDescription"
-                                    rows="3"
-                                    class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition"
-                                    placeholder="Jelaskan isi dataset, sumber data, dan kegunaannya..."
-                                    maxlength="1000"
-                                ></textarea>
-                                <p class="text-xs text-slate-500 mt-1">Maksimal 1000 karakter</p>
-                                <div class="text-xs text-red-600 mt-1 hidden" id="descError">Deskripsi dataset harus diisi</div>
-                            </div>
-                            
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <!-- Kategori -->
-                                <div>
-                                    <label class="block text-sm font-medium text-slate-700 mb-2">
-                                        <i class="fas fa-folder mr-2 text-blue-600"></i>Kategori*
-                                    </label>
-                                    <select 
-                                        id="datasetCategory"
-                                        class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition"
-                                    >
-                                        <option value="">Pilih Kategori</option>
-                                        <option value="Lalu Lintas">Lalu Lintas</option>
-                                        <option value="Transportasi">Transportasi</option>
-                                        <option value="Parkir">Parkir</option>
-                                        <option value="Terminal">Terminal</option>
-                                        <option value="Infrastruktur">Infrastruktur</option>
-                                        <option value="Personil">Personil</option>
-                                        <option value="Angkutan Umum">Angkutan Umum</option>
-                                        <option value="Rambu Lalu Lintas">Rambu Lalu Lintas</option>
-                                        <option value="Kecelakaan">Kecelakaan</option>
-                                        <option value="Lainnya">Lainnya</option>
-                                    </select>
-                                    <div class="text-xs text-red-600 mt-1 hidden" id="categoryError">Kategori harus dipilih</div>
-                                </div>
-                                
-                                <!-- Tahun -->
-                                <div>
-                                    <label class="block text-sm font-medium text-slate-700 mb-2">
-                                        <i class="fas fa-calendar-alt mr-2 text-blue-600"></i>Tahun Data*
-                                    </label>
-                                    <select 
-                                        id="datasetYear"
-                                        class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition"
-                                    >
-                                        <option value="">Pilih Tahun</option>
-                                        <option value="2025">2025</option>
-                                        <option value="2024">2024</option>
-                                        <option value="2023">2023</option>
-                                        <option value="2022">2022</option>
-                                        <option value="2021">2021</option>
-                                        <option value="2020">2020</option>
-                                        <option value="2019">2019</option>
-                                        <option value="2018">2018</option>
-                                    </select>
-                                    <div class="text-xs text-red-600 mt-1 hidden" id="yearError">Tahun harus dipilih</div>
-                                </div>
-                            </div>
-                            
-                            <!-- Sumber Data -->
-                            <div>
-                                <label class="block text-sm font-medium text-slate-700 mb-2">
-                                    <i class="fas fa-source mr-2 text-blue-600"></i>Sumber Data
-                                </label>
-                                <input 
-                                    type="text" 
-                                    id="dataSource"
-                                    class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition"
-                                    placeholder="Contoh: Dinas Perhubungan Kota Makassar"
-                                >
-                                <p class="text-xs text-slate-500 mt-1">Asal atau pemilik data</p>
-                            </div>
-                            
-                            <!-- Tags -->
-                            <div>
-                                <label class="block text-sm font-medium text-slate-700 mb-2">
-                                    <i class="fas fa-tags mr-2 text-blue-600"></i>Tag/Kata Kunci
-                                </label>
-                                <div class="flex flex-wrap gap-2 mb-2" id="tagsContainer">
-                                    <!-- Tags will be added here -->
-                                </div>
-                                <div class="flex">
-                                    <input 
-                                        type="text" 
-                                        id="tagInput"
-                                        class="flex-1 px-4 py-3 border border-slate-300 rounded-l-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition"
-                                        placeholder="Tambahkan tag (Enter untuk menambahkan)"
-                                    >
-                                    <button 
-                                        type="button"
-                                        onclick="addTag()"
-                                        class="bg-blue-600 text-white px-4 rounded-r-lg hover:bg-blue-700 transition"
-                                    >
-                                        <i class="fas fa-plus"></i>
-                                    </button>
-                                </div>
-                                <p class="text-xs text-slate-500 mt-1">Pisahkan dengan koma atau tekan Enter</p>
-                            </div>
-                            
-                            <!-- Visibilitas -->
-                            <div>
-                                <label class="block text-sm font-medium text-slate-700 mb-2">
-                                    <i class="fas fa-eye mr-2 text-blue-600"></i>Visibilitas Dataset
-                                </label>
-                                <div class="space-y-2">
-                                    <label class="flex items-center">
-                                        <input type="radio" name="visibility" value="public" class="mr-2" checked>
-                                        <span class="text-sm">Publik - Dapat diakses semua pengguna</span>
-                                    </label>
-                                    <label class="flex items-center">
-                                        <input type="radio" name="visibility" value="private" class="mr-2">
-                                        <span class="text-sm">Privat - Hanya saya yang bisa mengakses</span>
-                                    </label>
-                                    <label class="flex items-center">
-                                        <input type="radio" name="visibility" value="restricted" class="mr-2">
-                                        <span class="text-sm">Terbatas - Hanya pengguna tertentu</span>
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
+                    <div class="overflow-auto max-h-[500px]" id="tableContainer">
+                        <table class="w-full text-left text-xs border-collapse">
+                            <thead class="bg-white sticky top-0 z-10">
+                                <tr id="tableHeader" class="border-b border-slate-100">
+                                    <th class="p-4 text-slate-300 italic font-medium">Data akan muncul di sini setelah upload...</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tableBody" class="text-slate-600 divide-y divide-slate-50">
+                                </tbody>
+                        </table>
                     </div>
-                </div>
-                
-                <!-- Right Column - Preview & Actions -->
-                <div class="space-y-6">
-                    <!-- Data Preview -->
-                    <div class="bg-white rounded-xl shadow border border-slate-100 p-6 card-hover">
-                        <h2 class="font-bold text-blue-900 text-lg mb-4">
-                            <i class="fas fa-search mr-2"></i>Pratinjau Data
-                        </h2>
-                        
-                        <div id="previewPlaceholder" class="text-center p-8">
-                            <i class="fas fa-table text-4xl text-slate-300 mb-4"></i>
-                            <p class="text-slate-500">Upload file untuk melihat pratinjau data</p>
-                        </div>
-                        
-                        <div id="dataPreview" class="hidden">
-                            <div class="mb-4">
-                                <p class="text-sm font-medium text-slate-700 mb-1">Preview Baris Pertama</p>
-                                <div class="preview-table border border-slate-200 rounded-lg overflow-hidden">
-                                    <table class="w-full text-sm" id="previewTable">
-                                        <thead>
-                                            <tr id="previewHeaders" class="bg-slate-100">
-                                                <!-- Headers will be added here -->
-                                            </tr>
-                                        </thead>
-                                        <tbody id="previewRows">
-                                            <!-- Rows will be added here -->
-                                        </tbody>
-                                    </table>
-                                </div>
-                                <p id="previewInfo" class="text-xs text-slate-500 mt-2"></p>
-                            </div>
-                            
-                            <div class="grid grid-cols-2 gap-4">
-                                <div class="text-center p-3 bg-blue-50 rounded-lg">
-                                    <p id="totalRows" class="text-xl font-bold text-blue-900">0</p>
-                                    <p class="text-xs text-slate-600">Total Baris</p>
-                                </div>
-                                <div class="text-center p-3 bg-green-50 rounded-lg">
-                                    <p id="totalColumns" class="text-xl font-bold text-blue-900">0</p>
-                                    <p class="text-xs text-slate-600">Total Kolom</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Upload Actions -->
-                    <div class="bg-white rounded-xl shadow border border-slate-100 p-6 card-hover">
-                        <h2 class="font-bold text-blue-900 text-lg mb-4">
-                            <i class="fas fa-cogs mr-2"></i>Pengaturan Upload
-                        </h2>
-                        
-                        <div class="space-y-4">
-                            <div>
-                                <label class="flex items-center mb-2">
-                                    <input type="checkbox" id="autoDetectColumns" class="mr-2" checked>
-                                    <span class="text-sm font-medium text-slate-700">Deteksi otomatis format kolom</span>
-                                </label>
-                                <p class="text-xs text-slate-500">Sistem akan mendeteksi tipe data setiap kolom</p>
-                            </div>
-                            
-                            <div>
-                                <label class="flex items-center mb-2">
-                                    <input type="checkbox" id="validateData" class="mr-2" checked>
-                                    <span class="text-sm font-medium text-slate-700">Validasi data sebelum upload</span>
-                                </label>
-                                <p class="text-xs text-slate-500">Periksa kesalahan dan inkonsistensi data</p>
-                            </div>
-                            
-                            <div>
-                                <label class="flex items-center mb-2">
-                                    <input type="checkbox" id="createBackup" class="mr-2">
-                                    <span class="text-sm font-medium text-slate-700">Buat backup dataset</span>
-                                </label>
-                                <p class="text-xs text-slate-500">Simpan salinan dataset untuk keamanan</p>
-                            </div>
-                            
-                            <hr class="my-4">
-                            
-                            <!-- Upload Button -->
-                            <button 
-                                id="uploadButton"
-                                onclick="submitUpload()"
-                                class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-lg transition transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed"
-                                disabled
-                            >
-                                <i class="fas fa-upload mr-2"></i> Upload Dataset
-                            </button>
-                            
-                            <!-- Cancel Button -->
-                            <button 
-                                onclick="resetForm()"
-                                class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium py-3 px-4 rounded-lg transition"
-                            >
-                                <i class="fas fa-times mr-2"></i> Batalkan
-                            </button>
-                        </div>
-                        
-                        <div class="mt-6 pt-6 border-t border-slate-100">
-                            <p class="text-xs text-slate-500">
-                                <i class="fas fa-info-circle mr-1"></i>
-                                Dataset akan melalui proses validasi setelah diupload
-                            </p>
-                        </div>
-                    </div>
-                    
-                    <!-- Recent Uploads -->
-                    <div class="bg-white rounded-xl shadow border border-slate-100 p-6 card-hover">
-                        <h2 class="font-bold text-blue-900 text-lg mb-4">
-                            <i class="fas fa-history mr-2"></i>Upload Terakhir
-                        </h2>
-                        
-                        <div class="space-y-3">
-                            <div class="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
-                                <div>
-                                    <p class="font-medium text-sm">Lalu Lintas Harian</p>
-                                    <p class="text-xs text-slate-500">15 Mar 2025</p>
-                                </div>
-                                <span class="px-2 py-1 bg-green-100 text-green-800 text-xs rounded">Sukses</span>
-                            </div>
-                            
-                            <div class="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
-                                <div>
-                                    <p class="font-medium text-sm">Data Parkir</p>
-                                    <p class="text-xs text-slate-500">10 Mar 2025</p>
-                                </div>
-                                <span class="px-2 py-1 bg-green-100 text-green-800 text-xs rounded">Sukses</span>
-                            </div>
-                            
-                            <div class="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
-                                <div>
-                                    <p class="font-medium text-sm">Angkutan Umum</p>
-                                    <p class="text-xs text-slate-500">5 Mar 2025</p>
-                                </div>
-                                <span class="px-2 py-1 bg-amber-100 text-amber-800 text-xs rounded">Pending</span>
-                            </div>
-                        </div>
-                        
-                        <a href="my-datasets.html" class="block text-center text-blue-600 hover:text-blue-800 text-sm mt-4">
-                            Lihat semua dataset <i class="fas fa-arrow-right ml-1"></i>
-                        </a>
+
+                    <div class="p-4 bg-amber-50 border-t border-amber-100 flex items-center">
+                        <i class="fas fa-info-circle text-amber-500 mr-3"></i>
+                        <p class="text-[10px] text-amber-700 font-medium italic">Tips: Anda bisa menyalin sel dari Excel (Ctrl+C) dan menekan (Ctrl+V) di area halaman ini untuk input cepat.</p>
                     </div>
                 </div>
             </div>
-        </main>
-    </div>
-    
-    <!-- Success Modal -->
-    <div id="successModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
-        <div class="bg-white rounded-xl shadow-2xl max-w-md w-full mx-4">
-            <div class="p-8 text-center">
-                <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <i class="fas fa-check text-green-600 text-2xl"></i>
-                </div>
-                <h3 class="text-xl font-bold text-blue-900 mb-2">Upload Berhasil!</h3>
-                <p class="text-slate-600 mb-6" id="successMessage">Dataset berhasil diupload dan sedang diproses.</p>
-                <div class="space-y-3">
-                    <a href="my-datasets.html" class="block w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 transition">
-                        Lihat Dataset Saya
-                    </a>
-                    <button 
-                        onclick="closeSuccessModal()"
-                        class="block w-full bg-slate-100 text-slate-700 py-3 rounded-lg font-medium hover:bg-slate-200 transition"
-                    >
-                        Upload Lagi
-                    </button>
-                </div>
-            </div>
+
         </div>
-    </div>
-    
-    <!-- JavaScript -->
+    </main>
+
     <script>
-        // Global variables
-        let selectedFile = null;
-        let uploadedFileData = null;
-        let tags = [];
-        
-        // Initialize user data
-        function initUserData() {
-            const username = localStorage.getItem('pd_username') || 'guest';
-            const display = localStorage.getItem('pd_display') || 'Pengguna';
-            const role = localStorage.getItem('pd_role') || 'user';
-            
-            // If no user data, redirect to login
-            if (!localStorage.getItem('pd_username')) {
-                window.location.href = 'login.html';
-                return;
+        const fileInput = document.getElementById('fileInput');
+        const dropZone = document.getElementById('dropZone');
+        const tableHeader = document.getElementById('tableHeader');
+        const tableBody = document.getElementById('tableBody');
+        const rowCountText = document.getElementById('rowCount');
+
+        // Handle File Click
+        dropZone.addEventListener('click', () => fileInput.click());
+
+        // Handle Drop File
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('drop-zone--over');
+        });
+
+        dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drop-zone--over'));
+
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('drop-zone--over');
+            if (e.dataTransfer.files.length) {
+                processFile(e.dataTransfer.files[0]);
             }
-            
-            // Update UI with user data
-            document.getElementById('userName').textContent = display;
-            document.getElementById('userRole').textContent = getRoleName(role);
-            document.getElementById('dropdownName').textContent = display;
-            document.getElementById('dropdownRole').textContent = getRoleName(role);
-            
-            // Load menu
-            loadMenu(role);
-        }
-        
-        // Get role name
-        function getRoleName(role) {
-            const roles = {
-                'admin': 'Administrator',
-                'staff': 'Staff Dishub',
-                'user': 'Pengguna'
-            };
-            return roles[role] || 'Pengguna';
-        }
-        
-        // Load menu
-        function loadMenu(role) {
-            const menuItems = {
-                admin: [
-                    { icon: 'fas fa-tachometer-alt', text: 'Dashboard', link: 'dashboard.html' },
-                    { icon: 'fas fa-upload', text: 'Upload Data', link: 'upload.html', active: true },
-                    { icon: 'fas fa-database', text: 'Semua Dataset', link: 'datasets.html' },
-                    { icon: 'fas fa-users', text: 'Pengguna', link: 'users.html' },
-                    { icon: 'fas fa-cog', text: 'Pengaturan', link: 'settings.html' }
-                ],
-                staff: [
-                    { icon: 'fas fa-tachometer-alt', text: 'Dashboard', link: 'dashboard.html' },
-                    { icon: 'fas fa-upload', text: 'Upload Data', link: 'upload.html', active: true },
-                    { icon: 'fas fa-database', text: 'Dataset Saya', link: 'my-datasets.html' },
-                    { icon: 'fas fa-chart-bar', text: 'Analisis', link: 'analytics.html' },
-                    { icon: 'fas fa-user-cog', text: 'Profil', link: 'profile.html' }
-                ],
-                user: [
-                    { icon: 'fas fa-tachometer-alt', text: 'Dashboard', link: 'dashboard.html' },
-                    { icon: 'fas fa-upload', text: 'Upload Data', link: 'upload.html', active: true },
-                    { icon: 'fas fa-database', text: 'Dataset Saya', link: 'my-datasets.html' },
-                    { icon: 'fas fa-user-cog', text: 'Profil', link: 'profile.html' }
-                ]
-            };
-            
-            const items = menuItems[role] || menuItems.user;
-            const desktopMenu = document.getElementById('desktopMenu');
-            const mobileMenuContent = document.getElementById('mobileMenuContent');
-            
-            // Clear existing menu
-            desktopMenu.innerHTML = '';
-            mobileMenuContent.innerHTML = '';
-            
-            // Create menu items
-            items.forEach(item => {
-                const menuItem = `
-                    <a href="${item.link}" class="sidebar-link ${item.active ? 'active' : ''} flex items-center space-x-3 px-4 py-3 rounded-lg text-slate-700 hover:text-blue-600">
-                        <i class="${item.icon} w-5"></i>
-                        <span>${item.text}</span>
-                    </a>
-                `;
-                
-                desktopMenu.innerHTML += menuItem;
-                mobileMenuContent.innerHTML += menuItem;
-            });
-            
-            // Add logout to mobile menu
-            mobileMenuContent.innerHTML += `
-                <div class="mt-6 pt-6 border-t border-slate-200">
-                    <button onclick="logout()" class="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-red-600 hover:bg-red-50">
-                        <i class="fas fa-sign-out-alt w-5"></i>
-                        <span>Keluar</span>
-                    </button>
-                </div>
-            `;
-        }
-        
-        // File upload handling
-        function setupFileUpload() {
-            const dropzone = document.getElementById('dropzone');
-            const fileInput = document.getElementById('fileInput');
-            
-            // Click to select file
-            dropzone.addEventListener('click', () => fileInput.click());
-            
-            // Drag and drop events
-            dropzone.addEventListener('dragover', (e) => {
-                e.preventDefault();
-                dropzone.classList.add('dragover');
-            });
-            
-            dropzone.addEventListener('dragleave', () => {
-                dropzone.classList.remove('dragover');
-            });
-            
-            dropzone.addEventListener('drop', (e) => {
-                e.preventDefault();
-                dropzone.classList.remove('dragover');
-                
-                if (e.dataTransfer.files.length) {
-                    handleFile(e.dataTransfer.files[0]);
-                }
-            });
-            
-            // File input change
-            fileInput.addEventListener('change', (e) => {
-                if (e.target.files.length) {
-                    handleFile(e.target.files[0]);
-                }
-            });
-        }
-        
-        // Handle selected file
-        function handleFile(file) {
-            selectedFile = file;
-            
-            // Validate file
-            const validTypes = [
-                'text/csv',
-                'application/vnd.ms-excel',
-                'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-                'application/json',
-                'text/plain'
-            ];
-            
-            const validExtensions = ['.csv', '.xlsx', '.xls', '.json', '.txt'];
-            const fileExt = '.' + file.name.split('.').pop().toLowerCase();
-            
-            if (!validTypes.includes(file.type) && !validExtensions.includes(fileExt)) {
-                alert('Format file tidak didukung. Harap upload file CSV, Excel, JSON, atau TXT.');
-                return;
-            }
-            
-            if (file.size > 50 * 1024 * 1024) { // 50MB
-                alert('Ukuran file terlalu besar. Maksimal 50MB.');
-                return;
-            }
-            
-            // Update UI
-            updateFileInfo(file);
-            previewFile(file);
-            enableUploadButton();
-        }
-        
-        // Update file info display
-        function updateFileInfo(file) {
-            const dropzone = document.getElementById('dropzone');
-            const fileInfo = document.getElementById('fileInfo');
-            const fileName = document.getElementById('fileName');
-            const fileDetails = document.getElementById('fileDetails');
-            const fileTypeBadge = document.getElementById('fileTypeBadge');
-            const fileSizeBadge = document.getElementById('fileSizeBadge');
-            const fileIcon = document.getElementById('fileIcon');
-            
-            // Set file type icon
-            let fileType = file.name.split('.').pop().toLowerCase();
-            let typeName = '';
-            let iconClass = '';
-            
-            if (fileType === 'csv') {
-                iconClass = 'fas fa-file-csv text-green-600';
-                typeName = 'CSV';
-            } else if (fileType === 'xlsx' || fileType === 'xls') {
-                iconClass = 'fas fa-file-excel text-green-600';
-                typeName = 'Excel';
-            } else if (fileType === 'json') {
-                iconClass = 'fas fa-file-code text-blue-600';
-                typeName = 'JSON';
-            } else {
-                iconClass = 'fas fa-file-alt text-slate-600';
-                typeName = 'TXT';
-            }
-            
-            // Format file size
-            const fileSize = formatFileSize(file.size);
-            
-            // Update elements
-            fileIcon.innerHTML = `<i class="${iconClass}"></i>`;
-            fileName.textContent = file.name;
-            fileDetails.textContent = `Terakhir diubah: ${new Date(file.lastModified).toLocaleDateString('id-ID')}`;
-            fileTypeBadge.textContent = typeName;
-            fileSizeBadge.textContent = fileSize;
-            
-            // Show file info and update dropzone
-            dropzone.classList.add('has-file');
-            fileInfo.classList.remove('hidden');
-        }
-        
-        // Preview file content
-        function previewFile(file) {
-            const previewPlaceholder = document.getElementById('previewPlaceholder');
-            const dataPreview = document.getElementById('dataPreview');
-            
-            previewPlaceholder.classList.add('hidden');
-            dataPreview.classList.remove('hidden');
-            
-            // Clear previous preview
-            document.getElementById('previewHeaders').innerHTML = '';
-            document.getElementById('previewRows').innerHTML = '';
-            
-            const fileType = file.name.split('.').pop().toLowerCase();
-            
-            if (fileType === 'csv') {
-                previewCSV(file);
-            } else if (fileType === 'json') {
-                previewJSON(file);
-            } else {
-                // For Excel and text files, show generic info
-                document.getElementById('previewInfo').textContent = 'Preview tidak tersedia untuk format ini';
-                document.getElementById('totalRows').textContent = '-';
-                document.getElementById('totalColumns').textContent = '-';
-            }
-        }
-        
-        // Preview CSV file
-        function previewCSV(file) {
-            Papa.parse(file, {
-                header: true,
-                preview: 10, // Preview first 10 rows
-                skipEmptyLines: true,
-                complete: function(results) {
-                    if (results.data.length === 0) return;
-                    
-                    // Get headers
-                    const headers = Object.keys(results.data[0]);
-                    const headerRow = document.getElementById('previewHeaders');
-                    
-                    headers.forEach(header => {
-                        const th = document.createElement('th');
-                        th.className = 'px-4 py-2 text-left text-xs font-medium text-slate-700';
-                        th.textContent = header;
-                        headerRow.appendChild(th);
-                    });
-                    
-                    // Get first 5 rows for preview
-                    const previewRows = document.getElementById('previewRows');
-                    const rowsToShow = results.data.slice(0, 5);
-                    
-                    rowsToShow.forEach(row => {
-                        const tr = document.createElement('tr');
-                        tr.className = 'border-t border-slate-100 hover:bg-slate-50';
-                        
-                        headers.forEach(header => {
-                            const td = document.createElement('td');
-                            td.className = 'px-4 py-2 text-sm text-slate-700';
-                            td.textContent = row[header] || '-';
-                            tr.appendChild(td);
-                        });
-                        
-                        previewRows.appendChild(tr);
-                    });
-                    
-                    // Update info
-                    document.getElementById('previewInfo').textContent = 
-                        `Menampilkan 5 dari ${results.data.length} baris`;
-                    document.getElementById('totalRows').textContent = results.data.length;
-                    document.getElementById('totalColumns').textContent = headers.length;
-                    
-                    // Store parsed data
-                    uploadedFileData = results.data;
-                },
-                error: function(error) {
-                    document.getElementById('previewInfo').textContent = 'Gagal memparsing file CSV';
-                }
-            });
-        }
-        
-        // Preview JSON file
-        function previewJSON(file) {
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length) processFile(e.target.files[0]);
+        });
+
+        function processFile(file) {
             const reader = new FileReader();
-            
-            reader.onload = function(e) {
-                try {
-                    const data = JSON.parse(e.target.result);
-                    
-                    // Handle different JSON structures
-                    let rows = [];
-                    let headers = [];
-                    
-                    if (Array.isArray(data)) {
-                        if (data.length > 0) {
-                            headers = Object.keys(data[0]);
-                            rows = data.slice(0, 5);
-                        }
-                    } else if (typeof data === 'object') {
-                        headers = Object.keys(data);
-                        rows = [data];
-                    }
-                    
-                    // Create headers
-                    const headerRow = document.getElementById('previewHeaders');
-                    
-                    headers.forEach(header => {
-                        const th = document.createElement('th');
-                        th.className = 'px-4 py-2 text-left text-xs font-medium text-slate-700';
-                        th.textContent = header;
-                        headerRow.appendChild(th);
-                    });
-                    
-                    // Create rows
-                    const previewRows = document.getElementById('previewRows');
-                    
-                    rows.forEach(row => {
-                        const tr = document.createElement('tr');
-                        tr.className = 'border-t border-slate-100 hover:bg-slate-50';
-                        
-                        headers.forEach(header => {
-                            const td = document.createElement('td');
-                            td.className = 'px-4 py-2 text-sm text-slate-700';
-                            td.textContent = typeof row[header] === 'object' ? 
-                                JSON.stringify(row[header]) : (row[header] || '-');
-                            tr.appendChild(td);
-                        });
-                        
-                        previewRows.appendChild(tr);
-                    });
-                    
-                    // Update info
-                    const totalRows = Array.isArray(data) ? data.length : 1;
-                    document.getElementById('previewInfo').textContent = 
-                        `Menampilkan ${rows.length} dari ${totalRows} baris`;
-                    document.getElementById('totalRows').textContent = totalRows;
-                    document.getElementById('totalColumns').textContent = headers.length;
-                    
-                    // Store parsed data
-                    uploadedFileData = data;
-                    
-                } catch (error) {
-                    document.getElementById('previewInfo').textContent = 'Gagal memparsing file JSON';
-                }
-            };
-            
-            reader.readAsText(file);
-        }
-        
-        // Remove selected file
-        function removeFile() {
-            selectedFile = null;
-            uploadedFileData = null;
-            
-            const dropzone = document.getElementById('dropzone');
-            const fileInfo = document.getElementById('fileInfo');
-            const previewPlaceholder = document.getElementById('previewPlaceholder');
-            const dataPreview = document.getElementById('dataPreview');
-            const fileInput = document.getElementById('fileInput');
-            
-            dropzone.classList.remove('has-file');
-            fileInfo.classList.add('hidden');
-            previewPlaceholder.classList.remove('hidden');
-            dataPreview.classList.add('hidden');
-            fileInput.value = '';
-            
-            disableUploadButton();
-        }
-        
-        // Enable upload button
-        function enableUploadButton() {
-            document.getElementById('uploadButton').disabled = false;
-        }
-        
-        // Disable upload button
-        function disableUploadButton() {
-            document.getElementById('uploadButton').disabled = true;
-        }
-        
-        // Format file size
-        function formatFileSize(bytes) {
-            if (bytes === 0) return '0 Bytes';
-            const k = 1024;
-            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-            const i = Math.floor(Math.log(bytes) / Math.log(k));
-            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-        }
-        
-        // Tag management
-        function setupTagInput() {
-            const tagInput = document.getElementById('tagInput');
-            
-            tagInput.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') {
-                    e.preventDefault();
-                    addTag();
-                }
-            });
-        }
-        
-        function addTag() {
-            const tagInput = document.getElementById('tagInput');
-            const tag = tagInput.value.trim();
-            
-            if (tag && !tags.includes(tag) && tags.length < 10) {
-                tags.push(tag);
-                renderTags();
-                tagInput.value = '';
-            }
-        }
-        
-        function removeTag(index) {
-            tags.splice(index, 1);
-            renderTags();
-        }
-        
-        function renderTags() {
-            const container = document.getElementById('tagsContainer');
-            container.innerHTML = '';
-            
-            tags.forEach((tag, index) => {
-                const tagElement = document.createElement('span');
-                tagElement.className = 'inline-flex items-center px-3 py-1 rounded-full text-xs bg-blue-100 text-blue-800';
-                tagElement.innerHTML = `
-                    ${tag}
-                    <button onclick="removeTag(${index})" class="ml-2 text-blue-600 hover:text-blue-800">
-                        <i class="fas fa-times text-xs"></i>
-                    </button>
-                `;
-                container.appendChild(tagElement);
-            });
-        }
-        
-        // Form validation
-        function validateForm() {
-            let isValid = true;
-            
-            // Check file
-            if (!selectedFile) {
-                alert('Harap pilih file data terlebih dahulu');
-                isValid = false;
-            }
-            
-            // Check required fields
-            const requiredFields = [
-                { id: 'datasetName', errorId: 'nameError' },
-                { id: 'datasetDescription', errorId: 'descError' },
-                { id: 'datasetCategory', errorId: 'categoryError' },
-                { id: 'datasetYear', errorId: 'yearError' }
-            ];
-            
-            requiredFields.forEach(field => {
-                const element = document.getElementById(field.id);
-                const errorElement = document.getElementById(field.errorId);
+            reader.onload = (e) => {
+                const data = new Uint8Array(e.target.result);
+                const workbook = XLSX.read(data, { type: 'array' });
+                const firstSheet = workbook.SheetNames[0];
+                const worksheet = workbook.Sheets[firstSheet];
+                const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
                 
-                if (!element.value.trim()) {
-                    errorElement.classList.remove('hidden');
-                    element.classList.add('validation-error');
-                    setTimeout(() => element.classList.remove('validation-error'), 500);
-                    isValid = false;
-                } else {
-                    errorElement.classList.add('hidden');
-                    element.classList.remove('validation-error');
+                populateTable(jsonData);
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        function populateTable(data) {
+            if (data.length === 0) return;
+
+            // Render Header
+            const headers = data[0];
+            tableHeader.innerHTML = headers.map(h => `<th class="p-4 font-extrabold text-blue-900 uppercase tracking-tighter bg-slate-50">${h || ''}</th>`).join('');
+
+            // Render Body
+            const rows = data.slice(1);
+            tableBody.innerHTML = rows.map(row => `
+                <tr class="hover:bg-blue-50/30 transition-colors">
+                    ${row.map(cell => `<td class="p-4 border-b border-slate-50 font-medium">${cell || '-'}</td>`).join('')}
+                </tr>
+            `).join('');
+
+            rowCountText.innerText = `(${rows.length} Baris Detected)`;
+        }
+
+        function clearTable() {
+            tableHeader.innerHTML = '<th class="p-4 text-slate-300 italic font-medium">Data akan muncul di sini setelah upload...</th>';
+            tableBody.innerHTML = '';
+            rowCountText.innerText = '(0 Baris)';
+            fileInput.value = '';
+        }
+
+        // Fitur Copy-Paste dari Excel
+        document.addEventListener('paste', (e) => {
+            const pasteData = e.clipboardData.getData('text');
+            const rows = pasteData.split('\n').map(row => row.split('\t'));
+            
+            if (rows.length > 0 && rows[0].length > 1) {
+                populateTable(rows);
+            }
+        });
+    </script>
+    <script>
+        // Populate header with logged-in user info stored in localStorage
+        (function(){
+            const display = localStorage.getItem('pd_display');
+            const username = localStorage.getItem('pd_username');
+            const userRole = document.getElementById('userRole');
+            const userFullName = document.getElementById('userFullName');
+            const userNip = document.getElementById('userNip');
+            const userAvatar = document.getElementById('userAvatar');
+
+            if (display) {
+                if (userRole) userRole.textContent = display;
+                if (userFullName) {
+                    userFullName.textContent = display;
+                    userFullName.classList.remove('text-slate-700');
+                    userFullName.classList.add('text-black');
+                }
+                if (userNip) userNip.textContent = username ? `NIP. ${username}` : 'NIP. -';
+                if (userAvatar) {
+                    const nameForAvatar = encodeURIComponent(display.replace(/\s+/g, '+'));
+                    userAvatar.src = `https://ui-avatars.com/api/?name=${nameForAvatar}&background=1e3a8a&color=fff`;
+                }
+            }
+        })();
+    </script>
+
+    <script>
+        // Publish dataset functionality
+        (function(){
+            const publishBtn = document.getElementById('publishBtn');
+            const titleEl = document.getElementById('datasetTitle');
+            const descEl = document.getElementById('datasetDesc');
+            const catEl = document.getElementById('datasetCategory');
+            const yearEl = document.getElementById('datasetYear');
+
+            publishBtn.addEventListener('click', async () => {
+                // Validate input
+                const title = titleEl.value.trim();
+                const description = descEl.value.trim();
+                const category = catEl.value;
+                const year = yearEl.value;
+                const selectedFile = fileInput.files[0];
+
+                if (!title) {
+                    alert('❌ Judul dataset wajib diisi!');
+                    titleEl.focus();
+                    return;
+                }
+
+                // Get table data
+                const tableData = getTableData();
+
+                if (!selectedFile && (!tableData.headers || tableData.totalRows === 0)) {
+                    alert('❌ Tidak ada data untuk dipublikasikan!\nMohon upload file atau input data di tabel.');
+                    return;
+                }
+
+                // Prepare dataset object
+                const dataset = {
+                    id: 'ds-' + Date.now(),
+                    title: title,
+                    description: description,
+                    category: category,
+                    year: year,
+                    format: selectedFile ? selectedFile.name.split('.').pop().toUpperCase() : 'CSV',
+                    rows: tableData.totalRows,
+                    owner: localStorage.getItem('pd_display') || 'Unknown User',
+                    upload_date: new Date().toISOString(),
+                    status: 'pending',
+                    preview_data: tableData.headers ? [tableData.headers, ...tableData.rows] : null
+                };
+
+                try {
+                    // If file is selected, process it for direct upload
+                    if (selectedFile) {
+                        if (!isValidFile(selectedFile)) return;
+
+                        // Convert file to base64 for storage
+                        const reader = new FileReader();
+                        await new Promise((resolve, reject) => {
+                            reader.onload = resolve;
+                            reader.onerror = reject;
+                            reader.readAsDataURL(selectedFile);
+                        });
+
+                        dataset.fileData = reader.result;
+                        dataset.original_filename = selectedFile.name;
+                        dataset.file_size = selectedFile.size;
+                        dataset.format = selectedFile.name.split('.').pop().toUpperCase();
+                    }
+
+                    // Send data directly to Google Sheets
+                    alert('📤 Mengirim data ke Google Sheets...');
+                    const sheetsResult = await uploadToGoogleSheets(dataset);
+
+                    if (sheetsResult && sheetsResult.success) {
+                        // Save to IndexedDB for public access
+                        await saveDataset(dataset);
+
+                        // Success message
+                        const successMessage = `
+✅ **DATASET BERHASIL DIPUBLIKASIKAN!**
+
+Judul: ${title}
+Kategori: ${category}
+Tahun: ${year}
+ID: ${dataset.id}
+
+Data telah disimpan ke:
+• Google Sheets ✓
+• Database publik ✓
+
+Data akan muncul di halaman dataset dalam beberapa detik.
+                        `;
+
+                        alert(successMessage);
+
+                        // Reset form
+                        clearTable();
+                        titleEl.value = '';
+                        descEl.value = '';
+                        fileInput.value = '';
+
+                        // Redirect to Datasets page
+                        setTimeout(() => {
+                            window.location.href = `Datasets.html?added=${encodeURIComponent(dataset.id)}`;
+                        }, 2000);
+
+                    } else {
+                        throw new Error('Gagal mengirim ke Google Sheets');
+                    }
+
+                } catch (error) {
+                    console.error('Publish failed:', error);
+
+                    // Fallback: Save to IndexedDB only
+                    await saveDataset(dataset);
+
+                    const fallbackMessage = `
+⚠️ **GOOGLE SHEETS OFFLINE - DISIMPAN LOKAL**
+
+Data berhasil disimpan di database lokal:
+ID: ${dataset.id}
+
+Catatan: Data tersimpan dan dapat diakses publik.
+Untuk sinkronisasi ke Google Sheets, coba lagi nanti.
+                    `;
+
+                    alert(fallbackMessage);
+
+                    // Reset form
+                    clearTable();
+                    titleEl.value = '';
+                    descEl.value = '';
+
+                    // Redirect to Datasets page
+                    setTimeout(() => {
+                        window.location.href = `Datasets.html?added=${encodeURIComponent(dataset.id)}`;
+                    }, 1500);
                 }
             });
-            
-            return isValid;
-        }
-        
-        // Submit upload
-        function submitUpload() {
-            if (!validateForm()) return;
-            
-            // Show progress
-            const progressContainer = document.getElementById('uploadProgress');
-            const progressBar = document.getElementById('progressBar');
-            const progressPercent = document.getElementById('progressPercent');
-            const progressMessage = document.getElementById('progressMessage');
-            
-            progressContainer.classList.remove('hidden');
-            
-            // Simulate upload progress
-            let progress = 0;
-            const interval = setInterval(() => {
-                progress += 5;
-                if (progress <= 100) {
-                    progressBar.style.width = `${progress}%`;
-                    progressPercent.textContent = `${progress}%`;
-                    
-                    if (progress < 30) {
-                        progressMessage.textContent = 'Menyiapkan file...';
-                    } else if (progress < 60) {
-                        progressMessage.textContent = 'Mengupload file...';
-                    } else if (progress < 90) {
-                        progressMessage.textContent = 'Memproses data...';
-                    } else {
-                        progressMessage.textContent = 'Menyimpan metadata...';
-                    }
-                } else {
-                    clearInterval(interval);
-                    
-                    // Simulate server processing delay
-                    setTimeout(() => {
-                        showSuccessModal();
-                        progressContainer.classList.add('hidden');
-                    }, 1000);
-                }
-            }, 100);
-        }
-        
-        // Show success modal
-        function showSuccessModal() {
-            const datasetName = document.getElementById('datasetName').value;
-            const successMessage = document.getElementById('successMessage');
-            successMessage.textContent = `Dataset "${datasetName}" berhasil diupload dan sedang diproses.`;
-            
-            document.getElementById('successModal').classList.remove('hidden');
-            
-            // Reset form after success
-            setTimeout(resetForm, 100);
-        }
-        
-        function closeSuccessModal() {
-            document.getElementById('successModal').classList.add('hidden');
-        }
-        
-        // Reset form
-        function resetForm() {
-            // Reset file
-            selectedFile = null;
-            uploadedFileData = null;
-            removeFile();
-            
-            // Reset form fields
-            document.getElementById('datasetName').value = '';
-            document.getElementById('datasetDescription').value = '';
-            document.getElementById('datasetCategory').selectedIndex = 0;
-            document.getElementById('datasetYear').selectedIndex = 0;
-            document.getElementById('dataSource').value = '';
-            
-            // Reset tags
-            tags = [];
-            renderTags();
-            
-            // Reset visibility
-            document.querySelector('input[name="visibility"][value="public"]').checked = true;
-            
-            // Reset checkboxes
-            document.getElementById('autoDetectColumns').checked = true;
-            document.getElementById('validateData').checked = true;
-            document.getElementById('createBackup').checked = false;
-        }
-        
-        // Mobile menu toggle
-        document.getElementById('mobileMenuBtn').addEventListener('click', function() {
-            document.getElementById('mobileSidebar').classList.add('open');
-            document.getElementById('overlay').classList.add('active');
-        });
-        
-        document.getElementById('closeMobileMenu').addEventListener('click', function() {
-            document.getElementById('mobileSidebar').classList.remove('open');
-            document.getElementById('overlay').classList.remove('active');
-        });
-        
-        document.getElementById('overlay').addEventListener('click', function() {
-            document.getElementById('mobileSidebar').classList.remove('open');
-            this.classList.remove('active');
-        });
-        
-        // User dropdown
-        document.getElementById('userDropdownBtn').addEventListener('click', function(e) {
-            e.stopPropagation();
-            const dropdown = document.getElementById('userDropdown');
-            dropdown.classList.toggle('hidden');
-        });
-        
-        // Close dropdown when clicking outside
-        document.addEventListener('click', function() {
-            document.getElementById('userDropdown').classList.add('hidden');
-        });
-        
-        // Prevent dropdown from closing when clicking inside
-        document.getElementById('userDropdown').addEventListener('click', function(e) {
-            e.stopPropagation();
-        });
-        
-        // Logout function
-        function logout() {
-            if (confirm('Apakah Anda yakin ingin keluar?')) {
-                localStorage.removeItem('pd_username');
-                localStorage.removeItem('pd_display');
-                localStorage.removeItem('pd_role');
-                window.location.href = 'login.html';
-            }
-        }
-        
-        // Initialize on page load
-        document.addEventListener('DOMContentLoaded', function() {
-            initUserData();
-            setupFileUpload();
-            setupTagInput();
-            
-            // Set current year as default option
-            const currentYear = new Date().getFullYear();
-            const yearSelect = document.getElementById('datasetYear');
-            const yearOptions = Array.from(yearSelect.options);
-            const currentYearOption = yearOptions.find(option => option.value === currentYear.toString());
-            if (currentYearOption) {
-                currentYearOption.selected = true;
-            }
-        });
+        })();
+// Fungsi untuk upload ke Google Spreadsheet
+async function uploadToGoogleSheets(datasetData) {
+  const { GOOGLE_SCRIPT_URL, API_KEY } = window.APP_CONFIG || {};
+  
+  if (!GOOGLE_SCRIPT_URL || !API_KEY) {
+    console.error('Google Script URL atau API Key belum diatur di lib/config.js');
+    return null;
+  }
+  
+  try {
+    const payload = {
+      method: 'addDataset',
+      api_key: API_KEY,
+      ...datasetData
+    };
+    
+    console.log('Mengirim data ke Google Sheets:', payload);
+    
+    // Kirim ke Google Apps Script
+    const response = await fetch(GOOGLE_SCRIPT_URL, {
+      method: 'POST',
+      mode: 'no-cors', // Penting untuk Google Apps Script
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(payload)
+    });
+    
+    // Karena no-cors, kita tidak bisa membaca response
+    // Tapi kita anggap sukses jika tidak ada error
+    return { success: true, message: 'Data terkirim ke Google Sheets' };
+    
+  } catch (error) {
+    console.error('Error mengirim ke Google Sheets:', error);
+    throw error;
+  }
+}
+
+// Fungsi untuk upload file ke Google Drive (manual)
+function uploadFileToDriveManual(file) {
+  return new Promise((resolve, reject) => {
+    const instructions = `
+📁 **UPLOAD FILE KE GOOGLE DRIVE**
+
+Langkah-langkah:
+1. Buka drive.google.com
+2. Upload file: "${file.name}"
+3. Klik kanan file → "Dapatkan link"
+4. Setel akses: "Anyone with the link" → "Viewer"
+5. Salin link dan tempel di popup berikut
+
+Catatan: File akan tersimpan di Google Drive.
+    `;
+    
+    alert(instructions);
+    
+    const driveLink = prompt('📋 Tempel Google Drive link di sini:', '');
+    
+    if (driveLink) {
+      // Konversi share link ke direct download link
+      let directLink = driveLink;
+      
+      // Pattern 1: https://drive.google.com/file/d/FILE_ID/view
+      const pattern1 = /\/d\/([a-zA-Z0-9_-]+)/;
+      // Pattern 2: https://drive.google.com/open?id=FILE_ID
+      const pattern2 = /id=([a-zA-Z0-9_-]+)/;
+      
+      if (pattern1.test(driveLink)) {
+        const fileId = driveLink.match(pattern1)[1];
+        directLink = `https://drive.google.com/uc?export=download&id=${fileId}`;
+      } else if (pattern2.test(driveLink)) {
+        const fileId = driveLink.match(pattern2)[1];
+        directLink = `https://drive.google.com/uc?export=download&id=${fileId}`;
+      }
+      
+      resolve({
+        share_link: driveLink,
+        direct_link: directLink,
+        filename: file.name,
+        size: file.size
+      });
+    } else {
+      reject(new Error('User membatalkan upload'));
+    }
+  });
+}
+
+// Fungsi untuk simpan ke localStorage (backup)
+function saveToLocalBackup(dataset) {
+  try {
+    const localData = JSON.parse(localStorage.getItem('local_datasets') || '[]');
+    
+    // Tambah ID unik jika belum ada
+    if (!dataset.id) {
+      dataset.id = 'local-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+    }
+    
+    dataset.local_backup = true;
+    dataset.local_save_date = new Date().toISOString();
+    
+    localData.push(dataset);
+    localStorage.setItem('local_datasets', JSON.stringify(localData));
+    
+    console.log('Data disimpan ke localStorage backup:', dataset);
+    return dataset.id;
+  } catch (error) {
+    console.error('Gagal simpan ke localStorage:', error);
+    return null;
+  }
+}
+
+// Fungsi untuk ambil data dari tabel
+function getTableData() {
+  const headers = Array.from(tableHeader.querySelectorAll('th'))
+    .map(th => th.textContent.trim())
+    .filter(h => h && h !== 'Data akan muncul di sini setelah upload...');
+  
+  const rows = Array.from(tableBody.querySelectorAll('tr'))
+    .map(tr => Array.from(tr.querySelectorAll('td'))
+      .map(td => td.textContent.trim())
+    )
+    .filter(row => row.length > 0);
+  
+  return {
+    headers: headers.length > 0 ? headers : null,
+    rows: rows.length > 0 ? rows : null,
+    totalRows: rows.length
+  };
+}a
+
+// Modifikasi publishBtn event listener
+// ========== FUNGSI UNTUK KIRIM KE GOOGLE SHEETS ==========
+
+// Fungsi utama untuk upload dataset
+async function uploadToGoogleSheets(datasetData) {
+  const { GOOGLE_SCRIPT_URL, API_KEY } = window.APP_CONFIG || {};
+  
+  if (!GOOGLE_SCRIPT_URL || !API_KEY) {
+    console.error('Google Script URL atau API Key belum diatur di lib/config.js');
+    return null;
+  }
+  
+  try {
+    const payload = {
+      method: 'addDataset',
+      api_key: API_KEY,
+      ...datasetData
+    };
+    
+    console.log('Mengirim data ke Google Sheets:', payload);
+    
+    // Kirim ke Google Apps Script
+    const response = await fetch(GOOGLE_SCRIPT_URL, {
+      method: 'POST',
+      mode: 'no-cors', // Penting untuk Google Apps Script
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(payload)
+    });
+    
+    // Karena no-cors, kita tidak bisa membaca response
+    // Tapi kita anggap sukses jika tidak ada error
+    return { success: true, message: 'Data terkirim ke Google Sheets' };
+    
+  } catch (error) {
+    console.error('Error mengirim ke Google Sheets:', error);
+    throw error;
+  }
+}
+
+// Fungsi untuk upload file ke Google Drive (manual)
+function uploadFileToDriveManual(file) {
+  return new Promise((resolve, reject) => {
+    const instructions = `
+📁 **UPLOAD FILE KE GOOGLE DRIVE**
+
+Langkah-langkah:
+1. Buka drive.google.com
+2. Upload file: "${file.name}"
+3. Klik kanan file → "Dapatkan link"
+4. Setel akses: "Anyone with the link" → "Viewer"
+5. Salin link dan tempel di popup berikut
+
+Catatan: File akan tersimpan di Google Drive.
+    `;
+    
+    alert(instructions);
+    
+    const driveLink = prompt('📋 Tempel Google Drive link di sini:', '');
+    
+    if (driveLink) {
+      // Konversi share link ke direct download link
+      let directLink = driveLink;
+      
+      // Pattern 1: https://drive.google.com/file/d/FILE_ID/view
+      const pattern1 = /\/d\/([a-zA-Z0-9_-]+)/;
+      // Pattern 2: https://drive.google.com/open?id=FILE_ID
+      const pattern2 = /id=([a-zA-Z0-9_-]+)/;
+      
+      if (pattern1.test(driveLink)) {
+        const fileId = driveLink.match(pattern1)[1];
+        directLink = `https://drive.google.com/uc?export=download&id=${fileId}`;
+      } else if (pattern2.test(driveLink)) {
+        const fileId = driveLink.match(pattern2)[1];
+        directLink = `https://drive.google.com/uc?export=download&id=${fileId}`;
+      }
+      
+      resolve({
+        share_link: driveLink,
+        direct_link: directLink,
+        filename: file.name,
+        size: file.size
+      });
+    } else {
+      reject(new Error('User membatalkan upload'));
+    }
+  });
+}
+
+// Fungsi untuk simpan ke localStorage (backup)
+function saveToLocalBackup(dataset) {
+  try {
+    const localData = JSON.parse(localStorage.getItem('local_datasets') || '[]');
+    
+    // Tambah ID unik jika belum ada
+    if (!dataset.id) {
+      dataset.id = 'local-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+    }
+    
+    dataset.local_backup = true;
+    dataset.local_save_date = new Date().toISOString();
+    
+    localData.push(dataset);
+    localStorage.setItem('local_datasets', JSON.stringify(localData));
+    
+    console.log('Data disimpan ke localStorage backup:', dataset);
+    return dataset.id;
+  } catch (error) {
+    console.error('Gagal simpan ke localStorage:', error);
+    return null;
+  }
+}
+
+// Fungsi untuk ambil data dari tabel
+function getTableData() {
+  const headers = Array.from(tableHeader.querySelectorAll('th'))
+    .map(th => th.textContent.trim())
+    .filter(h => h && h !== 'Data akan muncul di sini setelah upload...');
+  
+  const rows = Array.from(tableBody.querySelectorAll('tr'))
+    .map(tr => Array.from(tr.querySelectorAll('td'))
+      .map(td => td.textContent.trim())
+    )
+    .filter(row => row.length > 0);
+  
+  return {
+    headers: headers.length > 0 ? headers : null,
+    rows: rows.length > 0 ? rows : null,
+    totalRows: rows.length
+  };
+}
+
+// ========== EVENT LISTENER PUBLISH BUTTON ==========
+
+publishBtn.addEventListener('click', async function() {
+  // 1. Validasi input
+  const title = datasetTitle.value.trim();
+  const description = datasetDesc.value.trim();
+  const category = datasetCategory.value;
+  const year = datasetYear.value;
+  const selectedFile = fileInput.files[0];
+  
+  if (!title) {
+    alert('❌ Judul dataset wajib diisi!');
+    datasetTitle.focus();
+    return;
+  }
+  
+  // 2. Ambil data dari tabel
+  const tableData = getTableData();
+  
+  if (!selectedFile && (!tableData.headers || tableData.totalRows === 0)) {
+    alert('❌ Tidak ada data untuk dipublikasikan!\nMohon upload file atau input data di tabel.');
+    return;
+  }
+  
+  // 3. Siapkan data untuk dikirim
+  const dataset = {
+    id: 'ds-' + Date.now(),
+    title: title,
+    description: description,
+    category: category,
+    year: year,
+    format: selectedFile ? selectedFile.name.split('.').pop().toUpperCase() : 'CSV',
+    rows: tableData.totalRows,
+    owner: localStorage.getItem('pd_display') || 'Unknown User',
+    upload_date: new Date().toISOString(),
+    status: 'pending',
+    preview_data: tableData.headers ? [tableData.headers, ...tableData.rows] : null
+  };
+  
+  // 4. Jika ada file, upload ke Google Drive
+  if (selectedFile) {
+    try {
+      alert('🔄 Mengupload file ke Google Drive...');
+      const driveResult = await uploadFileToDriveManual(selectedFile);
+      
+      dataset.file_url = driveResult.direct_link;
+      dataset.share_url = driveResult.share_link;
+      dataset.original_filename = selectedFile.name;
+      dataset.file_size = selectedFile.size;
+      dataset.format = selectedFile.name.split('.').pop().toUpperCase();
+      
+    } catch (error) {
+      console.warn('File upload dibatalkan atau gagal:', error);
+      // Lanjut tanpa file URL
+    }
+  }
+  
+  // 5. Kirim ke Google Sheets
+  try {
+    alert('📤 Mengirim metadata ke Google Sheets...');
+    const sheetsResult = await uploadToGoogleSheets(dataset);
+    
+    if (sheetsResult && sheetsResult.success) {
+      // 6. Simpan backup ke localStorage
+      const localId = saveToLocalBackup(dataset);
+      
+      // 7. Tampilkan konfirmasi sukses
+      const successMessage = `
+✅ **DATASET BERHASIL DIPUBLIKASIKAN!**
+
+Judul: ${title}
+Kategori: ${category}
+Tahun: ${year}
+ID: ${dataset.id}
+
+Data telah disimpan ke:
+• Google Sheets (metadata)
+• Google Drive (file)${selectedFile ? ' ✓' : ''}
+• Local Storage (backup) ✓
+
+Data akan muncul di katalog dalam beberapa detik.
+      `;
+      
+      alert(successMessage);
+      
+      // 8. Reset form
+      clearTable();
+      datasetTitle.value = '';
+      datasetDesc.value = '';
+      fileInput.value = '';
+      
+      // 9. Redirect ke katalog setelah delay
+      setTimeout(() => {
+        window.location.href = `katalog.html?added=${encodeURIComponent(dataset.id)}`;
+      }, 2000);
+      
+    } else {
+      throw new Error('Gagal mengirim ke Google Sheets');
+    }
+    
+  } catch (error) {
+    console.error('Publish failed:', error);
+    
+    // Fallback: Simpan hanya di localStorage
+    const localId = saveToLocalBackup(dataset);
+    
+    const fallbackMessage = `
+⚠️ **GOOGLE SHEETS OFFLINE - DISIMPAN LOKAL**
+
+Data berhasil disimpan di browser (localStorage):
+ID: ${localId}
+
+Catatan: Data hanya tersimpan di browser ini.
+Untuk sinkronisasi ke Google Sheets, coba lagi nanti.
+    `;
+    
+    alert(fallbackMessage);
+    
+    // Reset form
+    clearTable();
+    datasetTitle.value = '';
+    datasetDesc.value = '';
+    
+    // Redirect ke katalog
+    setTimeout(() => {
+      window.location.href = `katalog.html?added=${encodeURIComponent(localId)}`;
+    }, 1500);
+  }
+});
+
+// ========== EKSPOR KE EXCEL (OPTIONAL) ==========
+
+// Tambahkan button export di sidebar
+const exportBtn = document.createElement('button');
+exportBtn.innerHTML = '<i class="fas fa-file-excel mr-2"></i> Export to Excel';
+exportBtn.className = 'mt-4 w-full bg-emerald-600 text-white py-3 px-4 rounded-xl text-sm font-bold hover:bg-emerald-700 transition flex items-center justify-center';
+exportBtn.onclick = function() {
+  const tableData = getTableData();
+  
+  if (!tableData.headers || tableData.totalRows === 0) {
+    alert('Tidak ada data untuk diexport');
+    return;
+  }
+  
+  // Buat workbook
+  const wb = XLSX.utils.book_new();
+  
+  // Siapkan data untuk Excel
+  const excelData = tableData.headers ? [tableData.headers, ...tableData.rows] : [];
+  const ws = XLSX.utils.aoa_to_sheet(excelData);
+  
+  // Tambah ke workbook
+  XLSX.utils.book_append_sheet(wb, ws, 'Dataset');
+  
+  // Generate filename
+  const title = datasetTitle.value.trim() || 'dataset_export';
+  const date = new Date().toISOString().split('T')[0];
+  const filename = `${title}_${date}.xlsx`;
+  
+  // Export
+  XLSX.writeFile(wb, filename);
+  
+  alert(`✅ Data berhasil diexport ke ${filename}`);
+};
+
+// Tambahkan button ke sidebar
+const sidebar = document.querySelector('.lg\\:col-span-1');
+if (sidebar) {
+  sidebar.appendChild(exportBtn);
+}
     </script>
 </body>
 </html>

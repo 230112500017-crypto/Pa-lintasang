@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Katalog Dataset - Pa'lintasang Data</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="lib/db.js"></script>
+    <script src="lib/helpers.js"></script>
+    <script src="lib/config.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .hero-gradient { background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%); }
+        .accent-makassar { color: #facc15; }
+        .modal-active { display: flex !important; animation: fadeIn 0.2s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-900">
+
+    <div id="detailModal" class="fixed inset-0 z-[100] hidden items-center justify-center bg-blue-900/60 backdrop-blur-sm p-4">
+        <div class="bg-white w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden relative">
+            <button onclick="closeModal()" class="absolute top-4 right-4 text-slate-400 hover:text-rose-500 transition">
+                <i class="fas fa-times-circle text-2xl"></i>
+            </button>
+            <div class="p-8">
+                <div id="modalCategory" class="inline-block text-[10px] font-extrabold uppercase px-3 py-1 rounded-full bg-blue-50 text-blue-600 mb-4 tracking-widest">KATEGORI</div>
+                <h3 id="modalTitle" class="text-xl font-bold text-blue-900 mb-2 leading-tight">Judul Dataset</h3>
+                <div class="flex flex-wrap gap-3 mb-6">
+                    <span class="text-[10px] font-bold text-slate-500 bg-slate-100 px-2 py-1 rounded-lg" id="modalYear">2024</span>
+                    <span class="text-[10px] font-bold text-amber-600 bg-amber-50 px-2 py-1 rounded-lg" id="modalFormat">CSV</span>
+                </div>
+                <p id="modalDesc" class="text-sm text-slate-600 leading-relaxed italic mb-6">Deskripsi lengkap akan muncul di sini.</p>
+                <button class="w-full bg-blue-900 text-white py-3 rounded-2xl text-xs font-bold hover:bg-blue-800 transition">
+                    <i class="fas fa-download mr-2"></i> UNDUH SEKARANG
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <nav class="bg-white/80 backdrop-blur-md sticky top-0 z-50 border-b border-slate-200">
+        <div class="container mx-auto px-6 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <a href="index.html" class="flex items-center space-x-2">
+                    <div class="bg-blue-900 p-1.5 rounded-lg">
+                        <i class="fas fa-route text-white text-lg"></i>
+                    </div>
+                    <h1 class="font-bold text-lg tracking-tight text-blue-900 uppercase">PA'LINTASANG <span class="text-amber-500">DATA</span></h1>
+                </a>
+            </div>
+            <div id="authArea"></div>
+        </div>
+    </nav>
+
+    <header class="hero-gradient text-white pt-12 pb-8 relative">
+        <div class="container mx-auto px-6">
+            <div class="flex flex-col md:flex-row md:items-end justify-between gap-6">
+                <div>
+                    <h2 class="text-3xl font-extrabold italic uppercase leading-none mb-2">Katalog <span class="accent-makassar">Dataset</span></h2>
+                    <p class="text-blue-100 text-[11px] uppercase tracking-widest opacity-70">Manajemen Data Terpadu Dinas Perhubungan Makassar</p>
+                </div>
+                
+                <div class="flex flex-wrap gap-2">
+                    <a href="index.html" class="bg-white/10 hover:bg-white/20 backdrop-blur-sm border border-white/20 px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-wider transition flex items-center">
+                        <i class="fas fa-home mr-2 text-amber-400"></i> Beranda
+                    </a>
+                    <a href="katalog.html" class="bg-amber-500 text-blue-900 px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-wider transition flex items-center shadow-lg shadow-amber-500/20">
+                        <i class="fas fa-database mr-2"></i> Katalog Data
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container mx-auto px-6 py-8">
+        <div class="flex flex-col lg:flex-row gap-6">
+            
+            <aside class="w-full lg:w-1/4">
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 sticky top-24">
+                    <div class="mb-5">
+                        <label class="block text-[10px] font-bold uppercase text-slate-400 mb-2 tracking-widest">Cari Data</label>
+                        <div class="relative">
+                            <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+                            <input type="text" id="searchInput" placeholder="Judul dataset..." class="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:border-blue-500">
+                        </div>
+                    </div>
+
+                    <div class="mb-5">
+                        <label class="block text-[10px] font-bold uppercase text-slate-400 mb-2 tracking-widest">Tahun</label>
+                        <select id="yearFilter" onchange="applyFilters()" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:border-blue-500 font-bold text-blue-900">
+                            <option value="all">Semua Tahun</option>
+                            <option value="2024">2024</option>
+                            <option value="2023">2023</option>
+                            <option value="2022">2022</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-2">
+                        <label class="block text-[10px] font-bold uppercase text-slate-400 mb-2 tracking-widest">Kategori</label>
+                        <div class="space-y-1" id="categoryFilters">
+                            <button onclick="setCategory('all')" class="w-full text-left px-3 py-2 rounded-lg text-xs bg-blue-50 text-blue-700 font-bold cat-btn" data-cat="all">Semua Kategori</button>
+                            <button onclick="setCategory('Lalu Lintas')" class="w-full text-left px-3 py-2 rounded-lg text-xs text-slate-600 cat-btn" data-cat="Lalu Lintas">Lalu Lintas</button>
+                            <button onclick="setCategory('Transportasi')" class="w-full text-left px-3 py-2 rounded-lg text-xs text-slate-600 cat-btn" data-cat="Transportasi">Transportasi Umum</button>
+                            <button onclick="setCategory('Parkir')" class="w-full text-left px-3 py-2 rounded-lg text-xs text-slate-600 cat-btn" data-cat="Parkir">Parkir & Terminal</button>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+            <main class="w-full lg:w-3/4">
+                <div id="datasetGrid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                    </div>
+
+                <div class="mt-10 flex items-center justify-between border-t border-slate-200 pt-6">
+                    <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest" id="pageInfo">Halaman 1</p>
+                    <div class="flex space-x-2">
+                        <button onclick="prevPage()" class="w-10 h-10 bg-white border border-slate-200 rounded-xl flex items-center justify-center hover:bg-slate-50 transition"><i class="fas fa-chevron-left text-xs"></i></button>
+                        <button onclick="nextPage()" class="w-10 h-10 bg-blue-900 text-white rounded-xl flex items-center justify-center shadow-lg shadow-blue-900/20 hover:bg-blue-800 transition"><i class="fas fa-chevron-right text-xs"></i></button>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        // Mock data generator (60 items)
+        let mockDatasets = Array.from({ length: 60 }, (_, i) => ({
+            id: i,
+            title: i % 2 === 0 ? `Analisis Volume Kendaraan Titik ${i + 1}` : `Trayek Angkutan Kota Jalur ${i + 1}`,
+            category: i % 3 === 0 ? 'Lalu Lintas' : (i % 3 === 1 ? 'Transportasi' : 'Parkir'),
+            format: i % 2 === 0 ? 'CSV' : 'JSON',
+            year: (2024 - (i % 3)).toString(),
+            date: `10 Des ${2024 - (i % 3)}`,
+            desc: 'Dataset operasional harian Dinas Perhubungan Kota Makassar untuk analisis kebijakan transportasi.'
+        }));
+
+        // ========== CONFIGURASI GOOGLE SHEETS (dari lib/config.js) ==========
+        const { GOOGLE_SCRIPT_URL, API_KEY } = (window.APP_CONFIG || {});
+        if (!GOOGLE_SCRIPT_URL) console.warn('GOOGLE_SCRIPT_URL not configured. Set lib/config.js');
+
+        // Load datasets: ambil dari Google Sheets (Apps Script) dan fallback ke IndexedDB
+        let allDatasets = [];
+        let filteredData = [];
+        let currentPage = 1;
+        const itemsPerPage = 20;
+        let currentCategory = 'all';
+
+        // Update di katalog.html
+async function loadDatasets() {
+  const { GOOGLE_SCRIPT_URL, API_KEY } = window.APP_CONFIG;
+  
+  try {
+    // Ambil data dari Google Spreadsheet
+    const response = await fetch(
+      `${GOOGLE_SCRIPT_URL}?method=getDatasets&api_key=${API_KEY}`
+    );
+    
+    if (!response.ok) throw new Error('Failed to fetch from Google Sheet');
+    
+    const googleData = await response.json();
+    
+    // Gabungkan dengan data lokal (jika ada)
+    let localData = [];
+    try {
+      localData = await getAllDatasets();
+    } catch (e) {
+      console.warn('Failed to load local data:', e);
+    }
+    
+    // Gabungkan dan hilangkan duplikat
+    allDatasets = [...googleData, ...localData.filter(local => 
+      !googleData.some(google => google.id === local.id)
+    )];
+    
+    // Sort by upload date (newest first)
+    allDatasets.sort((a, b) => 
+      new Date(b.upload_date || b.date) - new Date(a.upload_date || a.date)
+    );
+    
+    filteredData = [...allDatasets];
+    renderDatasets();
+    
+  } catch (error) {
+    console.error('Error loading datasets:', error);
+    
+    // Fallback ke data lokal
+    try {
+      allDatasets = await getAllDatasets();
+      filteredData = [...allDatasets];
+      renderDatasets();
+    } catch (e) {
+      console.error('Local data also failed:', e);
+      // Gunakan data mock sebagai last resort
+      allDatasets = generateMockData();
+      filteredData = [...allDatasets];
+      renderDatasets();
+    }
+  }
+}
+
+        // Generate mock data helper
+        function generateMockData() {
+            return Array.from({ length: 20 }, (_, i) => ({
+                id: `mock-${i}`,
+                title: i % 2 === 0 ? `Dataset Contoh ${i + 1}` : `Data Transportasi ${i + 1}`,
+                category: i % 3 === 0 ? 'Lalu Lintas' : (i % 3 === 1 ? 'Transportasi' : 'Parkir'),
+                description: 'Ini adalah dataset contoh untuk testing',
+                year: '2024',
+                upload_date: new Date().toISOString(),
+                date: new Date().toLocaleDateString('id-ID'),
+                download_count: Math.floor(Math.random() * 100),
+                status: 'active',
+                isMock: true
+            }));
+        }
+
+        // Highlight new dataset on page
+        function highlightNewDataset(id) {
+            setTimeout(() => {
+                const found = allDatasets.find(d => d.id === id);
+                if (found) {
+                    openModal(id);
+                    const card = document.querySelector(`[data-id="${id}"]`);
+                    if (card) {
+                        card.classList.add('ring-4', 'ring-yellow-400', 'shadow-lg');
+                        card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        setTimeout(() => card.classList.remove('ring-4', 'ring-yellow-400', 'shadow-lg'), 5000);
+                    }
+                }
+            }, 800);
+        }
+
+        // Updated renderDatasets to support Google Drive links and cloud/local badges
+        function renderDatasets() {
+            const grid = document.getElementById('datasetGrid');
+            const start = (currentPage - 1) * itemsPerPage;
+            const pageItems = filteredData.slice(start, start + itemsPerPage);
+
+            grid.innerHTML = pageItems.map(item => `
+                <div class="bg-white p-4 rounded-xl border border-slate-200 hover:border-blue-400 transition-all shadow-sm flex flex-col justify-between group" data-id="${item.id}">
+                    <div>
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-[8px] font-black uppercase px-2 py-0.5 rounded-md ${
+                                item.category === 'Lalu Lintas' ? 'bg-blue-50 text-blue-600' : (item.category === 'Transportasi' ? 'bg-purple-50 text-purple-600' : 'bg-green-50 text-green-600')
+                            }">
+                                ${item.category}
+                            </span>
+                            <div class="flex items-center space-x-1">
+                                ${item.google_sheet_id ? '<span class="text-[7px] bg-green-100 text-green-700 px-1 py-0.5 rounded">Cloud</span>' : '<span class="text-[7px] bg-gray-100 text-gray-700 px-1 py-0.5 rounded">Local</span>'}
+                                <span class="text-[9px] font-bold text-slate-300">${item.year || ''}</span>
+                            </div>
+                        </div>
+                        
+                        <h4 class="font-bold text-xs text-blue-900 mb-1 line-clamp-2 leading-tight">${item.title}</h4>
+                        <p class="text-slate-400 text-[10px] line-clamp-2 mb-4 italic">"${item.description || item.desc || 'No description'}"</p>
+                        
+                        <div class="flex items-center justify-between text-[9px] text-slate-500">
+                            <div class="flex items-center"><i class="fas fa-calendar mr-1"></i>${item.date || new Date(item.upload_date).toLocaleDateString('id-ID')}</div>
+                            <div class="flex items-center"><i class="fas fa-download mr-1"></i>${item.download_count || 0}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex gap-2 pt-3 border-t border-slate-50">
+                        <a href="detail.html?id=${item.id}" class="flex-1 bg-slate-100 text-slate-600 py-2 rounded-lg text-[10px] font-bold hover:bg-blue-900 hover:text-white transition uppercase tracking-tighter inline-flex items-center justify-center">
+                            <i class="fas fa-info-circle mr-1 text-[8px]"></i> Detail
+                        </a>
+                        
+                        ${item.file_url ? `
+                            <a href="${item.file_url}" target="_blank" class="px-3 bg-amber-50 text-amber-600 py-2 rounded-lg text-[10px] hover:bg-amber-500 hover:text-white transition inline-flex items-center justify-center">
+                                <i class="fas fa-download"></i>
+                            </a>
+                        ` : `
+                            <a href="detail.html?id=${item.id}&download=1" class="px-3 bg-amber-50 text-amber-600 py-2 rounded-lg text-[10px] hover:bg-amber-500 hover:text-white transition inline-flex items-center justify-center">
+                                <i class="fas fa-download"></i>
+                            </a>
+                        `}
+                    </div>
+                </div>
+            `).join('');
+
+            document.getElementById('pageInfo').innerText = `DATA ${start + 1}-${Math.min(start + itemsPerPage, filteredData.length)} DARI ${filteredData.length}`;
+        }
+
+        function openModal(id) {
+            const item = allDatasets.find(d => d.id == id);
+            document.getElementById('modalTitle').innerText = item.title;
+            document.getElementById('modalCategory').innerText = item.category;
+            document.getElementById('modalDesc').innerText = item.desc;
+            document.getElementById('modalYear').innerText = item.year;
+            document.getElementById('modalFormat').innerText = item.format;
+            document.getElementById('detailModal').classList.add('modal-active');
+        }
+
+        function closeModal() { document.getElementById('detailModal').classList.remove('modal-active'); }
+
+        function applyFilters() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const selectedYear = document.getElementById('yearFilter').value;
+            filteredData = allDatasets.filter(item => {
+                const matchSearch = item.title.toLowerCase().includes(searchTerm);
+                const matchCat = currentCategory === 'all' || item.category === currentCategory;
+                const matchYear = selectedYear === 'all' || item.year === selectedYear;
+                return matchSearch && matchCat && matchYear;
+            });
+            currentPage = 1;
+            renderDatasets();
+        }
+
+        function setCategory(cat) {
+            const mapping = {
+                'Angkutan': 'Transportasi'
+            };
+            const resolved = mapping[cat] || cat;
+            currentCategory = resolved;
+            document.querySelectorAll('.cat-btn').forEach(btn => {
+                btn.classList.remove('bg-blue-50', 'text-blue-700', 'font-bold');
+                btn.classList.add('text-slate-600');
+            });
+            const el = document.querySelector(`[data-cat="${resolved}"]`);
+            if (el) {
+                el.classList.add('bg-blue-50', 'text-blue-700', 'font-bold');
+            }
+            applyFilters();
+        }
+
+        document.getElementById('searchInput').addEventListener('input', applyFilters);
+        function nextPage() { if (currentPage * itemsPerPage < filteredData.length) { currentPage++; renderDatasets(); window.scrollTo({top: 0, behavior: 'smooth'}); } }
+        function prevPage() { if (currentPage > 1) { currentPage--; renderDatasets(); window.scrollTo({top: 0, behavior: 'smooth'}); } }
+
+        // If the page was opened with a category query param, apply it
+        (function applyCategoryFromUrl(){
+            const params = new URLSearchParams(window.location.search);
+            const cat = params.get('category');
+            if (cat) setCategory(cat);
+        })();
+
+        // Update auth area: hide Login when logged-in and show account name (black)
+        (function updateAuthArea(){
+            const auth = document.getElementById('authArea');
+            const display = localStorage.getItem('pd_display');
+            const username = localStorage.getItem('pd_username');
+            if (display) {
+                auth.innerHTML = `<div class="flex items-center space-x-3"><div class="text-sm font-bold text-black">${display}</div><a href="dashboard.html" class="ml-3 bg-blue-900 text-white px-3 py-1 rounded-full text-xs">Dashboard</a></div>`;
+            } else {
+                auth.innerHTML = `<a href="login.html" class="bg-blue-900 text-white px-4 py-1.5 rounded-full text-xs font-semibold hover:bg-amber-500 transition">Login</a>`;
+            }
+        })();
+
+        loadDatasets();
+    </script>
+</body>
+</html>

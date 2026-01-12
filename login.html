@@ -4,280 +4,255 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - Pa'lintasang Data</title>
-    
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700;800&display=swap');
-        
-        body { 
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-        
-        .accent-makassar { 
-            color: #facc15; 
-        }
-        
-        .login-card {
-            background: white;
-            border-radius: 1rem;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
-            transition: transform 0.3s ease;
-        }
-        
-        .login-card:hover {
-            transform: translateY(-5px);
-        }
-        
-        .input-focus:focus {
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-            border-color: #3b82f6;
-        }
-        
-        .btn-login {
-            background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
-            transition: all 0.3s ease;
-        }
-        
-        .btn-login:hover {
-            background: linear-gradient(135deg, #1e40af 0%, #1d4ed8 100%);
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(30, 64, 175, 0.3);
-        }
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .hero-gradient { background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%); }
+        .glass-effect { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); }
     </style>
 </head>
-<body class="flex flex-col min-h-screen">
-    
-    <!-- Simple Navigation -->
-    <nav class="bg-white/90 backdrop-blur-md py-4 border-b border-slate-200">
-        <div class="container mx-auto px-4">
-            <div class="flex justify-between items-center">
-                <a href="index.html" class="flex items-center space-x-2">
-                    <div class="bg-blue-900 p-2 rounded-lg">
-                        <i class="fas fa-route text-white"></i>
+<body class="bg-slate-100 flex items-center justify-center min-h-screen p-4">
+
+    <div class="max-w-4xl w-full bg-white rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col md:flex-row shadow-blue-900/20">
+        
+        <div class="md:w-1/2 hero-gradient p-12 text-white flex flex-col justify-between relative overflow-hidden">
+            <div class="absolute -top-10 -left-10 w-40 h-40 bg-white/10 rounded-full blur-3xl"></div>
+            <div class="absolute -bottom-10 -right-10 w-40 h-40 bg-amber-500/20 rounded-full blur-3xl"></div>
+
+            <div class="relative z-10">
+                <div class="flex items-center space-x-3 mb-8">
+                    <div class="bg-white p-2 rounded-xl">
+                        <i class="fas fa-route text-blue-900 text-xl"></i>
                     </div>
-                    <span class="font-bold text-blue-900 text-lg">
-                        PA'LINTASANG <span class="text-amber-500">DATA</span>
-                    </span>
-                </a>
-                <a href="index.html" class="text-blue-600 hover:text-blue-800 font-medium">
-                    <i class="fas fa-arrow-left mr-1"></i> Kembali
-                </a>
-            </div>
-        </div>
-    </nav>
-    
-    <!-- Main Content -->
-    <main class="flex-grow flex items-center justify-center p-4">
-        <div class="w-full max-w-md">
-            <!-- Login Card -->
-            <div class="login-card p-8">
-                <!-- Header -->
-                <div class="text-center mb-8">
-                    <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <i class="fas fa-user-lock text-blue-600 text-2xl"></i>
-                    </div>
-                    <h1 class="text-2xl font-bold text-blue-900 mb-2">Login ke Sistem</h1>
-                    <p class="text-slate-600">Portal Data Transportasi Kota Makassar</p>
+                    <h1 class="font-bold text-xl tracking-tight uppercase">PA'LINTASANG <span class="text-amber-500">DATA</span></h1>
                 </div>
-                
-                <!-- Login Form -->
-                <form id="loginForm" class="space-y-6">
-                    <!-- Username -->
-                    <div>
-                        <label class="block text-sm font-medium text-slate-700 mb-2">
-                            <i class="fas fa-user mr-2 text-blue-600"></i>Username
-                        </label>
-                        <input 
-                            type="text" 
-                            id="username" 
-                            required
-                            class="input-focus w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none transition"
-                            placeholder="Masukkan username"
-                        >
-                    </div>
-                    
-                    <!-- Password -->
-                    <div>
-                        <div class="flex justify-between items-center mb-2">
-                            <label class="block text-sm font-medium text-slate-700">
-                                <i class="fas fa-key mr-2 text-blue-600"></i>Password
-                            </label>
-                            <a href="forgot-password.html" class="text-xs text-blue-600 hover:text-blue-800">
-                                Lupa password?
-                            </a>
-                        </div>
-                        <input 
-                            type="password" 
-                            id="password" 
-                            required
-                            class="input-focus w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none transition"
-                            placeholder="Masukkan password"
-                        >
-                    </div>
-                    
-                    <!-- Error Message -->
-                    <div id="errorMessage" class="hidden bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
-                        <i class="fas fa-exclamation-triangle mr-2"></i>
-                        <span id="errorText"></span>
-                    </div>
-                    
-                    <!-- Login Button -->
-                    <button 
-                        type="submit"
-                        id="loginButton"
-                        class="btn-login w-full text-white font-bold py-3 px-4 rounded-lg"
-                    >
-                        <i class="fas fa-sign-in-alt mr-2"></i> Login
-                    </button>
-                    
-                    <!-- Demo Accounts -->
-                    <div class="mt-6 pt-6 border-t border-slate-100">
-                        <p class="text-xs text-slate-500 text-center mb-3">Akun demo untuk testing:</p>
-                        <div class="grid grid-cols-3 gap-2">
-                            <button type="button" onclick="fillDemoCredentials('admin')" 
-                                class="text-xs bg-blue-100 hover:bg-blue-200 text-blue-800 py-2 rounded">
-                                Admin
-                            </button>
-                            <button type="button" onclick="fillDemoCredentials('dishub')" 
-                                class="text-xs bg-green-100 hover:bg-green-200 text-green-800 py-2 rounded">
-                                Staff
-                            </button>
-                            <button type="button" onclick="fillDemoCredentials('user')" 
-                                class="text-xs bg-purple-100 hover:bg-purple-200 text-purple-800 py-2 rounded">
-                                User
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <!-- Register Link -->
-                    <div class="text-center mt-6">
-                        <p class="text-slate-600 text-sm">
-                            Belum punya akun?
-                            <a href="register.html" class="text-blue-600 hover:text-blue-800 font-medium ml-1">
-                                Daftar di sini
-                            </a>
-                        </p>
-                    </div>
-                </form>
+                <h2 class="text-3xl font-extrabold italic uppercase leading-tight mb-4">Selamat <br><span class="text-amber-400">Datang Kembali</span></h2>
+                <p class="text-blue-100/80 text-sm leading-relaxed max-w-xs">Masuk ke dashboard untuk mengelola dataset transportasi dan lalu lintas Kota Makassar.</p>
             </div>
-            
-            <!-- Footer Note -->
-            <div class="text-center mt-6 text-white text-sm">
-                <p>© 2025 Dinas Perhubungan Kota Makassar</p>
-                <p class="text-white/70 text-xs mt-1">Sistem Informasi Transportasi Terintegrasi</p>
+
+            <div class="relative z-10 mt-12">
+                <div class="flex items-center space-x-4 text-xs font-bold tracking-widest opacity-60 uppercase">
+                    <span class="w-8 h-[1px] bg-white/40"></span>
+
+                </div>
             </div>
         </div>
-    </main>
-    
-    <!-- JavaScript -->
-    <script>
-        // Login Form Submission
-        document.getElementById('loginForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const username = document.getElementById('username').value.trim();
-            const password = document.getElementById('password').value.trim();
-            const errorMessage = document.getElementById('errorMessage');
-            const errorText = document.getElementById('errorText');
-            const loginButton = document.getElementById('loginButton');
-            
-            // Reset error message
-            errorMessage.classList.add('hidden');
-            
-            // Simple validation
-            if (!username || !password) {
-                errorText.textContent = 'Username dan password harus diisi';
-                errorMessage.classList.remove('hidden');
-                return;
-            }
-            
-            // Show loading state
-            const originalButtonText = loginButton.innerHTML;
-            loginButton.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Memproses...';
-            loginButton.disabled = true;
-            
-            // Simulate API call
-            setTimeout(() => {
-                // Demo credentials
-                let isValidLogin = false;
-                let userData = {};
-                
-                // Check credentials
-                if (username === 'admin' && password === 'admin123') {
-                    isValidLogin = true;
-                    userData = { username: 'admin', display: 'Administrator', role: 'admin' };
-                } else if (username === 'dishub' && password === 'dishub123') {
-                    isValidLogin = true;
-                    userData = { username: 'dishub', display: 'Petugas Dishub', role: 'staff' };
-                } else if (username === 'user' && password === 'user12345') {
-                    isValidLogin = true;
-                    userData = { username: 'user', display: 'Pengguna', role: 'user' };
-                } else if (username === 'demo' && password === 'demo123') {
-                    isValidLogin = true;
-                    userData = { username: 'demo', display: 'Demo User', role: 'user' };
+
+        <div class="md:w-1/2 p-10 md:p-16 bg-white">
+            <div class="mb-10">
+                <h3 class="text-2xl font-bold text-blue-900 mb-2">Login Portal</h3>
+                <p class="text-slate-400 text-xs font-medium">Gunakan akun resmi dinas Anda untuk mengakses data.</p>
+            </div>
+
+            <form id="loginForm" action="#" class="space-y-6">
+                <div>
+                    <label for="usernameInput" class="block text-[10px] font-extrabold uppercase text-slate-400 mb-2 tracking-widest">NIP / Username</label>
+                    <div class="relative">
+                        <i class="fas fa-user absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 text-sm"></i>
+                        <input id="usernameInput" name="username" type="text" placeholder="Masukkan NIP" class="w-full pl-12 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/5 transition">
+                    </div>
+                </div>
+
+                <div>
+                    <div class="flex justify-between mb-2">
+                        <label for="passwordInput" class="block text-[10px] font-extrabold uppercase text-slate-400 tracking-widest">Password</label>
+                        <a href="#" class="text-[10px] font-bold text-blue-600 hover:text-amber-500 uppercase tracking-tighter">Lupa Password?</a>
+                    </div>
+                    <div class="relative">
+                        <i class="fas fa-lock absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 text-sm"></i>
+                        <input id="passwordInput" name="password" type="password" placeholder="••••••••" class="w-full pl-12 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/5 transition">
+                    </div>
+                </div>
+
+                <div class="flex items-center">
+                    <input type="checkbox" id="remember" class="w-4 h-4 text-blue-600 border-slate-300 rounded focus:ring-blue-500">
+                    <label for="remember" class="ml-2 text-xs text-slate-500 font-medium">Ingat perangkat ini</label>
+                </div>
+
+                <button type="submit" class="w-full bg-blue-900 text-white py-4 rounded-2xl text-xs font-bold uppercase tracking-widest hover:bg-blue-800 transition-all shadow-xl shadow-blue-900/20 active:scale-[0.98]">
+                    Masuk Sekarang <i class="fas fa-arrow-right ml-2"></i>
+                </button>
+            </form>
+
+            <script>
+                // Daftar pengguna (username = NIP). Password default: 'P@ss' + last 4 digit NIP
+                const users = {
+                    "198003141999121002": "MUHAMMAD RHEZA,S.STP.M.Si, S.STP,  M.Si",
+                    "197506041997031005": "ANDI TENRI LENGKA,SH, M.Si",
+                    "196908171995032001": "SITTI KHUSNAENI SAKKA MANGGASALI,S.PI",
+                    "198207042001121003": "DARMAWAN,S.STP",
+                    "197812312009011039": "Dr.JUSMAN,S.KEL, M.Si",
+                    "197008232000032005": "ANDI CENDRAWATI,ST,  MT",
+                    "197804072009011003": "SEMMA UPE,ST., MM",
+                    "197006151991031012": "IRWAN,SE.,MM",
+                    "197607072010012012": "EVI YULIA SURYANI SIREGAR,ST, ST.MT",
+                    "197003211998031007": "ABD RAZAQ RASYID,S.Sos .M.Si",
+                    "197702022007011025": "FADLI,S.T",
+                    "197103021995031002": "MANSUR TIMBANG,ST, ST.MM",
+                    "197410142008012008": "HAJRAH,ST., M.T.",
+                    "198001152010011019": "NASRUDDIN M,ST",
+                    "197703032008041002": "IRWAN KARDINANSYAH,ST",
+                    "197804182010012011": "LAILA KURNIATI,S.Kom",
+                    "197804272009011012": "ADY KARTA M.UKKAS,SH., MH",
+                    "198901072010101002": "MUHAMMAD IRLAN RUSLAN,S.STP., M.Si",
+                    "197504242010012010": "EVALINA EVLIN,ST",
+                    "198306132010012032": "AMALIA RASJID,SE",
+                    "198111272009032002": "HIKMAWATI,ST",
+                    "197912222010012021": "SITTI NURBAYA,ST",
+                    "197008281996031006": "IRWAN  M",
+                    "197704022010012013": "VERONICA RUSSA,ST,MT",
+                    "197108051996032005": "LYLIANI SUNARNO,S.Sos",
+                    "198204242009011013": "ANDI ARIFUDDIN,SE",
+                    "199308242017081002": "MUHAMMAD AKBAR RAHMAN,S.STP., M.M",
+                    "199103102014061001": "SYAHMAN ALHADY YUSUF,S.STP",
+                    "199210162015042002": "OKTIVIANA,S.E.,M.M.",
+                    "197601302010011005": "MUHAMMAD NASRI,S.Pi, M.Si",
+                    "197601172009011002": "MUHAMMAD RUSLI ALI,SE",
+                    "198408202005021001": "AMRI MUNIR,ST., M.Tr.A.P",
+                    "199510172018081003": "YUSRIANTO YUSDI,S.STP",
+                    "198009202009011003": "SALAMONG. H,S.Sos",
+                    "198009032010012016": "ANDI FARIDA,S.E",
+                    "198202062010011012": "HASANUDDIN,S.AP",
+                    "198209102008011006": "ANDI ANTO,SE",
+                    "197607022009011002": "OMA MULYONO,S.Sos",
+                    "197306112010012003": "SUKMAWATI. M,SE",
+                    "197406292007011011": "RAMLI,S.H.",
+                    "197807172010011017": "MUHAMMAD RUSLAN RASYID,S.Sos",
+                    "198011172009011008": "ANDI SUNTANA,A.Md",
+                    "197508022002121005": "RUSYANTO",
+                    "196809112010012001": "HASNATI,S.Sos",
+                    "197505102010012009": "SURIANI,A.Md",
+                    "196811032009012001": "SITTI NORMAH,S.E",
+                    "198401072009011003": "RUSTAM DANI,S.Sos",
+                    "198302172010012018": "HARNIA,S.A.P",
+                    "197906212009011002": "SAMSUDDIN,S.AP",
+                    "197303312009011001": "HERMAN, ,S.IP",
+                    "197511202010011008": "HAERUDDIN H,S.H",
+                    "197103112008011003": "NURUDDIN,S.Sos",
+                    "198306192009011001": "MUH. RUSLI S,,S.M",
+                    "197905022009011001": "MUHAMMAD WAHID,S.Ip",
+                    "197807102009011002": "ABDUL RAHMAN,S.AP",
+                    "197710092010011011": "ASDAR,S.Sos",
+                    "196912311991031041": "Drs. ANWAR",
+                    "198205172009011001": "RAHMAN RELI,S.Sos",
+                    "196807182007011023": "MUSTARI,S.T",
+                    "197302022009011003": "ABD. ASIS,S.M",
+                    "196810162009011003": "GASSIN DG. KAMBA",
+                    "198205132010012037": "TRISMAILANY IRWAN",
+                    "197608062008011016": "MUHAMMAD JUSUF",
+                    "197710242009011001": "SYAMSUL BACHRI",
+                    "197411282007011018": "IDRUS",
+                    "197603112009011003": "RUSDI",
+                    "197807272009011002": "SULAEMAN",
+                    "198301012010011034": "LUKMAN  A",
+                    "198006012009011002": "SOLTAN",
+                    "198107232009011001": "KASMIN",
+                    "198309102009011001": "SOFYAN,S.AP",
+                    "197507082009012007": "ST. HABIBA  AS",
+                    "197105192000051001": "ASRI. M",
+                    "197212202007011016": "M.ARIS",
+                    "197609062008011005": "ABDUL MAJID",
+                    "197507312008011009": "RUSTAM",
+                    "197706162014102002": "WAHYUNI SAHID,SPt",
+                    "197001092014071003": "MAS YUSUF",
+                    "197301232010011004": "MUH. WAHYU DG. NAI",
+                    "197012112009011004": "SUPARJO DIPONEGORO",
+                    "197812312009011021": "SANUSI BELLA",
+                    "197305212009011001": "MAMUS",
+                    "198103122010012014": "NURBIAH",
+                    "198412102009011001": "ASRI,-",
+                    "197003032009011001": "KARIM",
+                    // PPPK
+                    "198510272024211001": "BAMBANG SUROSO,S.E",
+                    "198406262025211025": "IRLAN CHRISTI NOER,S.E",
+                    "198005272025211019": "ANDI HENDRO,S.E.",
+                    "199712072024212004": "NURUL HANIFATUL KARIMAH,A.Md.Pi.",
+                    "197203232025212004": "NAPISA",
+                    "198405182025211019": "JAHARUDDIN,-",
+                    "198707252025211025": "ASRULLAH AHMAD,-",
+                    "199705022025211014": "RUSTAM EFENDI",
+                    "196903042025211014": "RUDY MANAN,-",
+                    "200004152025211009": "MUH. ZAINUL MUTTAQIN,-",
+                    "197503292025212004": "ROSITA TANDI",
+                    "197405272025211014": "AWALUDDIN MADJID,-",
+                    "197405112025212013": "SABDA.N,-",
+                    "199604152025211029": "MUHAMMAD APRIANSYAH ISNAIN,-",
+                    "199211282025211022": "MUH WANDY",
+                    "197509172025211009": "HAMZAH,-",
+                    "197605192025211015": "TAMSIL",
+                    "197707022025211019": "YUDI EKO SAPUTRA,-",
+                    "197003262025212003": "MARIANA,-",
+                    "199712262025211017": "FARID ALFALAH ALIF SAPUTRA,-",
+                    "199501062025211020": "MUHAMMAD FARID",
+                    "198708312025211020": "FAISAL,-",
+                    "198908072025211031": "SATRIO HARIMULYO LATEKA,-",
+                    "197105052025211023": "ANSARUDDIN,-",
+                    "196906122025211017": "AMBO TUWO",
+                    "198510202025211033": "RAHMANSYAH,-",
+                    "199505252025212045": "RISKI AMALIA,-",
+                    "197808142025211022": "MUHAMMAD ARIFIN,-",
+                    "198410072025211035": "NUHARDA,-",
+                    "198705032025211035": "A YUDHISTIRA M,-",
+                    "198706032025211042": "ASPIN",
+                    "199308052025212036": "SRI WAYUNI NENGSIH,-",
+                    "197610012025212007": "WIWIK HASTIPA,-",
+                    "198706202025211036": "DANI IRAWAN,-",
+                    "198909262025211020": "M. IRHAS,-",
+                    "199710132024211005": "OKTOBANGUN SAPUTRA",
+                    "198305252024211003": "ANDI MUH. ILYAS",
+                    "198007012024211003": "KAMARUDDIN",
+                    "198408112025211021": "SYAMSUDDIN,-",
+                    "197911262025211014": "ABDUL MA'RUF RAUF,-",
+                    "197712212025212007": "ANDI WETTOENG TUNGKE,-",
+                    "197605022025211026": "SYARIF RAHMAN,-",
+                    "197108182025211013": "HAMZAH,-",
+                    "197705052025211031": "MASSALISI,-",
+                    "197108172025211021": "SANGKALA"
+                };
+
+                function makePassword(nip) {
+                    const s = String(nip).slice(-4);
+                    return 'P@ss' + s;
                 }
-                
-                if (isValidLogin) {
-                    // Store user data
-                    localStorage.setItem('pd_username', userData.username);
-                    localStorage.setItem('pd_display', userData.display);
-                    localStorage.setItem('pd_role', userData.role);
-                    
-                    // Show success
-                    errorMessage.classList.remove('hidden');
-                    errorMessage.classList.remove('bg-red-50', 'border-red-200', 'text-red-700');
-                    errorMessage.classList.add('bg-green-50', 'border-green-200', 'text-green-700');
-                    errorText.innerHTML = '<i class="fas fa-check-circle mr-2"></i> Login berhasil!';
-                    
-                    // Redirect to home
-                    setTimeout(() => {
-                        window.location.href = 'index.html';
-                    }, 1000);
-                    
-                } else {
-                    // Show error
-                    errorText.textContent = 'Username atau password salah';
-                    errorMessage.classList.remove('hidden');
-                    errorMessage.classList.remove('bg-green-50', 'border-green-200', 'text-green-700');
-                    errorMessage.classList.add('bg-red-50', 'border-red-200', 'text-red-700');
-                    
-                    // Reset button
-                    loginButton.innerHTML = originalButtonText;
-                    loginButton.disabled = false;
-                }
-            }, 1000);
-        });
-        
-        // Demo credentials auto-fill
-        function fillDemoCredentials(role) {
-            if (role === 'admin') {
-                document.getElementById('username').value = 'admin';
-                document.getElementById('password').value = 'admin123';
-            } else if (role === 'dishub') {
-                document.getElementById('username').value = 'dishub';
-                document.getElementById('password').value = 'dishub123';
-            } else if (role === 'user') {
-                document.getElementById('username').value = 'user';
-                document.getElementById('password').value = 'user12345';
-            }
-        }
-        
-        // Check if already logged in
-        document.addEventListener('DOMContentLoaded', function() {
-            const username = localStorage.getItem('pd_username');
-            if (username) {
-                window.location.href = 'index.html';
-            }
-        });
-    </script>
+
+                document.getElementById('loginForm').addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    const username = (document.getElementById('usernameInput').value || '').trim();
+                    const password = (document.getElementById('passwordInput').value || '').trim();
+
+                    if (!username) { alert('Masukkan NIP/username terlebih dahulu.'); return; }
+                    if (!password) { alert('Masukkan password.'); return; }
+
+                    if (!users.hasOwnProperty(username)) {
+                        alert('Akun tidak ditemukan. Periksa NIP Anda.');
+                        return;
+                    }
+
+                    const expected = makePassword(username);
+                    if (password === expected) {
+                        // sukses: simpan info minimal dan arahkan ke dashboard
+                        localStorage.setItem('pd_username', username);
+                        localStorage.setItem('pd_display', users[username]);
+                        localStorage.setItem('pd_role', 'Pegawai');
+                        window.location.href = 'dashboard.html';
+                    } else {
+                        alert('Password salah. Password default: P@ss' + String(username).slice(-4));
+                    }
+                });
+            </script>
+
+            <div class="mt-12 text-center">
+                <p class="text-[10px] text-slate-400 font-medium uppercase tracking-tighter">
+                    Belum punya akses? <a href="#" class="text-blue-600 font-bold hover:underline">Hubungi Admin IT</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="fixed -bottom-20 -left-20 w-80 h-80 bg-blue-900/5 rounded-full blur-3xl -z-10"></div>
+    <div class="fixed -top-20 -right-20 w-80 h-80 bg-amber-500/5 rounded-full blur-3xl -z-10"></div>
+
 </body>
 </html>
